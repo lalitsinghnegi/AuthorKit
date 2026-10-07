@@ -1,0 +1,64 @@
+/* Admin UI theme. This styles AuthorKit itself, not the CSS it generates. */
+:root {
+  --ui-bg: #f6f7f9;
+  --ui-surface: #ffffff;
+  --ui-panel: #11182a;
+  --ui-panel-fg: #d7dbe6;
+  --ui-panel-muted: #8a93a8;
+  --ui-panel-active: #2a3554;
+  --ui-fg: #1b2030;
+  --ui-muted: #5c6477;
+  --ui-border: #dfe2e8;
+  --ui-accent: #3156d3;
+  --ui-accent-fg: #ffffff;
+  --ui-focus: #ffbf47;
+  --ui-radius: 6px;
+  --ui-panel-width: 260px;
+  --ui-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ui-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ui-bg: #0f121a;
+    --ui-surface: #171b26;
+    --ui-fg: #e6e8ee;
+    --ui-muted: #9aa2b5;
+    --ui-border: #2a3040;
+    --ui-accent: #6d8cff;
+    --ui-accent-fg: #0b0e16;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}
