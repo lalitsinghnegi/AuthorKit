@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { z } from "zod";
 
@@ -43,6 +43,24 @@ export async function readJson<T>(relativePath: string, schema: z.ZodType<T>): P
     throw err;
   }
   return schema.parse(JSON.parse(raw));
+}
+
+/** Names of the sub-folders (or files, with `files: true`) in a data folder; [] if it does not exist. */
+export async function listEntries(relativePath: string, { files = false } = {}): Promise<string[]> {
+  try {
+    const entries = await readdir(resolveDataPath(relativePath), { withFileTypes: true });
+    return entries.filter((e) => (files ? e.isFile() : e.isDirectory())).map((e) => e.name);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw err;
+  }
+}
+
+/** Remove a file or folder inside the data dir. */
+export async function removeDataPath(relativePath: string): Promise<void> {
+  const target = resolveDataPath(relativePath);
+  if (target === getDataDir()) throw new Error("Refusing to remove the data directory");
+  await rm(target, { recursive: true, force: true });
 }
 
 /** Confirm the data dir exists and is writable by round-tripping a probe file. */

@@ -55,6 +55,7 @@ Rules:
   - `data/projects/<project-id>/project.json` holds the brand, prefix, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
   - `data/scaffold-templates/*.json` holds the scaffold presets.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.
+- **Schemas** live in `src/lib/model/` (zod, one file per entity). Repositories in `src/lib/storage/` are the only code that reads or writes `data/`.
 - **Atomic writes.** Write to a temp file, then rename. A single repository module (`src/lib/storage/`) owns all file access. Validate with zod on every read and write.
 - **Import and export.** The admin can export and import `project.json`, which makes projects portable and easy to keep in git.
 - **Not committed.** `data/` is git-ignored except for seeded presets.
@@ -121,4 +122,6 @@ npm run build        # production build
 - Route handlers that touch the filesystem call `await connection()` so they run at request time.
 - Client components that call `usePathname` sit inside `<Suspense>`, which dynamic routes such as `/projects/[id]` require under cacheComponents.
 - **Panel actions:** each screen adds its left-panel actions with a parallel route, `src/app/@actions/<route>/page.tsx`. Every route needs one, even an empty one. Otherwise, during client-side navigation, the slot keeps showing the previous screen's actions.
+- `notFound()` inside a `<Suspense>` boundary renders the not-found UI but keeps HTTP 200, because streaming has already started. Next.js adds `noindex`. This is expected.
+- Server actions live next to their route (e.g. `src/app/projects/actions.ts`). They validate with zod, return field errors for `useActionState`, and `redirect()` on success.
 - Paths built from `DATA_DIR` use `/*turbopackIgnore: true*/` so the build doesn't bundle runtime data.

@@ -199,3 +199,34 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Panel action variants (links share the button look) */
+a.panelButton {
+  display: block;
+  text-decoration: none;
+}
+
+.panelButton[data-variant="secondary"] {
+  background: transparent;
+  color: var(--ui-panel-fg);
+  border: 1px solid rgb(255 255 255 / 0.25);
+}
+
+.panelButton[data-variant="danger"] {
+  background: transparent;
+  color: #ff8a80;
+  border: 1px solid rgb(255 138 128 / 0.5);
+}
+
+.panelNote {
+  margin: 0;
+  padding-inline: 12px;
+  font-size: 0.8rem;
+  color: #ff8a80;
+}
+
+.fileInput {
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--ui-panel-muted);
+}

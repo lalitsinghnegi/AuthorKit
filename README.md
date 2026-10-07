@@ -32,6 +32,16 @@ npm run dev            # http://localhost:3000
 
 There is no database. Project configuration is saved as JSON files under `DATA_DIR` (default `./data`, git-ignored). Generated CSS and zips are built on demand and never stored.
 
+```
+data/
+  settings.json                  # encrypted Figma token (Prompt 7)
+  projects/<id>/project.json     # brand, prefix, breakpoints, scaffold, Figma links
+  projects/<id>/tokens.json      # design tokens
+  scaffold-templates/<id>.json   # scaffold presets
+```
+
+Projects can be exported and imported as a single JSON file from the Projects screen.
+
 ## Health check
 
 `GET /api/health` returns `{"status":"ok","storage":"ok"}` when the data folder is writable, and returns `503` otherwise.
@@ -45,5 +55,6 @@ src/
     api/health/       # health check
     projects/ templates/ settings/
   components/AppShell # two-pane shell: left action panel + right work area
-  lib/storage/        # atomic JSON file storage (zod-validated)
+  lib/model/          # zod schemas: Project, BreakpointSet, ScaffoldTemplate, FigmaLink, DesignToken, Settings
+  lib/storage/        # repositories: atomic JSON file storage (zod-validated)
 ```
