@@ -73,7 +73,7 @@ async function ProjectOverview({ params }: Pick<PageProps<"/projects/[id]">, "pa
 
         <section className={ui.card} aria-labelledby="scaffold">
           <h2 id="scaffold" className={ui.sectionHeading}>
-            Scaffold
+            Scaffold <Link href={`/projects/${project.id}/scaffold`}>Edit</Link>
           </h2>
           <ul className={ui.tree}>
             <Tree node={project.scaffold} />

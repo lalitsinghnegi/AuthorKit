@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { COMPONENT_PRESET } from "@/lib/scaffold/presets";
+import { cloneWithNewIds } from "@/lib/scaffold/tree";
 import type { BreakpointSet } from "./breakpoints";
-import type { CssTemplateId } from "./cssTemplate";
-import type { FileNode, FolderNode, ScaffoldTree } from "./scaffold";
+import type { ScaffoldTree } from "./scaffold";
 
 export function defaultBreakpoints(): BreakpointSet {
   return {
@@ -13,33 +14,7 @@ export function defaultBreakpoints(): BreakpointSet {
   };
 }
 
-const file = (name: string, cssTemplateId: CssTemplateId | null): FileNode => ({
-  id: randomUUID(),
-  type: "file",
-  name,
-  cssTemplateId,
-});
-const folder = (name: string, children: FolderNode["children"]): FolderNode => ({
-  id: randomUUID(),
-  type: "folder",
-  name,
-  children,
-});
-
-/** Starting scaffold for a new project. The scaffold designer (Prompt 4) adds presets. */
+/** Starting scaffold for a new project: a fresh copy of the component-based preset. */
 export function defaultScaffold(rootName: string): ScaffoldTree {
-  return folder(rootName, [
-    folder("css", [
-      file("tokens.css", "tokens"),
-      file("global.css", "global"),
-      folder("components", [
-        file("header.css", "header"),
-        file("footer.css", "footer"),
-        file("isi.css", "isi"),
-        file("modals.css", "modals"),
-        file("cta.css", "cta"),
-        file("accordion.css", "accordion"),
-      ]),
-    ]),
-  ]);
+  return { ...cloneWithNewIds(COMPONENT_PRESET.tree), name: rootName };
 }

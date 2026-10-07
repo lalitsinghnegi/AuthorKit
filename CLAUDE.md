@@ -53,7 +53,7 @@ Rules:
 
 - **No database.** Project configuration is stored as JSON files on disk:
   - `data/projects/<project-id>/project.json` holds the brand, prefix, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
-  - `data/scaffold-templates/*.json` holds the scaffold presets.
+  - `data/scaffold-templates/*.json` holds the scaffold presets. Built-in presets (Basic, Component-based) live in code (`src/lib/scaffold/presets.ts`), can't be changed or deleted, and are merged into listings.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.
 - **Schemas** live in `src/lib/model/` (zod, one file per entity). Repositories in `src/lib/storage/` are the only code that reads or writes `data/`.
 - **Atomic writes.** Write to a temp file, then rename. A single repository module (`src/lib/storage/`) owns all file access. Validate with zod on every read and write.

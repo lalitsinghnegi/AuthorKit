@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./AppShell.module.css";
 
-/** Sub-navigation for one project. Later prompts add Scaffold, Figma, Tokens and Generate. */
+/** Sub-navigation for one project. Later prompts add Figma, Tokens and Generate. */
 export function ProjectNav({ id, name }: { id: string; name: string }) {
   const pathname = usePathname();
   const base = `/projects/${id}`;
   const items = [
     { href: base, label: "Overview" },
     { href: `${base}/breakpoints`, label: "Breakpoints" },
+    { href: `${base}/scaffold`, label: "Scaffold" },
   ];
 
   return (

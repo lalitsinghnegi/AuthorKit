@@ -74,3 +74,11 @@ export const ScaffoldTemplate = z.object({
   tree: ScaffoldTree.refine(treeIdsAreUnique, "Node ids must be unique"),
 });
 export type ScaffoldTemplate = z.infer<typeof ScaffoldTemplate>;
+
+/** Portable file for sharing a scaffold preset. */
+export const ScaffoldExport = z.object({
+  schemaVersion: SchemaVersion,
+  kind: z.literal("authorkit-scaffold"),
+  template: ScaffoldTemplate,
+});
+export type ScaffoldExport = z.infer<typeof ScaffoldExport>;

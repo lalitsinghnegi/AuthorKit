@@ -13,6 +13,17 @@ export const CSS_TEMPLATE_IDS = [
 ] as const;
 
 export const CssTemplateId = z.enum(CSS_TEMPLATE_IDS);
+
+export const CSS_TEMPLATE_LABELS: Record<(typeof CSS_TEMPLATE_IDS)[number], string> = {
+  tokens: "Design tokens",
+  global: "Global (type, links, base)",
+  header: "Header",
+  footer: "Footer",
+  isi: "ISI and safety bar",
+  modals: "Modals",
+  cta: "CTA buttons",
+  accordion: "Accordion",
+};
 export type CssTemplateId = z.infer<typeof CssTemplateId>;
 
 export const CssTemplate = z.object({

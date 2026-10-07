@@ -21,7 +21,6 @@ const bp = (name: string, minWidth?: number, maxWidth?: number): Breakpoint => (
 
 const standard = () => [bp("mobile", undefined, 767), bp("tablet", 768, 1023), bp("desktop", 1024)];
 
-
 describe("validateBreakpoints", () => {
   it("accepts the standard set and every preset", () => {
     expect(validateBreakpoints(standard())).toEqual([]);

@@ -3,6 +3,7 @@ import { defaultScaffold } from "@/lib/model/defaults";
 import type { ScaffoldTemplate } from "@/lib/model";
 import { withTempDataDir } from "@/test/tempDataDir";
 import {
+  availableTemplateId,
   deleteScaffoldTemplate,
   getScaffoldTemplate,
   listScaffoldTemplates,
@@ -11,20 +12,36 @@ import {
 
 withTempDataDir();
 
-const template = (id: string, name: string, builtIn = false): ScaffoldTemplate => ({
+const template = (id: string, name: string): ScaffoldTemplate => ({
   schemaVersion: 1,
   id,
   name,
-  builtIn,
+  builtIn: false,
   tree: defaultScaffold("root"),
 });
 
 describe("scaffold templates repository", () => {
-  it("saves, lists by name, and reads templates", async () => {
-    await saveScaffoldTemplate(template("component-based", "Component-based"));
-    await saveScaffoldTemplate(template("basic", "Basic"));
-    expect((await listScaffoldTemplates()).map((t) => t.id)).toEqual(["basic", "component-based"]);
-    expect((await getScaffoldTemplate("basic"))?.name).toBe("Basic");
+  it("lists built-ins first, then custom templates by name", async () => {
+    await saveScaffoldTemplate(template("zeta", "Zeta"));
+    await saveScaffoldTemplate(template("alpha", "Alpha"));
+    expect((await listScaffoldTemplates()).map((t) => t.id)).toEqual([
+      "basic",
+      "component-based",
+      "alpha",
+      "zeta",
+    ]);
+    expect((await getScaffoldTemplate("alpha"))?.name).toBe("Alpha");
+    expect((await getScaffoldTemplate("basic"))?.builtIn).toBe(true);
+  });
+
+  it("never marks saved templates as built-in", async () => {
+    await saveScaffoldTemplate({ ...template("sneaky", "Sneaky"), builtIn: true });
+    expect((await getScaffoldTemplate("sneaky"))?.builtIn).toBe(false);
+  });
+
+  it("protects built-in ids from being saved or deleted", async () => {
+    await expect(saveScaffoldTemplate(template("basic", "Mine"))).rejects.toThrow(/Built-in/);
+    await expect(deleteScaffoldTemplate("component-based")).rejects.toThrow(/Built-in/);
   });
 
   it("rejects unsafe ids", async () => {
@@ -32,11 +49,17 @@ describe("scaffold templates repository", () => {
     expect(await getScaffoldTemplate("../x")).toBeNull();
   });
 
-  it("deletes custom templates but not built-in ones", async () => {
+  it("deletes custom templates", async () => {
     await saveScaffoldTemplate(template("mine", "Mine"));
-    await saveScaffoldTemplate(template("basic", "Basic", true));
     await deleteScaffoldTemplate("mine");
-    await expect(deleteScaffoldTemplate("basic")).rejects.toThrow(/Built-in/);
-    expect((await listScaffoldTemplates()).map((t) => t.id)).toEqual(["basic"]);
+    expect(await getScaffoldTemplate("mine")).toBeNull();
+  });
+
+  it("derives free ids from names", async () => {
+    expect(await availableTemplateId("My Preset!")).toBe("my-preset");
+    await saveScaffoldTemplate(template("my-preset", "My Preset"));
+    expect(await availableTemplateId("My Preset")).toBe("my-preset-2");
+    expect(await availableTemplateId("Basic")).toBe("basic-2");
+    expect(await availableTemplateId("!!!")).toBe("preset");
   });
 });
