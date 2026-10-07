@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { PANEL_PORTAL_ID } from "./PanelActions";
 import { SideNav, SideNavFallback } from "./SideNav";
 import styles from "./AppShell.module.css";
 
@@ -67,6 +68,8 @@ export function AppShell({ actions, children }: Props) {
             <SideNav onNavigate={closeDrawer} />
           </Suspense>
           <div className={styles.actions}>{actions}</div>
+          {/* Interactive screens render their actions here via <PanelActions>. */}
+          <div id={PANEL_PORTAL_ID} className={styles.actions} />
         </div>
       </aside>
 

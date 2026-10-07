@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { DeleteProjectButton } from "@/components/AppShell/DeleteProjectButton";
 import { PanelDownload, PanelLink, PanelSection } from "@/components/AppShell/PanelSection";
+import { ProjectNav } from "@/components/AppShell/ProjectNav";
 import { getProject } from "@/lib/storage/projects";
 
 export default function ProjectActions({ params }: PageProps<"/projects/[id]">) {
@@ -17,12 +18,17 @@ async function Actions({ params }: Pick<PageProps<"/projects/[id]">, "params">) 
   if (!project) return null;
 
   return (
-    <PanelSection title="Project">
-      <PanelDownload href={`/api/projects/${project.id}/export`}>Export project.json</PanelDownload>
-      <DeleteProjectButton id={project.id} name={project.name} />
-      <PanelLink href="/projects" variant="secondary">
-        All projects
-      </PanelLink>
-    </PanelSection>
+    <>
+      <ProjectNav id={project.id} name={project.name} />
+      <PanelSection title="Project">
+        <PanelDownload href={`/api/projects/${project.id}/export`}>
+          Export project.json
+        </PanelDownload>
+        <DeleteProjectButton id={project.id} name={project.name} />
+        <PanelLink href="/projects" variant="secondary">
+          All projects
+        </PanelLink>
+      </PanelSection>
+    </>
   );
 }

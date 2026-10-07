@@ -122,6 +122,8 @@ npm run build        # production build
 - Route handlers that touch the filesystem call `await connection()` so they run at request time.
 - Client components that call `usePathname` sit inside `<Suspense>`, which dynamic routes such as `/projects/[id]` require under cacheComponents.
 - **Panel actions:** each screen adds its left-panel actions with a parallel route, `src/app/@actions/<route>/page.tsx`. Every route needs one, even an empty one. Otherwise, during client-side navigation, the slot keeps showing the previous screen's actions.
+- **Interactive panel actions:** when panel buttons need a client editor's state (Save, Fix all), the editor renders them with `<PanelActions>` (`src/components/AppShell/PanelActions.tsx`, a React portal into the panel). The route's `@actions` page then supplies only the static parts, such as `<ProjectNav>`. Portaled actions are client-only and don't appear in the server HTML.
+- **Project menu:** add new project sub-screens to the `items` list in `ProjectNav.tsx`, and give each one an `@actions/projects/[id]/<screen>/page.tsx`.
 - `notFound()` inside a `<Suspense>` boundary renders the not-found UI but keeps HTTP 200, because streaming has already started. Next.js adds `noindex`. This is expected.
 - Server actions live next to their route (e.g. `src/app/projects/actions.ts`). They validate with zod, return field errors for `useActionState`, and `redirect()` on success.
 - Paths built from `DATA_DIR` use `/*turbopackIgnore: true*/` so the build doesn't bundle runtime data.

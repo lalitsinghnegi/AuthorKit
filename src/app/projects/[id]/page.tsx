@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
@@ -48,7 +49,7 @@ async function ProjectOverview({ params }: Pick<PageProps<"/projects/[id]">, "pa
 
         <section className={ui.card} aria-labelledby="breakpoints">
           <h2 id="breakpoints" className={ui.sectionHeading}>
-            Breakpoints
+            Breakpoints <Link href={`/projects/${project.id}/breakpoints`}>Edit</Link>
           </h2>
           <table className={ui.table}>
             <thead>
