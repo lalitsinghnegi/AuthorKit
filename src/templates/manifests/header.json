@@ -1,0 +1,139 @@
+{
+  "id": "header",
+  "name": "Header",
+  "description": "Site header with logo and primary navigation. On small screens the navigation collapses behind a menu button; on large screens it is shown inline.",
+  "fileName": "header.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-header",
+      "purpose": "Header bar: background, shadow, stacking and the responsive layout variables."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-header--sticky",
+      "purpose": "Keeps the header at the top while scrolling."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__inner",
+      "purpose": "Centered, max-width row that holds logo, toggle and nav."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__logo",
+      "purpose": "Logo link; an <img> inside is sized to the logo height token."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__toggle",
+      "purpose": "Menu button for small screens. Must be immediately before __nav."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__nav",
+      "purpose": "Navigation container: a dropdown panel on small screens, inline on large screens."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__list",
+      "purpose": "List of navigation items; stacks on small screens, row on large."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-header__link",
+      "purpose": "Navigation link."
+    }
+  ],
+  "states": [
+    {
+      "name": "menu open",
+      "trigger": "[aria-expanded=\"true\"] on __toggle",
+      "appliesTo": ".{{prefix}}-header__toggle",
+      "description": "Shows the __nav that directly follows the toggle."
+    },
+    {
+      "name": "current page",
+      "trigger": "[aria-current=\"page\"]",
+      "appliesTo": ".{{prefix}}-header__link",
+      "description": "Highlights the link for the current page."
+    },
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": ".{{prefix}}-header__link",
+      "description": "Link color and underline."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-header__link, .{{prefix}}-header__toggle, .{{prefix}}-header__logo",
+      "description": "Keyboard focus outline."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Header with navigation",
+      "html": "<header class=\"{{prefix}}-header {{prefix}}-header--sticky\">\n  <div class=\"{{prefix}}-header__inner\">\n    <a class=\"{{prefix}}-header__logo\" href=\"/\" aria-label=\"Home\"><img src=\"logo.svg\" alt=\"Brand\"></a>\n    <button class=\"{{prefix}}-header__toggle\" type=\"button\" aria-expanded=\"false\" aria-controls=\"site-nav\">Menu</button>\n    <nav class=\"{{prefix}}-header__nav\" id=\"site-nav\" aria-label=\"Main\">\n      <ul class=\"{{prefix}}-header__list\">\n        <li><a class=\"{{prefix}}-header__link\" href=\"#\" aria-current=\"page\">About</a></li>\n        <li><a class=\"{{prefix}}-header__link\" href=\"#\">Treatment</a></li>\n        <li><a class=\"{{prefix}}-header__link\" href=\"#\">Resources</a></li>\n      </ul>\n    </nav>\n  </div>\n</header>"
+    }
+  ],
+  "accessibility": [
+    "Use <header> and <nav aria-label=\"Main\">.",
+    "The menu button toggles aria-expanded and points at the nav with aria-controls.",
+    "Mark the current page link with aria-current=\"page\".",
+    "The logo link needs an accessible name (the img alt or an aria-label)."
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "action": "Moves through logo, menu button and links."
+    },
+    {
+      "keys": "Enter / Space",
+      "action": "On the menu button, opens or closes the navigation."
+    },
+    {
+      "keys": "Escape",
+      "action": "Should close an open menu and return focus to the button (script)."
+    }
+  ],
+  "hooks": [
+    {
+      "attribute": "aria-expanded on .{{prefix}}-header__toggle",
+      "purpose": "Script sets true/false on click; CSS shows the nav when true."
+    }
+  ],
+  "htl": "<header class=\"{{prefix}}-header {{prefix}}-header--sticky\" data-sly-use.nav=\"com.example.models.Navigation\">\n  <div class=\"{{prefix}}-header__inner\">\n    <a class=\"{{prefix}}-header__logo\" href=\"${nav.homeUrl}\"><img src=\"${nav.logo}\" alt=\"${nav.brand}\"></a>\n    <button class=\"{{prefix}}-header__toggle\" type=\"button\" aria-expanded=\"false\" aria-controls=\"site-nav\">Menu</button>\n    <nav class=\"{{prefix}}-header__nav\" id=\"site-nav\" aria-label=\"Main\">\n      <ul class=\"{{prefix}}-header__list\" data-sly-list.item=\"${nav.items}\">\n        <li><a class=\"{{prefix}}-header__link\" href=\"${item.url}\" aria-current=\"${item.active ? 'page' : ''}\">${item.title}</a></li>\n      </ul>\n    </nav>\n  </div>\n</header>",
+  "variables": [
+    "border-width",
+    "color-border",
+    "color-focus",
+    "color-header-background",
+    "color-link",
+    "color-text",
+    "font-weight-bold",
+    "header-bg",
+    "header-color",
+    "header-list-direction",
+    "header-nav-display",
+    "header-nav-padding",
+    "header-nav-position",
+    "header-nav-shadow",
+    "header-shadow",
+    "header-toggle-display",
+    "radius-sm",
+    "shadow-md",
+    "shadow-sm",
+    "size-container-max",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-gutter",
+    "size-header-height",
+    "size-logo-height",
+    "size-touch-target",
+    "space-2",
+    "space-4",
+    "space-5",
+    "z-header"
+  ]
+}

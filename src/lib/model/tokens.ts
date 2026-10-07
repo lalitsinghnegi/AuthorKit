@@ -12,7 +12,11 @@ export const TOKEN_TYPES = [
   "radius",
   "border",
   "shadow",
+  "zIndex",
+  "duration",
+  "size",
 ] as const;
+export type TokenType = (typeof TOKEN_TYPES)[number];
 
 export const DesignToken = z.object({
   id: Id,

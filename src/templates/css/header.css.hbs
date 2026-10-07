@@ -1,0 +1,110 @@
+{{> fileHeader}}
+
+.{{prefix}}-header {
+{{vars "header" "header"}}
+  --{{prefix}}-header-bg: var(--{{prefix}}-color-header-background);
+  --{{prefix}}-header-color: var(--{{prefix}}-color-text);
+  --{{prefix}}-header-shadow: var(--{{prefix}}-shadow-sm);
+
+  position: relative;
+  z-index: var(--{{prefix}}-z-header);
+  background-color: var(--{{prefix}}-header-bg);
+  color: var(--{{prefix}}-header-color);
+  box-shadow: var(--{{prefix}}-header-shadow);
+}
+
+.{{prefix}}-header--sticky {
+  position: sticky;
+  top: 0;
+}
+
+.{{prefix}}-header__inner {
+  display: flex;
+  gap: var(--{{prefix}}-space-4);
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--{{prefix}}-size-container-max);
+  min-height: var(--{{prefix}}-size-header-height);
+  margin: 0 auto;
+  padding: 0 var(--{{prefix}}-size-gutter);
+}
+
+.{{prefix}}-header__logo {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.{{prefix}}-header__logo img {
+  display: block;
+  width: auto;
+  height: var(--{{prefix}}-size-logo-height);
+}
+
+/* Menu button: shown on small screens, hidden where the nav fits inline */
+.{{prefix}}-header__toggle {
+  display: var(--{{prefix}}-header-toggle-display);
+  align-items: center;
+  justify-content: center;
+  min-width: var(--{{prefix}}-size-touch-target);
+  min-height: var(--{{prefix}}-size-touch-target);
+  padding: var(--{{prefix}}-space-2);
+  border: var(--{{prefix}}-border-width) solid var(--{{prefix}}-color-border);
+  border-radius: var(--{{prefix}}-radius-sm);
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.{{prefix}}-header__nav {
+  display: var(--{{prefix}}-header-nav-display);
+  position: var(--{{prefix}}-header-nav-position);
+  top: 100%;
+  right: 0;
+  left: 0;
+  padding: var(--{{prefix}}-header-nav-padding);
+  background-color: var(--{{prefix}}-header-bg);
+  box-shadow: var(--{{prefix}}-header-nav-shadow);
+}
+
+/* Open state: the toggle sits directly before the nav and carries aria-expanded */
+.{{prefix}}-header__toggle[aria-expanded="true"] + .{{prefix}}-header__nav {
+  display: block;
+}
+
+.{{prefix}}-header__list {
+  display: flex;
+  flex-direction: var(--{{prefix}}-header-list-direction);
+  gap: var(--{{prefix}}-space-2) var(--{{prefix}}-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.{{prefix}}-header__list li + li {
+  margin-top: 0;
+}
+
+.{{prefix}}-header__link {
+  display: block;
+  padding: var(--{{prefix}}-space-2) 0;
+  color: var(--{{prefix}}-header-color);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+  text-decoration: none;
+}
+
+.{{prefix}}-header__link:hover,
+.{{prefix}}-header__link[aria-current="page"] {
+  color: var(--{{prefix}}-color-link);
+  text-decoration: underline;
+}
+
+.{{prefix}}-header__toggle:focus-visible,
+.{{prefix}}-header__link:focus-visible,
+.{{prefix}}-header__logo:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+{{> responsive}}

@@ -1,0 +1,15 @@
+{{#each hooks}}
+
+/* @authorkit-responsive {{@root.file.id}} · {{name}} ({{range}}){{#unless rules.length}}: no overrides{{/unless}} */
+{{#if rules.length}}
+@media {{condition}} {
+{{#each rules}}
+  {{selector}} {
+{{#each declarations}}
+    {{property}}: {{value}};
+{{/each}}
+  }
+{{/each}}
+}
+{{/if}}
+{{/each}}

@@ -1,0 +1,134 @@
+{
+  "id": "global",
+  "name": "Global styles",
+  "description": "Base reset, body text, headings h1–h6, paragraphs, sup/sub, links, lists and focus outlines. Applies to bare HTML elements across the page.",
+  "fileName": "global.css",
+  "selectors": [
+    {
+      "type": "html-element",
+      "selector": "body",
+      "purpose": "Base font, size, line height, text and background color."
+    },
+    {
+      "type": "html-element",
+      "selector": "h1, h2, h3, h4, h5, h6",
+      "purpose": "Heading font, weight, line height, spacing and size scale."
+    },
+    {
+      "type": "html-element",
+      "selector": "p",
+      "purpose": "Paragraph spacing."
+    },
+    {
+      "type": "html-element",
+      "selector": "sup, sub",
+      "purpose": "Superscript and subscript that do not change line height (references, trademarks)."
+    },
+    {
+      "type": "html-element",
+      "selector": "a",
+      "purpose": "Link color and underline, with hover color."
+    },
+    {
+      "type": "html-element",
+      "selector": "ul, ol",
+      "purpose": "List spacing and indentation."
+    },
+    {
+      "type": "html-element",
+      "selector": "img",
+      "purpose": "Responsive images that never overflow their container."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h1",
+      "purpose": "h1 styling on another element, when the visual and semantic heading levels differ."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h2",
+      "purpose": "h2 styling on another element."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h3",
+      "purpose": "h3 styling on another element."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h4",
+      "purpose": "h4 styling on another element."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h5",
+      "purpose": "h5 styling on another element."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-h6",
+      "purpose": "h6 styling on another element."
+    }
+  ],
+  "states": [
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": "a",
+      "description": "Links switch to the hover color."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": "*",
+      "description": "Keyboard focus shows a high-contrast outline on any element."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Headings and body text",
+      "html": "<h1>Page title</h1>\n<h2>Section heading</h2>\n<p>Body copy with a <a href=\"#\">link</a> and a reference<sup>1</sup>.</p>\n<ul>\n  <li>First point</li>\n  <li>Second point</li>\n</ul>"
+    },
+    {
+      "title": "Visual heading level different from the semantic level",
+      "html": "<h2 class=\"{{prefix}}-h4\">Looks like an h4, reads as an h2</h2>"
+    }
+  ],
+  "accessibility": [
+    "Keep heading levels in order (h1, then h2, …); use the .{{prefix}}-h* classes to change size without breaking the outline.",
+    "Links are underlined so they are not identified by color alone.",
+    "The :focus-visible outline must not be removed; components rely on it.",
+    "prefers-reduced-motion turns off transitions and animations site-wide."
+  ],
+  "htl": "<h2 class=\"${properties.headingSize ? '{{prefix}}-' + properties.headingSize : ''}\">${properties.title}</h2>\n<div>${properties.text @ context='html'}</div>",
+  "variables": [
+    "color-background",
+    "color-focus",
+    "color-heading",
+    "color-link",
+    "color-link-hover",
+    "color-text",
+    "font-family-base",
+    "font-family-heading",
+    "font-size-base",
+    "font-size-h1",
+    "font-size-h2",
+    "font-size-h3",
+    "font-size-h4",
+    "font-size-h5",
+    "font-size-h6",
+    "font-size-sup",
+    "font-weight-bold",
+    "font-weight-regular",
+    "letter-spacing-heading",
+    "line-height-body",
+    "line-height-heading",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-sub-offset",
+    "size-sup-offset",
+    "space-2",
+    "space-4",
+    "space-5"
+  ]
+}

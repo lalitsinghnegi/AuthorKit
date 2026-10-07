@@ -1,0 +1,108 @@
+{{> fileHeader}}
+
+.{{prefix}}-btn {
+  --{{prefix}}-btn-bg: transparent;
+  --{{prefix}}-btn-color: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-border-color: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-bg-hover: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-on-primary);
+  --{{prefix}}-btn-border-color-hover: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-padding-y: var(--{{prefix}}-space-3);
+  --{{prefix}}-btn-padding-x: var(--{{prefix}}-space-5);
+  --{{prefix}}-btn-radius: var(--{{prefix}}-radius-pill);
+  --{{prefix}}-btn-font-size: var(--{{prefix}}-font-size-base);
+
+  display: inline-flex;
+  gap: var(--{{prefix}}-space-2);
+  align-items: center;
+  justify-content: center;
+  padding: var(--{{prefix}}-btn-padding-y) var(--{{prefix}}-btn-padding-x);
+  border: var(--{{prefix}}-border-width) solid var(--{{prefix}}-btn-border-color);
+  border-radius: var(--{{prefix}}-btn-radius);
+  background-color: var(--{{prefix}}-btn-bg);
+  color: var(--{{prefix}}-btn-color);
+  font-family: inherit;
+  font-size: var(--{{prefix}}-btn-font-size);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+  line-height: var(--{{prefix}}-line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--{{prefix}}-duration-fast) ease,
+    border-color var(--{{prefix}}-duration-fast) ease,
+    color var(--{{prefix}}-duration-fast) ease;
+}
+
+.{{prefix}}-btn:hover {
+  border-color: var(--{{prefix}}-btn-border-color-hover);
+  background-color: var(--{{prefix}}-btn-bg-hover);
+  color: var(--{{prefix}}-btn-color-hover);
+}
+
+.{{prefix}}-btn:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+
+/* Variants */
+.{{prefix}}-btn--primary {
+  --{{prefix}}-btn-bg: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-color: var(--{{prefix}}-color-on-primary);
+  --{{prefix}}-btn-border-color: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-bg-hover: var(--{{prefix}}-color-primary-hover);
+  --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-on-primary);
+  --{{prefix}}-btn-border-color-hover: var(--{{prefix}}-color-primary-hover);
+}
+
+.{{prefix}}-btn--secondary {
+  --{{prefix}}-btn-bg: transparent;
+  --{{prefix}}-btn-color: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-border-color: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-bg-hover: var(--{{prefix}}-color-primary);
+  --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-on-primary);
+  --{{prefix}}-btn-border-color-hover: var(--{{prefix}}-color-primary);
+}
+
+.{{prefix}}-btn--tertiary {
+  --{{prefix}}-btn-bg: transparent;
+  --{{prefix}}-btn-color: var(--{{prefix}}-color-link);
+  --{{prefix}}-btn-border-color: transparent;
+  --{{prefix}}-btn-bg-hover: transparent;
+  --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-link-hover);
+  --{{prefix}}-btn-border-color-hover: transparent;
+  --{{prefix}}-btn-padding-x: 0;
+
+  text-decoration: underline;
+}
+
+.{{prefix}}-btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.{{prefix}}-btn__icon {
+  flex: none;
+  width: var(--{{prefix}}-size-icon);
+  height: var(--{{prefix}}-size-icon);
+}
+
+/* Disabled: after the variants so it wins over all of them */
+.{{prefix}}-btn:disabled,
+.{{prefix}}-btn[aria-disabled="true"] {
+  --{{prefix}}-btn-bg: var(--{{prefix}}-color-disabled-background);
+  --{{prefix}}-btn-color: var(--{{prefix}}-color-disabled-text);
+  --{{prefix}}-btn-border-color: var(--{{prefix}}-color-disabled-background);
+  --{{prefix}}-btn-bg-hover: var(--{{prefix}}-color-disabled-background);
+  --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-disabled-text);
+  --{{prefix}}-btn-border-color-hover: var(--{{prefix}}-color-disabled-background);
+
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .{{prefix}}-btn {
+    transition: none;
+  }
+}
+{{> responsive}}

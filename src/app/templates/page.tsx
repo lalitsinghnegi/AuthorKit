@@ -4,13 +4,14 @@ import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
 import type { ScaffoldTemplate, TreeNode } from "@/lib/model";
 import { listScaffoldTemplates } from "@/lib/storage/scaffoldTemplates";
+import { getManifests, manifestClasses } from "@/lib/templates";
 
 export default function TemplatesPage() {
   return (
     <>
       <PageHeader
         title="Templates"
-        description="Scaffold presets give new projects a starting folder structure. The CSS template library arrives in a later step."
+        description="Scaffold presets give new projects a starting folder structure. CSS templates are the stylesheets the generator fills with each project's values."
       />
       <Suspense fallback={<p className={ui.muted}>Loading presets…</p>}>
         <PresetList />
@@ -32,6 +33,7 @@ async function PresetList() {
         presets={custom}
         empty="No custom presets yet. Create one, duplicate a built-in preset, or save a project's scaffold as a preset."
       />
+      <CssTemplateList />
     </div>
   );
 }
@@ -72,4 +74,26 @@ function Group({
 
 function countFiles(node: TreeNode): number {
   return node.type === "file" ? 1 : node.children.reduce((n, c) => n + countFiles(c), 0);
+}
+
+function CssTemplateList() {
+  const manifests = Object.values(getManifests());
+  return (
+    <section aria-label="CSS templates">
+      <h2 className={ui.sectionHeading}>CSS templates (built-in)</h2>
+      <ul className={ui.grid} style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {manifests.map((m) => (
+          <li key={m.id} className={ui.card}>
+            <h3 className={ui.cardTitle}>{m.name}</h3>
+            <div className={ui.muted}>{m.description}</div>
+            <div className={ui.meta}>
+              <span className={`${ui.badge} ${ui.code}`}>{m.fileName}</span>
+              <span className={ui.badge}>{manifestClasses(m, "x").length} classes</span>
+              <span className={ui.badge}>{m.variables.length} variables</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }

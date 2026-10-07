@@ -1,0 +1,90 @@
+{
+  "id": "footer",
+  "name": "Footer",
+  "description": "Site footer with logo, utility links, legal text and copyright. Stacks on small screens and lays out in a row on large screens.",
+  "fileName": "footer.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-footer",
+      "purpose": "Footer band: colors, font size and responsive layout variables."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__inner",
+      "purpose": "Centered, max-width container."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__logo",
+      "purpose": "Logo link; an <img> inside is sized to the logo height token."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__links",
+      "purpose": "List of footer links."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__link",
+      "purpose": "Footer link on the dark background."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__legal",
+      "purpose": "Legal or regulatory text, such as job codes."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-footer__copyright",
+      "purpose": "Copyright line."
+    }
+  ],
+  "states": [
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": ".{{prefix}}-footer__link",
+      "description": "Removes the underline."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-footer__link, .{{prefix}}-footer__logo",
+      "description": "Focus outline in the inverse focus color for the dark background."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Footer",
+      "html": "<footer class=\"{{prefix}}-footer\">\n  <div class=\"{{prefix}}-footer__inner\">\n    <a class=\"{{prefix}}-footer__logo\" href=\"/\"><img src=\"logo-white.svg\" alt=\"Brand home\"></a>\n    <ul class=\"{{prefix}}-footer__links\">\n      <li><a class=\"{{prefix}}-footer__link\" href=\"#\">Privacy policy</a></li>\n      <li><a class=\"{{prefix}}-footer__link\" href=\"#\">Terms of use</a></li>\n      <li><a class=\"{{prefix}}-footer__link\" href=\"#\">Contact us</a></li>\n    </ul>\n    <p class=\"{{prefix}}-footer__legal\">For US residents only. JOB-CODE-0000</p>\n    <p class=\"{{prefix}}-footer__copyright\">© 2026 Brand, Inc.</p>\n  </div>\n</footer>"
+    }
+  ],
+  "accessibility": [
+    "Use <footer>; group links in a list.",
+    "Links stay underlined on the dark background so they are distinguishable without color.",
+    "Focus uses the inverse focus color, which has 3:1 contrast on the footer background."
+  ],
+  "htl": "<footer class=\"{{prefix}}-footer\" data-sly-use.footer=\"com.example.models.Footer\">\n  <div class=\"{{prefix}}-footer__inner\">\n    <ul class=\"{{prefix}}-footer__links\" data-sly-list.link=\"${footer.links}\">\n      <li><a class=\"{{prefix}}-footer__link\" href=\"${link.url}\">${link.title}</a></li>\n    </ul>\n    <p class=\"{{prefix}}-footer__legal\">${footer.legal}</p>\n    <p class=\"{{prefix}}-footer__copyright\">${footer.copyright}</p>\n  </div>\n</footer>",
+  "variables": [
+    "color-focus-inverse",
+    "color-footer-background",
+    "color-footer-link",
+    "color-footer-text",
+    "font-size-sm",
+    "footer-align",
+    "footer-bg",
+    "footer-color",
+    "footer-direction",
+    "footer-link-color",
+    "footer-padding-y",
+    "size-container-max",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-gutter",
+    "size-logo-height",
+    "space-3",
+    "space-5",
+    "space-7"
+  ]
+}

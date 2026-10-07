@@ -1,0 +1,8 @@
+{{> fileHeader}}
+
+:root {
+{{#each tokens}}
+  --{{@root.prefix}}-{{name}}: {{value}};
+{{/each}}
+}
+{{> responsive}}

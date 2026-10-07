@@ -1,0 +1,109 @@
+{
+  "id": "accordion",
+  "name": "Accordion",
+  "description": "Stacked sections whose content can be shown or hidden, following the WAI-ARIA accordion pattern.",
+  "fileName": "accordion.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-accordion",
+      "purpose": "Accordion container with the top border."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-accordion__item",
+      "purpose": "One section: heading plus panel, separated by a border."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-accordion__heading",
+      "purpose": "Heading element (h2–h6) that wraps the trigger."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-accordion__trigger",
+      "purpose": "Full-width button that toggles the panel."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-accordion__icon",
+      "purpose": "Chevron in the trigger; rotates when expanded."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-accordion__panel",
+      "purpose": "Content region; hidden with the hidden attribute when collapsed."
+    }
+  ],
+  "states": [
+    {
+      "name": "expanded",
+      "trigger": "[aria-expanded=\"true\"] on __trigger, no hidden on __panel",
+      "appliesTo": ".{{prefix}}-accordion__trigger",
+      "description": "Rotates the icon; the panel is visible."
+    },
+    {
+      "name": "collapsed",
+      "trigger": "[aria-expanded=\"false\"] on __trigger, hidden on __panel",
+      "appliesTo": ".{{prefix}}-accordion__panel",
+      "description": "Panel is not displayed."
+    },
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": ".{{prefix}}-accordion__trigger",
+      "description": "Trigger text takes the link color."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-accordion__trigger",
+      "description": "Keyboard focus outline."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Accordion with one section open",
+      "html": "<div class=\"{{prefix}}-accordion\">\n  <div class=\"{{prefix}}-accordion__item\">\n    <h3 class=\"{{prefix}}-accordion__heading\">\n      <button class=\"{{prefix}}-accordion__trigger\" type=\"button\" aria-expanded=\"true\" aria-controls=\"acc-1\" id=\"acc-1-btn\">\n        How is it taken?\n        <svg class=\"{{prefix}}-accordion__icon\" aria-hidden=\"true\" viewBox=\"0 0 20 20\"><path d=\"m5 8 5 5 5-5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>\n      </button>\n    </h3>\n    <div class=\"{{prefix}}-accordion__panel\" id=\"acc-1\" role=\"region\" aria-labelledby=\"acc-1-btn\">\n      <p>Once a day, with or without food.</p>\n    </div>\n  </div>\n  <div class=\"{{prefix}}-accordion__item\">\n    <h3 class=\"{{prefix}}-accordion__heading\">\n      <button class=\"{{prefix}}-accordion__trigger\" type=\"button\" aria-expanded=\"false\" aria-controls=\"acc-2\" id=\"acc-2-btn\">\n        What are the side effects?\n        <svg class=\"{{prefix}}-accordion__icon\" aria-hidden=\"true\" viewBox=\"0 0 20 20\"><path d=\"m5 8 5 5 5-5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>\n      </button>\n    </h3>\n    <div class=\"{{prefix}}-accordion__panel\" id=\"acc-2\" role=\"region\" aria-labelledby=\"acc-2-btn\" hidden>\n      <p>The most common side effects are…</p>\n    </div>\n  </div>\n</div>"
+    }
+  ],
+  "accessibility": [
+    "Each trigger is a <button> inside a heading, with aria-expanded and aria-controls.",
+    "Panels use role=\"region\" and aria-labelledby the trigger; collapsed panels have the hidden attribute.",
+    "Script keeps aria-expanded and hidden in sync."
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "action": "Moves between triggers and into open panels."
+    },
+    {
+      "keys": "Enter / Space",
+      "action": "Toggles the focused section."
+    }
+  ],
+  "hooks": [
+    {
+      "attribute": "aria-expanded on .{{prefix}}-accordion__trigger",
+      "purpose": "Script flips it on click and toggles hidden on the panel."
+    }
+  ],
+  "htl": "<div class=\"{{prefix}}-accordion\" data-sly-list.item=\"${properties.items}\">\n  <div class=\"{{prefix}}-accordion__item\">\n    <h3 class=\"{{prefix}}-accordion__heading\">\n      <button class=\"{{prefix}}-accordion__trigger\" type=\"button\" aria-expanded=\"false\" aria-controls=\"acc-${itemList.index}\" id=\"acc-${itemList.index}-btn\">${item.title}</button>\n    </h3>\n    <div class=\"{{prefix}}-accordion__panel\" id=\"acc-${itemList.index}\" role=\"region\" aria-labelledby=\"acc-${itemList.index}-btn\" hidden>${item.text @ context='html'}</div>\n  </div>\n</div>",
+  "variables": [
+    "accordion-border-color",
+    "accordion-padding-y",
+    "accordion-title-size",
+    "border-width",
+    "color-border",
+    "color-focus",
+    "color-heading",
+    "color-link",
+    "duration-fast",
+    "font-size-lg",
+    "font-weight-bold",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-icon",
+    "space-4"
+  ]
+}

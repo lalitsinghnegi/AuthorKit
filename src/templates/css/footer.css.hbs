@@ -1,0 +1,70 @@
+{{> fileHeader}}
+
+.{{prefix}}-footer {
+{{vars "footer" "footer"}}
+  --{{prefix}}-footer-bg: var(--{{prefix}}-color-footer-background);
+  --{{prefix}}-footer-color: var(--{{prefix}}-color-footer-text);
+  --{{prefix}}-footer-link-color: var(--{{prefix}}-color-footer-link);
+  --{{prefix}}-footer-padding-y: var(--{{prefix}}-space-7);
+
+  background-color: var(--{{prefix}}-footer-bg);
+  color: var(--{{prefix}}-footer-color);
+  font-size: var(--{{prefix}}-font-size-sm);
+}
+
+.{{prefix}}-footer__inner {
+  display: flex;
+  flex-direction: var(--{{prefix}}-footer-direction);
+  gap: var(--{{prefix}}-space-5);
+  align-items: var(--{{prefix}}-footer-align);
+  justify-content: space-between;
+  max-width: var(--{{prefix}}-size-container-max);
+  margin: 0 auto;
+  padding: var(--{{prefix}}-footer-padding-y) var(--{{prefix}}-size-gutter);
+}
+
+.{{prefix}}-footer__logo {
+  display: inline-flex;
+  color: inherit;
+}
+
+.{{prefix}}-footer__logo img {
+  display: block;
+  width: auto;
+  height: var(--{{prefix}}-size-logo-height);
+}
+
+.{{prefix}}-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--{{prefix}}-space-3) var(--{{prefix}}-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.{{prefix}}-footer__links li + li {
+  margin-top: 0;
+}
+
+.{{prefix}}-footer__link {
+  color: var(--{{prefix}}-footer-link-color);
+  text-decoration: underline;
+}
+
+.{{prefix}}-footer__link:hover {
+  color: var(--{{prefix}}-footer-link-color);
+  text-decoration: none;
+}
+
+.{{prefix}}-footer__logo:focus-visible,
+.{{prefix}}-footer__link:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus-inverse);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+
+.{{prefix}}-footer__legal,
+.{{prefix}}-footer__copyright {
+  margin: 0;
+}
+{{> responsive}}

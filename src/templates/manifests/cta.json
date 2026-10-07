@@ -1,0 +1,121 @@
+{
+  "id": "cta",
+  "name": "CTA buttons",
+  "description": "Call-to-action buttons in primary, secondary and tertiary styles, for <button> and <a> elements.",
+  "fileName": "cta.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-btn",
+      "purpose": "Base button: layout, spacing, border, typography and transitions. Use with a variant."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-btn--primary",
+      "purpose": "Filled brand-color button for the main action."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-btn--secondary",
+      "purpose": "Outlined button for a supporting action."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-btn--tertiary",
+      "purpose": "Text-style button for low-emphasis actions."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-btn--block",
+      "purpose": "Full-width button."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-btn__icon",
+      "purpose": "Icon inside the button (SVG or img), sized to the icon token."
+    }
+  ],
+  "states": [
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": ".{{prefix}}-btn",
+      "description": "Background, border and text switch to the variant's hover colors."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-btn",
+      "description": "Keyboard focus outline."
+    },
+    {
+      "name": "disabled",
+      "trigger": ":disabled or [aria-disabled=\"true\"]",
+      "appliesTo": ".{{prefix}}-btn",
+      "description": "Muted colors and a not-allowed cursor. Use aria-disabled on links, which have no disabled attribute."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Variants",
+      "html": "<button type=\"button\" class=\"{{prefix}}-btn {{prefix}}-btn--primary\">Primary</button>\n<button type=\"button\" class=\"{{prefix}}-btn {{prefix}}-btn--secondary\">Secondary</button>\n<a href=\"#\" class=\"{{prefix}}-btn {{prefix}}-btn--tertiary\">Tertiary link</a>"
+    },
+    {
+      "title": "With an icon, and full width",
+      "html": "<a href=\"#\" class=\"{{prefix}}-btn {{prefix}}-btn--primary {{prefix}}-btn--block\">\n  Download the guide\n  <svg class=\"{{prefix}}-btn__icon\" aria-hidden=\"true\" viewBox=\"0 0 20 20\"><path d=\"M10 3v10m0 0 4-4m-4 4-4-4M4 17h12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>\n</a>"
+    },
+    {
+      "title": "Disabled",
+      "html": "<button type=\"button\" class=\"{{prefix}}-btn {{prefix}}-btn--primary\" disabled>Disabled button</button>\n<a class=\"{{prefix}}-btn {{prefix}}-btn--secondary\" aria-disabled=\"true\">Disabled link</a>"
+    }
+  ],
+  "accessibility": [
+    "Use <button> for actions and <a href> for navigation; both get the same look.",
+    "Disabled links need aria-disabled=\"true\" and no href, and should be removed from the tab order.",
+    "Icons are decorative: add aria-hidden=\"true\". Icon-only buttons need an aria-label.",
+    "The minimum target size is met by the default padding; keep it when overriding tokens."
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "action": "Moves focus to the button."
+    },
+    {
+      "keys": "Enter / Space",
+      "action": "Activates a <button>; Enter follows a link."
+    }
+  ],
+  "htl": "<a href=\"${properties.link @ extension='html'}\" class=\"{{prefix}}-btn {{prefix}}-btn--${properties.variant || 'primary'}\"\n   target=\"${properties.newTab ? '_blank' : ''}\" rel=\"${properties.newTab ? 'noopener' : ''}\">${properties.label}</a>",
+  "variables": [
+    "border-width",
+    "btn-bg",
+    "btn-bg-hover",
+    "btn-border-color",
+    "btn-border-color-hover",
+    "btn-color",
+    "btn-color-hover",
+    "btn-font-size",
+    "btn-padding-x",
+    "btn-padding-y",
+    "btn-radius",
+    "color-disabled-background",
+    "color-disabled-text",
+    "color-focus",
+    "color-link",
+    "color-link-hover",
+    "color-on-primary",
+    "color-primary",
+    "color-primary-hover",
+    "duration-fast",
+    "font-size-base",
+    "font-weight-bold",
+    "line-height-tight",
+    "radius-pill",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-icon",
+    "space-2",
+    "space-3",
+    "space-5"
+  ]
+}

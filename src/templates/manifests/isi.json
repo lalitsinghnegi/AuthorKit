@@ -1,0 +1,152 @@
+{
+  "id": "isi",
+  "name": "ISI and safety bar",
+  "description": "Important Safety Information: the full in-page ISI block, and a sticky safety bar fixed to the bottom of the viewport that expands to show more.",
+  "fileName": "isi.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-isi",
+      "purpose": "In-page ISI section with its own background and text size."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi__content",
+      "purpose": "Centered, max-width content column."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi__title",
+      "purpose": "ISI heading (for example \"Important Safety Information\")."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi__section",
+      "purpose": "A group of ISI content, such as indications or warnings; spaced from the previous one."
+    },
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-isi-bar",
+      "purpose": "Sticky safety bar fixed to the bottom of the screen; collapsed by default."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-isi-bar--expanded",
+      "purpose": "Expanded bar showing more of the ISI."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi-bar__header",
+      "purpose": "Row holding the bar title and the toggle."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi-bar__title",
+      "purpose": "Bar title."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi-bar__toggle",
+      "purpose": "Button that expands or collapses the bar."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi-bar__icon",
+      "purpose": "Chevron in the toggle; rotates when expanded."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-isi-bar__content",
+      "purpose": "Scrollable ISI text inside the bar."
+    },
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-isi-bar-spacer",
+      "purpose": "Empty element at the end of the page so the fixed bar never covers content."
+    }
+  ],
+  "states": [
+    {
+      "name": "expanded",
+      "trigger": ".{{prefix}}-isi-bar--expanded on the bar + aria-expanded=\"true\" on the toggle",
+      "appliesTo": ".{{prefix}}-isi-bar",
+      "description": "Grows the bar to the expanded height and rotates the icon."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-isi-bar__toggle",
+      "description": "Keyboard focus outline."
+    }
+  ],
+  "examples": [
+    {
+      "title": "In-page ISI",
+      "html": "<section class=\"{{prefix}}-isi\" aria-labelledby=\"isi-title\">\n  <div class=\"{{prefix}}-isi__content\">\n    <h2 class=\"{{prefix}}-isi__title\" id=\"isi-title\">Important Safety Information</h2>\n    <div class=\"{{prefix}}-isi__section\">\n      <p><strong>Indication:</strong> Brand is a prescription medicine used to treat…</p>\n    </div>\n    <div class=\"{{prefix}}-isi__section\">\n      <p><strong>Warnings:</strong> Serious side effects may include…</p>\n    </div>\n  </div>\n</section>"
+    },
+    {
+      "title": "Sticky safety bar (collapsed)",
+      "html": "<aside class=\"{{prefix}}-isi-bar\" aria-labelledby=\"isi-bar-title\">\n  <div class=\"{{prefix}}-isi-bar__header\">\n    <h2 class=\"{{prefix}}-isi-bar__title\" id=\"isi-bar-title\">Important Safety Information</h2>\n    <button class=\"{{prefix}}-isi-bar__toggle\" type=\"button\" aria-expanded=\"false\" aria-controls=\"isi-bar-content\">\n      More\n      <svg class=\"{{prefix}}-isi-bar__icon\" aria-hidden=\"true\" viewBox=\"0 0 20 20\"><path d=\"m5 12 5-5 5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>\n    </button>\n  </div>\n  <div class=\"{{prefix}}-isi-bar__content\" id=\"isi-bar-content\">\n    <p>Serious side effects may include…</p>\n  </div>\n</aside>\n<div class=\"{{prefix}}-isi-bar-spacer\" aria-hidden=\"true\"></div>"
+    }
+  ],
+  "accessibility": [
+    "Use a <section> (in-page) or <aside> (bar) with aria-labelledby pointing at the title.",
+    "The toggle is a <button> with aria-expanded and aria-controls; script updates both the attribute and the --expanded modifier.",
+    "ISI text must remain readable when expanded: the content area scrolls rather than being cut off.",
+    "The expand animation is turned off for users who prefer reduced motion."
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "action": "Moves focus to the toggle, then into links within the content."
+    },
+    {
+      "keys": "Enter / Space",
+      "action": "Expands or collapses the bar."
+    }
+  ],
+  "hooks": [
+    {
+      "attribute": "aria-expanded on .{{prefix}}-isi-bar__toggle",
+      "purpose": "Script toggles it together with the .{{prefix}}-isi-bar--expanded class."
+    }
+  ],
+  "htl": "<aside class=\"{{prefix}}-isi-bar\" aria-labelledby=\"isi-bar-title\">\n  <div class=\"{{prefix}}-isi-bar__header\">\n    <h2 class=\"{{prefix}}-isi-bar__title\" id=\"isi-bar-title\">${properties.title}</h2>\n    <button class=\"{{prefix}}-isi-bar__toggle\" type=\"button\" aria-expanded=\"false\" aria-controls=\"isi-bar-content\">${properties.expandLabel}</button>\n  </div>\n  <div class=\"{{prefix}}-isi-bar__content\" id=\"isi-bar-content\">${properties.text @ context='html'}</div>\n</aside>",
+  "variables": [
+    "border-width",
+    "color-border",
+    "color-focus",
+    "color-isi-background",
+    "color-isi-heading",
+    "color-isi-text",
+    "duration-base",
+    "duration-fast",
+    "font-size-base",
+    "font-size-lg",
+    "font-size-sm",
+    "font-weight-bold",
+    "isi-bar-bg",
+    "isi-bar-color",
+    "isi-bar-max-height",
+    "isi-bg",
+    "isi-color",
+    "isi-padding-y",
+    "line-height-body",
+    "radius-pill",
+    "shadow-lg",
+    "size-container-max",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-gutter",
+    "size-icon",
+    "size-isi-bar-collapsed",
+    "size-isi-bar-expanded",
+    "size-touch-target",
+    "space-2",
+    "space-3",
+    "space-4",
+    "space-5",
+    "space-6",
+    "z-isi-bar"
+  ]
+}

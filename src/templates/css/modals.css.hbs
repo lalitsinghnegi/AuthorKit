@@ -1,0 +1,93 @@
+{{> fileHeader}}
+
+/* Built on the native <dialog> element: showModal() provides the focus trap and Escape */
+.{{prefix}}-modal {
+  --{{prefix}}-modal-width: var(--{{prefix}}-size-modal-max);
+  --{{prefix}}-modal-padding: var(--{{prefix}}-space-5);
+  --{{prefix}}-modal-radius: var(--{{prefix}}-radius-lg);
+  --{{prefix}}-modal-bg: var(--{{prefix}}-color-background);
+
+  width: min(100% - 2 * var(--{{prefix}}-size-gutter), var(--{{prefix}}-modal-width));
+  max-height: calc(100% - 2 * var(--{{prefix}}-size-gutter));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--{{prefix}}-modal-radius);
+  background-color: var(--{{prefix}}-modal-bg);
+  color: var(--{{prefix}}-color-text);
+  box-shadow: var(--{{prefix}}-shadow-lg);
+}
+
+.{{prefix}}-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.{{prefix}}-modal::backdrop {
+  background-color: var(--{{prefix}}-color-overlay);
+}
+
+.{{prefix}}-modal__header {
+  display: flex;
+  flex: none;
+  gap: var(--{{prefix}}-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--{{prefix}}-modal-padding) var(--{{prefix}}-modal-padding) 0;
+}
+
+.{{prefix}}-modal__title {
+  margin: 0;
+  font-size: var(--{{prefix}}-font-size-h4);
+}
+
+.{{prefix}}-modal__close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--{{prefix}}-size-touch-target);
+  height: var(--{{prefix}}-size-touch-target);
+  padding: 0;
+  border: 0;
+  border-radius: var(--{{prefix}}-radius-pill);
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--{{prefix}}-font-size-lg);
+  cursor: pointer;
+}
+
+.{{prefix}}-modal__close:hover {
+  background-color: var(--{{prefix}}-color-surface);
+}
+
+.{{prefix}}-modal__close:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+
+.{{prefix}}-modal__body {
+  overflow-y: auto;
+  padding: var(--{{prefix}}-modal-padding);
+}
+
+.{{prefix}}-modal__footer {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--{{prefix}}-space-3);
+  justify-content: flex-end;
+  padding: 0 var(--{{prefix}}-modal-padding) var(--{{prefix}}-modal-padding);
+}
+
+/* Leaving-site / interstitial warning */
+.{{prefix}}-modal--interstitial {
+  --{{prefix}}-modal-width: var(--{{prefix}}-size-modal-narrow);
+}
+
+/* Set on <body> while a modal is open to stop the page scrolling behind it */
+.{{prefix}}-modal-open {
+  overflow: hidden;
+}
+{{> responsive}}

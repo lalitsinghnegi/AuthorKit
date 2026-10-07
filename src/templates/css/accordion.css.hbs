@@ -1,0 +1,70 @@
+{{> fileHeader}}
+
+.{{prefix}}-accordion {
+  --{{prefix}}-accordion-border-color: var(--{{prefix}}-color-border);
+  --{{prefix}}-accordion-padding-y: var(--{{prefix}}-space-4);
+  --{{prefix}}-accordion-title-size: var(--{{prefix}}-font-size-lg);
+
+  border-top: var(--{{prefix}}-border-width) solid var(--{{prefix}}-accordion-border-color);
+}
+
+.{{prefix}}-accordion__item {
+  border-bottom: var(--{{prefix}}-border-width) solid var(--{{prefix}}-accordion-border-color);
+}
+
+.{{prefix}}-accordion__heading {
+  margin: 0;
+  font-size: inherit;
+}
+
+.{{prefix}}-accordion__trigger {
+  display: flex;
+  gap: var(--{{prefix}}-space-4);
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--{{prefix}}-accordion-padding-y) 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--{{prefix}}-color-heading);
+  font: inherit;
+  font-size: var(--{{prefix}}-accordion-title-size);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+  text-align: left;
+  cursor: pointer;
+}
+
+.{{prefix}}-accordion__trigger:hover {
+  color: var(--{{prefix}}-color-link);
+}
+
+.{{prefix}}-accordion__trigger:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+
+.{{prefix}}-accordion__icon {
+  flex: none;
+  width: var(--{{prefix}}-size-icon);
+  height: var(--{{prefix}}-size-icon);
+  transition: transform var(--{{prefix}}-duration-fast) ease;
+}
+
+.{{prefix}}-accordion__trigger[aria-expanded="true"] .{{prefix}}-accordion__icon {
+  transform: rotate(180deg);
+}
+
+.{{prefix}}-accordion__panel {
+  padding: 0 0 var(--{{prefix}}-accordion-padding-y);
+}
+
+.{{prefix}}-accordion__panel[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .{{prefix}}-accordion__icon {
+    transition: none;
+  }
+}
+{{> responsive}}

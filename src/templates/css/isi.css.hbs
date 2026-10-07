@@ -1,0 +1,122 @@
+{{> fileHeader}}
+
+/* In-page Important Safety Information */
+.{{prefix}}-isi {
+  --{{prefix}}-isi-bg: var(--{{prefix}}-color-isi-background);
+  --{{prefix}}-isi-color: var(--{{prefix}}-color-isi-text);
+  --{{prefix}}-isi-padding-y: var(--{{prefix}}-space-6);
+
+  padding: var(--{{prefix}}-isi-padding-y) var(--{{prefix}}-size-gutter);
+  background-color: var(--{{prefix}}-isi-bg);
+  color: var(--{{prefix}}-isi-color);
+  font-size: var(--{{prefix}}-font-size-sm);
+  line-height: var(--{{prefix}}-line-height-body);
+}
+
+.{{prefix}}-isi__content {
+  max-width: var(--{{prefix}}-size-container-max);
+  margin: 0 auto;
+}
+
+.{{prefix}}-isi__title {
+  margin: 0 0 var(--{{prefix}}-space-3);
+  color: var(--{{prefix}}-color-isi-heading);
+  font-size: var(--{{prefix}}-font-size-lg);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+}
+
+.{{prefix}}-isi__section + .{{prefix}}-isi__section {
+  margin-top: var(--{{prefix}}-space-5);
+}
+
+/* Sticky safety bar: collapsed by default, expanded with the modifier */
+.{{prefix}}-isi-bar {
+  --{{prefix}}-isi-bar-max-height: var(--{{prefix}}-size-isi-bar-collapsed);
+  --{{prefix}}-isi-bar-bg: var(--{{prefix}}-color-isi-background);
+  --{{prefix}}-isi-bar-color: var(--{{prefix}}-color-isi-text);
+
+  display: flex;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--{{prefix}}-z-isi-bar);
+  flex-direction: column;
+  max-height: var(--{{prefix}}-isi-bar-max-height);
+  background-color: var(--{{prefix}}-isi-bar-bg);
+  color: var(--{{prefix}}-isi-bar-color);
+  box-shadow: var(--{{prefix}}-shadow-lg);
+  transition: max-height var(--{{prefix}}-duration-base) ease;
+}
+
+.{{prefix}}-isi-bar--expanded {
+  --{{prefix}}-isi-bar-max-height: var(--{{prefix}}-size-isi-bar-expanded);
+}
+
+.{{prefix}}-isi-bar__header {
+  display: flex;
+  flex: none;
+  gap: var(--{{prefix}}-space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--{{prefix}}-space-3) var(--{{prefix}}-size-gutter);
+  border-bottom: var(--{{prefix}}-border-width) solid var(--{{prefix}}-color-border);
+}
+
+.{{prefix}}-isi-bar__title {
+  margin: 0;
+  color: var(--{{prefix}}-color-isi-heading);
+  font-size: var(--{{prefix}}-font-size-base);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+}
+
+.{{prefix}}-isi-bar__toggle {
+  display: inline-flex;
+  flex: none;
+  gap: var(--{{prefix}}-space-2);
+  align-items: center;
+  min-height: var(--{{prefix}}-size-touch-target);
+  padding: var(--{{prefix}}-space-2) var(--{{prefix}}-space-4);
+  border: var(--{{prefix}}-border-width) solid currentcolor;
+  border-radius: var(--{{prefix}}-radius-pill);
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--{{prefix}}-font-size-sm);
+  font-weight: var(--{{prefix}}-font-weight-bold);
+  cursor: pointer;
+}
+
+.{{prefix}}-isi-bar__toggle:focus-visible {
+  outline: var(--{{prefix}}-size-focus-ring) solid var(--{{prefix}}-color-focus);
+  outline-offset: var(--{{prefix}}-size-focus-offset);
+}
+
+.{{prefix}}-isi-bar__icon {
+  width: var(--{{prefix}}-size-icon);
+  height: var(--{{prefix}}-size-icon);
+  transition: transform var(--{{prefix}}-duration-fast) ease;
+}
+
+.{{prefix}}-isi-bar--expanded .{{prefix}}-isi-bar__icon {
+  transform: rotate(180deg);
+}
+
+.{{prefix}}-isi-bar__content {
+  overflow-y: auto;
+  padding: var(--{{prefix}}-space-3) var(--{{prefix}}-size-gutter) var(--{{prefix}}-space-4);
+  font-size: var(--{{prefix}}-font-size-sm);
+}
+
+/* Keeps page content clear of the fixed bar; place at the end of the page */
+.{{prefix}}-isi-bar-spacer {
+  height: var(--{{prefix}}-size-isi-bar-collapsed);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .{{prefix}}-isi-bar,
+  .{{prefix}}-isi-bar__icon {
+    transition: none;
+  }
+}
+{{> responsive}}

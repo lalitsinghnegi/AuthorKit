@@ -1,0 +1,134 @@
+{
+  "id": "modals",
+  "name": "Modals",
+  "description": "Modal dialogs built on the native <dialog> element, including the interstitial (leaving-site) variant.",
+  "fileName": "modals.css",
+  "selectors": [
+    {
+      "type": "block",
+      "selector": ".{{prefix}}-modal",
+      "purpose": "The <dialog>: size, radius, background and shadow; ::backdrop is the overlay."
+    },
+    {
+      "type": "modifier",
+      "selector": ".{{prefix}}-modal--interstitial",
+      "purpose": "Narrow warning dialog, such as \"You are leaving this site\"."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-modal__header",
+      "purpose": "Row with the title and close button."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-modal__title",
+      "purpose": "Dialog title; reference it with aria-labelledby."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-modal__close",
+      "purpose": "Close button (icon); needs an aria-label."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-modal__body",
+      "purpose": "Scrollable content."
+    },
+    {
+      "type": "element",
+      "selector": ".{{prefix}}-modal__footer",
+      "purpose": "Action buttons, right-aligned."
+    },
+    {
+      "type": "utility",
+      "selector": ".{{prefix}}-modal-open",
+      "purpose": "Put on <body> while a modal is open to stop background scrolling."
+    }
+  ],
+  "states": [
+    {
+      "name": "open",
+      "trigger": "[open] (set by dialog.showModal())",
+      "appliesTo": ".{{prefix}}-modal",
+      "description": "The dialog is shown with the backdrop; closed dialogs are hidden by the browser."
+    },
+    {
+      "name": "hover",
+      "trigger": ":hover",
+      "appliesTo": ".{{prefix}}-modal__close",
+      "description": "Subtle background on the close button."
+    },
+    {
+      "name": "focus",
+      "trigger": ":focus-visible",
+      "appliesTo": ".{{prefix}}-modal__close",
+      "description": "Keyboard focus outline."
+    }
+  ],
+  "examples": [
+    {
+      "title": "Interstitial (leaving the site)",
+      "html": "<dialog class=\"{{prefix}}-modal {{prefix}}-modal--interstitial\" id=\"leaving\" aria-labelledby=\"leaving-title\" open>\n  <div class=\"{{prefix}}-modal__header\">\n    <h2 class=\"{{prefix}}-modal__title\" id=\"leaving-title\">You are leaving this site</h2>\n    <button class=\"{{prefix}}-modal__close\" type=\"button\" aria-label=\"Close\" data-{{prefix}}-modal-close>×</button>\n  </div>\n  <div class=\"{{prefix}}-modal__body\">\n    <p>The link you selected goes to a site that is not owned or controlled by us.</p>\n  </div>\n  <div class=\"{{prefix}}-modal__footer\">\n    <button class=\"{{prefix}}-btn {{prefix}}-btn--secondary\" type=\"button\" data-{{prefix}}-modal-close autofocus>Cancel</button>\n    <a class=\"{{prefix}}-btn {{prefix}}-btn--primary\" href=\"https://example.com\">Continue</a>\n  </div>\n</dialog>"
+    },
+    {
+      "title": "Opening a modal",
+      "html": "<button type=\"button\" class=\"{{prefix}}-btn {{prefix}}-btn--primary\" data-{{prefix}}-modal-open=\"leaving\">Visit partner site</button>"
+    }
+  ],
+  "accessibility": [
+    "Open with dialog.showModal(): the browser traps focus inside, makes the page inert and closes on Escape.",
+    "Label the dialog with aria-labelledby pointing at __title.",
+    "Put autofocus on the element that should receive focus first; on close, return focus to the trigger.",
+    "The close button is icon-only and needs aria-label=\"Close\"."
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab / Shift+Tab",
+      "action": "Cycles focus within the open dialog."
+    },
+    {
+      "keys": "Escape",
+      "action": "Closes the dialog."
+    }
+  ],
+  "hooks": [
+    {
+      "attribute": "data-{{prefix}}-modal-open=\"<dialog id>\"",
+      "purpose": "On a trigger: script calls showModal() on that dialog and adds .{{prefix}}-modal-open to <body>."
+    },
+    {
+      "attribute": "data-{{prefix}}-modal-close",
+      "purpose": "On buttons inside the dialog: script calls close() and returns focus to the trigger."
+    },
+    {
+      "attribute": "autofocus",
+      "purpose": "Native attribute: the element focused when the dialog opens."
+    }
+  ],
+  "htl": "<dialog class=\"{{prefix}}-modal\" id=\"${properties.modalId}\" aria-labelledby=\"${properties.modalId}-title\">\n  <div class=\"{{prefix}}-modal__header\">\n    <h2 class=\"{{prefix}}-modal__title\" id=\"${properties.modalId}-title\">${properties.title}</h2>\n    <button class=\"{{prefix}}-modal__close\" type=\"button\" aria-label=\"Close\" data-{{prefix}}-modal-close>×</button>\n  </div>\n  <div class=\"{{prefix}}-modal__body\">${properties.text @ context='html'}</div>\n</dialog>",
+  "variables": [
+    "color-background",
+    "color-focus",
+    "color-overlay",
+    "color-surface",
+    "color-text",
+    "font-size-h4",
+    "font-size-lg",
+    "modal-bg",
+    "modal-padding",
+    "modal-radius",
+    "modal-width",
+    "radius-lg",
+    "radius-pill",
+    "shadow-lg",
+    "size-focus-offset",
+    "size-focus-ring",
+    "size-gutter",
+    "size-modal-max",
+    "size-modal-narrow",
+    "size-touch-target",
+    "space-3",
+    "space-4",
+    "space-5"
+  ]
+}

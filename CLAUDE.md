@@ -49,6 +49,24 @@ Rules:
 - **Figma access** goes through a single `FigmaClient` (caching, retries, rate-limit handling, typed errors). Only the Figma API host is allowed (SSRF protection).
 - Core logic (breakpoints, scaffold tree operations, token extraction, generator, quality checks) lives in **pure TypeScript modules** independent of Next.js, so it is unit-testable.
 
+## CSS templates
+
+- **Templates:** `src/templates/css/<id>.css.hbs`, Handlebars with `strict` and `noEscape`. Shared partials (`fileHeader`, `responsive`) live in `src/templates/partials/`.
+- **Manifests:** `src/templates/manifests/<id>.json`, validated by `ComponentManifest`.
+- **Default values:** `src/templates/defaults/tokens.json`, including large-screen (≥ 1024px) overrides for tokens and component layout variables.
+- **Rendering:** `renderTemplate(id, buildTemplateContext(...))` in `src/lib/templates/render.ts`. It reads files with `fs`, so import it only on the server. `@/lib/templates` (the index) is safe anywhere.
+- **Responsive values:** per-breakpoint values go through `cascade()`. Base styles use the base breakpoint's values (smallest for mobile-first, largest for desktop-first). Each media query only holds what changed since the previous step, and every non-base breakpoint gets an `@authorkit-responsive` marker comment.
+- **Rules the tests enforce:**
+  - output passes stylelint (`outputStylelintConfig(prefix)`)
+  - design properties only use `var()` (`literalDesignValues`)
+  - the header variables, the manifest `variables` and the actual `var()` use are identical
+  - manifest classes and CSS classes are identical
+  - every used variable is defined
+  - reduced-motion handling exists wherever there is a transition
+  - default colours meet contrast
+- **When you change a template,** update its manifest `variables` and `selectors` to match. The tests say exactly what differs.
+- **Prettier** ignores `*.hbs`, because it would reformat Handlebars as HTML.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
@@ -103,6 +121,12 @@ These decisions override the build prompts wherever they conflict:
 - **Prompt 2:** the "data model" is a set of zod schemas and TypeScript types for the JSON files, not database tables and migrations. `GenerationRun` is dropped.
 - **Prompt 6, Prompt 11, Prompt 14:** the zip is built in memory and streamed to the browser. Nothing is written to disk.
 - **Prompt 13:** generation history, the diff view between runs, and downloading earlier runs are dropped. The style guide, token page and viewport switcher stay.
+- **global.css uses global element styles:** bare `h1`–`h6`, `p`, `a`, `sup`, `sub`, lists, a light `*` reset and `:focus-visible`. This was the admin's explicit choice, accepting that it can override other CSS on the page. Everything else is prefixed BEM classes; `.{prefix}-h1`…`-h6` are also provided for visual heading levels.
+- **Brand entry stylesheet (replaces Prompt 14's `index.css`):** every package has `<brand-slug>.css` at its root folder, for example `acme-health/acme-health.css`.
+  - It is generated automatically and contains only `@import url("…")` lines, relative to the root, for every other CSS file.
+  - Import order is fixed: tokens → global → cta → accordion → header → footer → isi → modals. Files with no template follow, in tree order.
+  - It is not part of the stored scaffold tree. The scaffold designer shows it as a locked "auto" row.
+  - A user file with the same name at the root is a validation error.
 - **Prompt 15:** the audit log (if kept) is an append-only `data/audit.log` (JSON lines).
 
 ## Commands
