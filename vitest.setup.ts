@@ -1,11 +1,36 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
+import { jar } from "@/test/session";
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  jar.cookies.clear();
+  jar.headers = new Headers();
+});
 
 // `server-only` throws outside the React Server bundle; tests import server modules directly.
 vi.mock("server-only", () => ({}));
+
+// A fixed signing secret for session cookies in tests.
+process.env.SESSION_SECRET ??= "test-session-secret-that-is-long-enough-0123456789";
+
+// Cookies and headers come from an in-memory jar; see src/test/session.ts.
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: (name: string) =>
+      jar.cookies.has(name) ? { name, value: jar.cookies.get(name)! } : undefined,
+    set: (name: string, value: string) => void jar.cookies.set(name, value),
+    delete: (name: string) => void jar.cookies.delete(name),
+  }),
+  headers: async () => jar.headers,
+}));
+
+// Outside a request, `connection()` has nothing to wait for.
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  connection: async () => {},
+}));
 
 // Tests must never reach the network (and especially never the real Figma API).
 // Tests that exercise HTTP code inject their own fetch implementation.

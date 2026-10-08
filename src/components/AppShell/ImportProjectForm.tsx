@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { importProjectAction, type ImportState } from "@/app/projects/actions";
+import { importProjectAction, type ImportState } from "@/app/(app)/projects/actions";
 import { PanelButton, PanelNote } from "./PanelSection";
 import styles from "./AppShell.module.css";
 

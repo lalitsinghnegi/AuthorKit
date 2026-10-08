@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/AppShell/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,12 +6,10 @@ export const metadata: Metadata = {
   description: "CSS package generator for content authoring teams",
 };
 
-export default function RootLayout({ children, actions }: LayoutProps<"/">) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <body>
-        <AppShell actions={actions}>{children}</AppShell>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

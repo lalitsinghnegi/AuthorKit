@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { addNode, createFile } from "@/lib/scaffold";
 import { createProject, updateProject } from "@/lib/storage/projects";
+import { withSignedIn } from "@/test/session";
 import { withTempDataDir } from "@/test/tempDataDir";
 import { GET } from "./route";
 
 withTempDataDir();
+withSignedIn("admin");
 
 const call = (id: string, path: string[]) =>
   GET(new Request("http://x") as never, { params: Promise.resolve({ id, path }) } as never);

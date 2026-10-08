@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { apiUser } from "@/lib/auth/session";
 import { buildPackage } from "@/lib/generator/build";
 import { loadGenerationInputs } from "@/lib/generator/load";
 import { generateStyleGuide } from "@/lib/styleguide/generate";
@@ -26,6 +27,8 @@ export async function GET(
   _req: NextRequest,
   ctx: RouteContext<"/api/projects/[id]/styleguide/[...path]">,
 ) {
+  const user = await apiUser();
+  if (user instanceof Response) return user;
   const { id, path } = await ctx.params;
   const project = await getProject(id);
   if (!project) return page(404, "Project not found", "This project no longer exists.");

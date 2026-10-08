@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { importScaffoldTemplateAction, type ImportState } from "@/app/templates/actions";
+import { importScaffoldTemplateAction, type ImportState } from "@/app/(app)/templates/actions";
 import { PanelButton, PanelNote } from "./PanelSection";
 import styles from "./AppShell.module.css";
 

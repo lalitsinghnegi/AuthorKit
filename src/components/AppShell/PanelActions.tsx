@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { useReadOnly } from "@/components/ReadOnly/ReadOnlyContext";
 
 export const PANEL_PORTAL_ID = "panel-actions-portal";
 
@@ -19,5 +20,16 @@ export function PanelActions({ children }: { children: React.ReactNode }) {
     () => document.getElementById(PANEL_PORTAL_ID),
     () => null,
   );
-  return target ? createPortal(children, target) : null;
+  const readOnly = useReadOnly();
+  if (!target) return null;
+  return createPortal(
+    readOnly ? (
+      <fieldset disabled style={{ minWidth: 0, margin: 0, padding: 0, border: 0 }}>
+        {children}
+      </fieldset>
+    ) : (
+      children
+    ),
+    target,
+  );
 }

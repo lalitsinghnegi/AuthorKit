@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteProjectAction } from "@/app/projects/actions";
+import { deleteProjectAction } from "@/app/(app)/projects/actions";
 import { PanelButton } from "./PanelSection";
 
 export function DeleteProjectButton({ id, name }: { id: string; name: string }) {

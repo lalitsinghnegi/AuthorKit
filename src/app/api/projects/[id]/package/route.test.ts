@@ -2,6 +2,8 @@ import JSZip from "jszip";
 import { describe, expect, it } from "vitest";
 import { addNode, createFile } from "@/lib/scaffold";
 import { createProject, saveResponsive, saveTokens, updateProject } from "@/lib/storage/projects";
+import { readAudit } from "@/lib/audit/log";
+import { jar, withSignedIn } from "@/test/session";
 import { withTempDataDir } from "@/test/tempDataDir";
 import { vi } from "vitest";
 
@@ -27,6 +29,7 @@ vi.mock("@/lib/quality/run", async (importOriginal) => {
 const { GET } = await import("./route");
 
 withTempDataDir();
+withSignedIn("admin");
 
 const call = (id: string) =>
   GET(new Request("http://x") as never, { params: Promise.resolve({ id }) } as never);
@@ -55,6 +58,15 @@ describe("GET /api/projects/[id]/package", () => {
     expect(await zip.file("acme-health/acme-health.css")!.async("string")).toContain(
       '@import url("css/tokens.css");',
     );
+    const [entry] = (await readAudit()).entries;
+    expect(entry).toMatchObject({ action: "package.download", target: { id: project.id } });
+  });
+
+  it("refuses signed-out callers", async () => {
+    const project = await newProject();
+    jar.cookies.clear();
+    const res = await call(project.id);
+    expect(res.status).toBe(401);
   });
 
   it("uses the saved tokens and responsive values", async () => {

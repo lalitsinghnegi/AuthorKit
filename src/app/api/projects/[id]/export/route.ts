@@ -1,7 +1,10 @@
 import type { NextRequest } from "next/server";
+import { apiUser } from "@/lib/auth/session";
 import { slugify, exportProject } from "@/lib/storage/projects";
 
 export async function GET(_req: NextRequest, ctx: RouteContext<"/api/projects/[id]/export">) {
+  const user = await apiUser();
+  if (user instanceof Response) return user;
   const { id } = await ctx.params;
   const data = await exportProject(id);
   if (!data) return Response.json({ error: "Project not found" }, { status: 404 });

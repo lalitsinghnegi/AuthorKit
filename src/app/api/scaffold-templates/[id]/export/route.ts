@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { apiUser } from "@/lib/auth/session";
 import type { ScaffoldExport } from "@/lib/model";
 import { getScaffoldTemplate } from "@/lib/storage/scaffoldTemplates";
 
@@ -6,6 +7,8 @@ export async function GET(
   _req: NextRequest,
   ctx: RouteContext<"/api/scaffold-templates/[id]/export">,
 ) {
+  const user = await apiUser();
+  if (user instanceof Response) return user;
   const { id } = await ctx.params;
   const template = await getScaffoldTemplate(id);
   if (!template) return Response.json({ error: "Preset not found" }, { status: 404 });

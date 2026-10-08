@@ -8,6 +8,8 @@ import styles from "./AppShell.module.css";
 type Props = {
   /** Context actions for the current screen, from the `@actions` slot. */
   actions: React.ReactNode;
+  /** Signed-in user box, shown at the bottom of the panel. */
+  account?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -16,7 +18,7 @@ type Props = {
  * and a right work area. The panel collapses on desktop and becomes a drawer
  * on narrow viewports.
  */
-export function AppShell({ actions, children }: Props) {
+export function AppShell({ actions, account, children }: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -70,6 +72,7 @@ export function AppShell({ actions, children }: Props) {
           <div className={styles.actions}>{actions}</div>
           {/* Interactive screens render their actions here via <PanelActions>. */}
           <div id={PANEL_PORTAL_ID} className={styles.actions} />
+          {account}
         </div>
       </aside>
 

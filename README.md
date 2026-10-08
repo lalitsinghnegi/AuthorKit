@@ -12,9 +12,18 @@ See [`CLAUDE.md`](./CLAUDE.md) for goals and conventions, and [`docs/BUILD_PROMP
 
 ```bash
 npm install
-cp .env.example .env   # then set ENCRYPTION_KEY (command is in the file)
+cp .env.example .env   # then set ENCRYPTION_KEY and SESSION_SECRET (commands are in the file)
 npm run dev            # http://localhost:3000
 ```
+
+### First sign-in
+
+On first start, with no users yet, the server log shows a one-time **setup code**. Open `/setup`, enter the code, and create the first admin account. After that, admins add people under **Settings → Users**:
+
+- **Admin:** changes everything (projects, Figma, tokens, presets, users).
+- **Viewer:** browses projects, previews packages and the style guide, and downloads zips.
+
+Everyone can change their own password on the **Account** page. **Settings → Audit log** shows who changed what. Changing `SESSION_SECRET` signs everyone out.
 
 ## Scripts
 
@@ -35,6 +44,8 @@ There is no database. Project configuration is saved as JSON files under `DATA_D
 ```
 data/
   settings.json                  # encrypted Figma token (Prompt 7)
+  users.json                     # users and password hashes
+  audit.log                      # who changed what (JSON lines)
   projects/<id>/project.json     # brand, prefix, breakpoints, scaffold, Figma links
   projects/<id>/tokens.json      # design tokens
   scaffold-templates/<id>.json   # scaffold presets

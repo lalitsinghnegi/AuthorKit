@@ -192,10 +192,36 @@ Rules:
 - **npm option checks:** `project.npm` holds `NpmName` (npm rules, optional `@scope/`, at most 214 characters) and `SemVer`. It is edited in the "Package options" card on the Generate screen.
 - **Browser test:** `src/test/browser/package.browser.test.ts` writes the Figma test project to a temporary folder and drives Chrome (`playwright-core`, `CHROME_PATH` or the default install paths) over `file://`. It checks for no console, page or request errors; brand colours; type sizes per viewport; the header drawer and inline nav; the accordion, modal and ISI bar hooks; and style guide inspect and search. It is skipped when no Chrome is found.
 
+## Access control and audit
+
+- **Roles:** `admin` changes everything. `viewer` browses projects, previews packages, opens the style guide and downloads zips. Settings, Users and Audit log are admin-only (`<AdminPage>`).
+- **Users:** stored in `data/users.json` (`src/lib/storage/users.ts`).
+  - Passwords are scrypt hashes (`src/lib/auth/password.ts`, N=2^15, per-user salt, constant-time compare), at least 12 characters, and not the email.
+  - There must always be one active admin, and admins can't demote, disable or delete themselves.
+  - A role, status or password change bumps `sessionVersion`.
+- **First admin:** with no users, the server prints a one-time setup code (`src/lib/auth/setup.ts`, also from `instrumentation.ts`), and `/setup` creates the first admin. Once a user exists, `/setup` is a 404. There is no public sign-up.
+- **Sessions:** an `ak_session` cookie holding `{ userId, version, expiresAt }`, signed with HMAC-SHA256 and `SESSION_SECRET` (at least 32 bytes) (`src/lib/auth/token.ts`).
+  - Flags: HttpOnly, SameSite=Lax, Secure in production; valid for 8 hours.
+  - Login is throttled: 5 failures per email and IP lock it for 15 minutes (in memory).
+  - Login errors are the same for unknown emails, wrong passwords and disabled users.
+- **Enforcement, in layers:**
+  1. `src/proxy.ts` checks the signature, expiry and that the user is still enabled with the same session version (`activeSession.ts`, which reads `users.json`). Pages redirect to `/login?next=…`; APIs return 401.
+  2. **Every server action starts with `checkAdmin()`** (or `requireAdmin()` for redirecting actions, or `checkSignedIn()` for the two read-only ones), before reading input. Return `auth.denied` when `!auth.user`.
+  3. Route handlers call `apiUser()`.
+  4. `src/test/allServerActions.test.ts` imports every `"use server"` file and fails if any action works for a viewer or a signed-out caller, or changes `data/`. New actions are covered automatically. Truly public actions go in its allow-list.
+- **Viewer UI:** wrap editors in `<EditGate>`, which shows a "View only" note, a disabled `<fieldset>` and `ReadOnlyProvider`, so `<PanelActions>` disables portaled buttons too. Hide admin-only panel actions with `<AdminOnly>`. `ScaffoldEditor` uses its own `readOnly`. Both read the session, so they render inside `<Suspense>`.
+- **Session reads** call `connection()` (the expiry check reads the clock), so they never run in a prerender.
+- **Audit log:** `data/audit.log`, one JSON line per event (`src/lib/audit/log.ts`), rotated to `audit-<time>.log` past 5 MB.
+  - Every changing action records `{ ts, actor, action, target, details }` with a short summary. So do sign-in, sign-out, failed sign-in (email only) and package downloads.
+  - Never log tokens, passwords or values that may hold secrets.
+  - Shown newest first at Settings → Audit log, with filters and 50 entries per page.
+- **Tests:** `src/test/session.ts` provides `withSignedIn(role)`, `signInAs`, `addTestUser` and the cookie and header `jar` behind the global `next/headers` mock in `vitest.setup.ts`. Action and route tests sign in first.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
   - `data/projects/<project-id>/project.json` holds the brand, prefix, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
+  - `data/users.json` holds users (scrypt hashes, never passwords), and `data/audit.log` holds the audit trail.
   - `data/scaffold-templates/*.json` holds the scaffold presets. Built-in presets (Basic, Component-based) live in code (`src/lib/scaffold/presets.ts`), can't be changed or deleted, and are merged into listings.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.
 - **Schemas** live in `src/lib/model/` (zod, one file per entity). Repositories in `src/lib/storage/` are the only code that reads or writes `data/`.
@@ -226,7 +252,7 @@ Rules:
 
 ## Secrets
 
-- Secrets live only in `.env` (never committed). `.env.example` documents required keys with placeholder values.
+- Secrets live only in `.env` (never committed): `ENCRYPTION_KEY`, `SESSION_SECRET` and the optional `ANTHROPIC_API_KEY`. `.env.example` documents required keys with placeholder values.
 - The Figma personal access token is **stored encrypted server-side** in `data/settings.json`, using AES-256-GCM with `ENCRYPTION_KEY` from `.env`. It is never sent to the browser, never logged, and never included in error messages.
 - Never commit real Figma tokens, file keys tied to private designs, or other credentials. Fixtures must be sanitised.
 - **Handling the token in code:**
@@ -269,7 +295,7 @@ These decisions override the build prompts wherever they conflict:
   - Import order is fixed: tokens → global → cta → accordion → header → footer → isi → modals. Files with no template follow, in tree order.
   - It is not part of the stored scaffold tree. The scaffold designer shows it as a locked "auto" row.
   - A user file with the same name at the root is a validation error.
-- **Prompt 15:** the audit log (if kept) is an append-only `data/audit.log` (JSON lines).
+- **Prompt 15:** the audit log is an append-only `data/audit.log` (JSON lines), and users live in `data/users.json`. There is no database, and no SSO for now.
 
 ## Commands
 
@@ -287,9 +313,10 @@ npm run build        # production build
 - This is **Next.js 16** with `cacheComponents` enabled. APIs differ from older versions, so check `node_modules/next/dist/docs/` before using a Next API (see `AGENTS.md`).
 - Route handlers that touch the filesystem call `await connection()` so they run at request time.
 - Client components that call `usePathname` sit inside `<Suspense>`, which dynamic routes such as `/projects/[id]` require under cacheComponents.
-- **Panel actions:** each screen adds its left-panel actions with a parallel route, `src/app/@actions/<route>/page.tsx`. Every route needs one, even an empty one. Otherwise, during client-side navigation, the slot keeps showing the previous screen's actions.
+- **Route groups:** signed-in screens live in `src/app/(app)/` (two-pane shell and account box). `/login` and `/setup` live in `src/app/(auth)/` (a centered card, no shell).
+- **Panel actions:** each screen adds its left-panel actions with a parallel route, `src/app/(app)/@actions/<route>/page.tsx`. Every route needs one, even an empty one. Otherwise, during client-side navigation, the slot keeps showing the previous screen's actions.
 - **Interactive panel actions:** when panel buttons need a client editor's state (Save, Fix all), the editor renders them with `<PanelActions>` (`src/components/AppShell/PanelActions.tsx`, a React portal into the panel). The route's `@actions` page then supplies only the static parts, such as `<ProjectNav>`. Portaled actions are client-only and don't appear in the server HTML.
 - **Project menu:** add new project sub-screens to the `items` list in `ProjectNav.tsx`, and give each one an `@actions/projects/[id]/<screen>/page.tsx`.
 - `notFound()` inside a `<Suspense>` boundary renders the not-found UI but keeps HTTP 200, because streaming has already started. Next.js adds `noindex`. This is expected.
-- Server actions live next to their route (e.g. `src/app/projects/actions.ts`). They validate with zod, return field errors for `useActionState`, and `redirect()` on success.
+- Server actions live next to their route (e.g. `src/app/(app)/projects/actions.ts`) and start with the admin check (see Access control). They validate with zod, return field errors for `useActionState`, and `redirect()` on success.
 - Paths built from `DATA_DIR` use `/*turbopackIgnore: true*/` so the build doesn't bundle runtime data.

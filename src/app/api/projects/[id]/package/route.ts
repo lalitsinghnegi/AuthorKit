@@ -1,5 +1,7 @@
 import { Readable } from "node:stream";
 import type { NextRequest } from "next/server";
+import { audit } from "@/lib/audit/log";
+import { actorOf, apiUser } from "@/lib/auth/session";
 import { buildPackage } from "@/lib/generator/build";
 import { loadGenerationInputs } from "@/lib/generator/load";
 import { zipFileName } from "@/lib/generator/naming";
@@ -8,6 +10,8 @@ import { getProject } from "@/lib/storage/projects";
 
 /** Stream the generated package as a zip. Nothing is written to disk. */
 export async function GET(_req: NextRequest, ctx: RouteContext<"/api/projects/[id]/package">) {
+  const user = await apiUser();
+  if (user instanceof Response) return user;
   const { id } = await ctx.params;
   const project = await getProject(id);
   if (!project) return Response.json({ error: "Project not found" }, { status: 404 });
@@ -23,6 +27,11 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/projects/[i
       { status: 409 },
     );
   }
+  await audit(actorOf(user), {
+    action: "package.download",
+    target: { type: "project", id: project.id, name: project.name },
+    details: `${pkg.files.length} files${project.npm?.enabled ? `, npm ${project.npm.name}@${project.npm.version}` : ""}`,
+  });
   const body = Readable.toWeb(zipStream(pkg)) as ReadableStream<Uint8Array>;
   return new Response(body, {
     headers: {

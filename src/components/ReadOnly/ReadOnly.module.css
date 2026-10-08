@@ -1,0 +1,14 @@
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.note {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border-radius: var(--ui-radius);
+  background: #fff4d6;
+  color: #3d2e00;
+}
