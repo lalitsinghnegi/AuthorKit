@@ -55,7 +55,9 @@ The token is encrypted on the server and is never shown again or sent to the bro
 
 If `ENCRYPTION_KEY` changes, the saved token can no longer be decrypted, so save it again.
 
-Then add frame links per project under **Figma**.
+Then add frame links per project under **Figma**, and match frames to components under **Components**.
+
+Optional: set `ANTHROPIC_API_KEY` in `.env` to let Claude suggest components for frames whose names are ambiguous. Only frame names, paths and sizes are sent, and suggestions always need your confirmation.
 
 ## Generating a package
 

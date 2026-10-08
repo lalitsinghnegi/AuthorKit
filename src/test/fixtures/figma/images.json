@@ -3,6 +3,13 @@
   "images": {
     "2:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/header-desktop.png",
     "2:2": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/header-mobile.png",
-    "3:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cta.png"
+    "3:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cta.png",
+    "4:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-1.png",
+    "4:10": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-10.png",
+    "4:11": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-11.png",
+    "4:12": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-12.png",
+    "4:13": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-13.png",
+    "4:14": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-14.png",
+    "4:15": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-15.png"
   }
 }

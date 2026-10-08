@@ -13,6 +13,7 @@ export function ProjectNav({ id, name }: { id: string; name: string }) {
     { href: `${base}/breakpoints`, label: "Breakpoints" },
     { href: `${base}/scaffold`, label: "Scaffold" },
     { href: `${base}/figma`, label: "Figma" },
+    { href: `${base}/mapping`, label: "Components" },
     { href: `${base}/tokens`, label: "Tokens" },
     { href: `${base}/generate`, label: "Generate" },
   ];

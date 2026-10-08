@@ -97,6 +97,20 @@ Rules:
 - **Saving:** `saveTokensAction` only changes `name`, `value` and `status`. It re-validates every value with `validateTokenValue`, which refuses `; { } < > \` and comments, because values go into CSS. A value different from Figma's is always saved as `overridden`.
 - **Not used by the generator yet.** Accepted and overridden tokens reach the CSS in Prompt 11.
 
+## Component mapping and AI
+
+- **Data:** frames inside each linked node are mapped to components and stored on the link as `FigmaLink.mappings` (`FrameMapping`).
+- **Finding frames:** `candidateFrames` lists the linked node and frame-like children and grandchildren. `suggestFromPatterns` matches whole-word keywords from Settings, with `DEFAULT_PATTERNS` used for anything not overridden. A tie or no match is low confidence and counts as ambiguous.
+- **Re-detection:** `mergeMappings` keeps confirmed and ignored frames, keeps AI suggestions over pattern misses, and marks frames that have disappeared as missing.
+- **AI is optional and only suggests.**
+  - It sits behind the `LLMProvider` interface. `AnthropicProvider` (`@anthropic-ai/sdk`) is used only when `ANTHROPIC_API_KEY` is set; `getLLMProvider()` returns null otherwise.
+  - Request: model `claude-opus-5-5`, effort `low`, structured output via a JSON schema, and `fallbacks: "default"` with beta `server-side-fallback-2026-07-01`.
+  - It sends frame names, paths, child names and sizes only. The system prompt treats names as data.
+  - Output passes `validateSuggestions`: schema-checked, unknown node ids dropped, reasons trimmed. Results are saved as `suggested` with source `ai` and never confirmed automatically.
+  - Errors become `LLMError` with fixed messages.
+- **Tests** use `MockLLMProvider` (`src/test/llm.ts`), or inject `fetch` into `AnthropicProvider` (with `maxRetries: 0`).
+- **Previews:** Figma image links expire, so they are never stored. They are filtered by `isAllowedImageUrl` (Figma's S3 bucket and `*.figma.com`, https only) on both server and client.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:

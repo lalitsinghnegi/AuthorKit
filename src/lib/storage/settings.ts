@@ -1,5 +1,5 @@
 import "server-only";
-import { type FigmaAccount, SCHEMA_VERSION, Settings } from "@/lib/model";
+import { type ComponentPatterns, type FigmaAccount, SCHEMA_VERSION, Settings } from "@/lib/model";
 import { decrypt, encrypt } from "@/lib/secrets/crypto";
 import type { Secret } from "@/lib/secrets/secret";
 import { readJson, writeJsonAtomic } from "./files";
@@ -45,4 +45,21 @@ export async function removeFigmaToken(): Promise<void> {
   void _a;
   void _d;
   await writeJsonAtomic(FILE, rest satisfies Settings);
+}
+
+/** Saved frame-name keywords (overrides only); undefined when the defaults are in use. */
+export async function getComponentPatterns(): Promise<ComponentPatterns | undefined> {
+  return (await load()).componentPatterns;
+}
+
+/** Save keyword overrides, or pass undefined to go back to the defaults. */
+export async function saveComponentPatterns(
+  patterns: ComponentPatterns | undefined,
+): Promise<void> {
+  const { componentPatterns: _old, ...rest } = await load();
+  void _old;
+  await writeJsonAtomic(
+    FILE,
+    Settings.parse(patterns ? { ...rest, componentPatterns: patterns } : rest),
+  );
 }

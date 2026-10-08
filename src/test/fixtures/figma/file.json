@@ -16,49 +16,104 @@
             "id": "1:1",
             "name": "Global / Colors",
             "type": "FRAME",
-            "absoluteBoundingBox": { "x": 0, "y": 0, "width": 800, "height": 200 },
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 0,
+              "width": 800,
+              "height": 200
+            },
             "children": [
               {
                 "id": "1:10",
                 "name": "Primary",
                 "type": "RECTANGLE",
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.5412,
+                      "g": 0.0431,
+                      "b": 0.3098,
+                      "a": 1
+                    }
+                  }
                 ],
-                "styles": { "fill": "S:primary" }
+                "styles": {
+                  "fill": "S:primary"
+                }
               },
               {
                 "id": "1:11",
                 "name": "Primary Dark",
                 "type": "RECTANGLE",
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.4, "g": 0.0314, "b": 0.2275, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.4,
+                      "g": 0.0314,
+                      "b": 0.2275,
+                      "a": 1
+                    }
+                  }
                 ],
-                "styles": { "fill": "S:primary-dark" }
+                "styles": {
+                  "fill": "S:primary-dark"
+                }
               },
               {
                 "id": "1:12",
                 "name": "Text",
                 "type": "RECTANGLE",
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.1216, "g": 0.1373, "b": 0.1608, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.1216,
+                      "g": 0.1373,
+                      "b": 0.1608,
+                      "a": 1
+                    }
+                  }
                 ],
-                "styles": { "fill": "S:text" }
+                "styles": {
+                  "fill": "S:text"
+                }
               },
               {
                 "id": "1:13",
                 "name": "Surface",
                 "type": "RECTANGLE",
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.9725, "g": 0.9529, "b": 0.9647, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.9725,
+                      "g": 0.9529,
+                      "b": 0.9647,
+                      "a": 1
+                    }
+                  }
                 ],
-                "styles": { "fill": "S:surface" }
+                "styles": {
+                  "fill": "S:surface"
+                }
               },
               {
                 "id": "1:14",
                 "name": "One-off accent",
                 "type": "RECTANGLE",
-                "fills": [{ "type": "SOLID", "color": { "r": 0.0, "g": 0.6, "b": 0.5, "a": 1 } }]
+                "fills": [
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.0,
+                      "g": 0.6,
+                      "b": 0.5,
+                      "a": 1
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -66,7 +121,12 @@
             "id": "1:2",
             "name": "Global / Typography",
             "type": "FRAME",
-            "absoluteBoundingBox": { "x": 0, "y": 300, "width": 800, "height": 600 },
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 300,
+              "width": 800,
+              "height": 600
+            },
             "children": [
               {
                 "id": "1:20",
@@ -80,7 +140,10 @@
                   "lineHeightPx": 48,
                   "letterSpacing": -0.4
                 },
-                "styles": { "text": "S:h1", "fill": "S:text" }
+                "styles": {
+                  "text": "S:h1",
+                  "fill": "S:text"
+                }
               },
               {
                 "id": "1:21",
@@ -94,7 +157,9 @@
                   "lineHeightPx": 40,
                   "letterSpacing": -0.32
                 },
-                "styles": { "text": "S:h2" }
+                "styles": {
+                  "text": "S:h2"
+                }
               },
               {
                 "id": "1:22",
@@ -108,7 +173,9 @@
                   "lineHeightPx": 24,
                   "letterSpacing": 0
                 },
-                "styles": { "text": "S:body" }
+                "styles": {
+                  "text": "S:body"
+                }
               },
               {
                 "id": "1:23",
@@ -123,7 +190,15 @@
                   "letterSpacing": 0
                 },
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.5412,
+                      "g": 0.0431,
+                      "b": 0.3098,
+                      "a": 1
+                    }
+                  }
                 ]
               }
             ]
@@ -139,20 +214,43 @@
             "id": "2:1",
             "name": "Header / Desktop",
             "type": "FRAME",
-            "absoluteBoundingBox": { "x": 0, "y": 0, "width": 1440, "height": 80 },
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 80
+            },
             "layoutMode": "HORIZONTAL",
             "itemSpacing": 32,
             "paddingLeft": 32,
             "paddingRight": 32,
             "paddingTop": 16,
             "paddingBottom": 16,
-            "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }],
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 1,
+                  "g": 1,
+                  "b": 1,
+                  "a": 1
+                }
+              }
+            ],
             "effects": [
               {
                 "type": "DROP_SHADOW",
                 "visible": true,
-                "color": { "r": 0, "g": 0, "b": 0, "a": 0.08 },
-                "offset": { "x": 0, "y": 1 },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.08
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
                 "radius": 2,
                 "spread": 0
               }
@@ -162,7 +260,12 @@
                 "id": "2:10",
                 "name": "Logo",
                 "type": "RECTANGLE",
-                "absoluteBoundingBox": { "x": 32, "y": 20, "width": 120, "height": 40 }
+                "absoluteBoundingBox": {
+                  "x": 32,
+                  "y": 20,
+                  "width": 120,
+                  "height": 40
+                }
               },
               {
                 "id": "2:11",
@@ -191,29 +294,58 @@
             "id": "2:2",
             "name": "Header / Mobile",
             "type": "FRAME",
-            "absoluteBoundingBox": { "x": 0, "y": 200, "width": 375, "height": 64 },
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 200,
+              "width": 375,
+              "height": 64
+            },
             "layoutMode": "HORIZONTAL",
             "itemSpacing": 16,
             "paddingLeft": 16,
             "paddingRight": 16,
             "paddingTop": 12,
             "paddingBottom": 12,
-            "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }],
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 1,
+                  "g": 1,
+                  "b": 1,
+                  "a": 1
+                }
+              }
+            ],
             "children": [
               {
                 "id": "2:20",
                 "name": "Logo",
                 "type": "RECTANGLE",
-                "absoluteBoundingBox": { "x": 16, "y": 16, "width": 96, "height": 32 }
+                "absoluteBoundingBox": {
+                  "x": 16,
+                  "y": 16,
+                  "width": 96,
+                  "height": 32
+                }
               },
-              { "id": "2:21", "name": "Menu button", "type": "FRAME" }
+              {
+                "id": "2:21",
+                "name": "Menu button",
+                "type": "FRAME"
+              }
             ]
           },
           {
             "id": "3:1",
             "name": "CTA / Buttons",
             "type": "FRAME",
-            "absoluteBoundingBox": { "x": 0, "y": 400, "width": 600, "height": 120 },
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 400,
+              "width": 600,
+              "height": 120
+            },
             "children": [
               {
                 "id": "3:10",
@@ -227,9 +359,19 @@
                 "paddingBottom": 12,
                 "cornerRadius": 999,
                 "fills": [
-                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.5412,
+                      "g": 0.0431,
+                      "b": 0.3098,
+                      "a": 1
+                    }
+                  }
                 ],
-                "styles": { "fill": "S:primary" },
+                "styles": {
+                  "fill": "S:primary"
+                },
                 "children": [
                   {
                     "id": "3:11",
@@ -242,7 +384,17 @@
                       "fontSize": 16,
                       "lineHeightPx": 18
                     },
-                    "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }]
+                    "fills": [
+                      {
+                        "type": "SOLID",
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 1
+                        }
+                      }
+                    ]
                   }
                 ]
               },
@@ -257,9 +409,164 @@
                 "paddingBottom": 12,
                 "cornerRadius": 999,
                 "strokes": [
-                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.5412,
+                      "g": 0.0431,
+                      "b": 0.3098,
+                      "a": 1
+                    }
+                  }
                 ],
                 "strokeWeight": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0:3",
+        "name": "Pages",
+        "type": "CANVAS",
+        "children": [
+          {
+            "id": "4:1",
+            "name": "Home / Desktop",
+            "type": "FRAME",
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 3200
+            },
+            "children": [
+              {
+                "id": "4:10",
+                "name": "Header",
+                "type": "INSTANCE",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1440,
+                  "height": 80
+                },
+                "children": [
+                  {
+                    "id": "4:100",
+                    "name": "Logo",
+                    "type": "RECTANGLE"
+                  },
+                  {
+                    "id": "4:101",
+                    "name": "Nav",
+                    "type": "FRAME",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "4:11",
+                "name": "Hero",
+                "type": "FRAME",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 80,
+                  "width": 1440,
+                  "height": 600
+                },
+                "children": [
+                  {
+                    "id": "4:110",
+                    "name": "Headline",
+                    "type": "TEXT",
+                    "characters": "Live well"
+                  },
+                  {
+                    "id": "4:111",
+                    "name": "Button / Primary",
+                    "type": "INSTANCE",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "4:12",
+                "name": "CTA band",
+                "type": "FRAME",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 680,
+                  "width": 1440,
+                  "height": 240
+                },
+                "children": []
+              },
+              {
+                "id": "4:13",
+                "name": "Frame 12",
+                "type": "FRAME",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 920,
+                  "width": 1440,
+                  "height": 400
+                },
+                "children": [
+                  {
+                    "id": "4:130",
+                    "name": "Question 1",
+                    "type": "FRAME",
+                    "children": []
+                  },
+                  {
+                    "id": "4:131",
+                    "name": "Question 2",
+                    "type": "FRAME",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "4:14",
+                "name": "Important Safety Information",
+                "type": "SECTION",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 1320,
+                  "width": 1440,
+                  "height": 800
+                },
+                "children": []
+              },
+              {
+                "id": "4:15",
+                "name": "Footer",
+                "type": "FRAME",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 2120,
+                  "width": 1440,
+                  "height": 320
+                },
+                "children": []
+              },
+              {
+                "id": "4:16",
+                "name": "Header / Footer spacer",
+                "type": "FRAME",
+                "absoluteBoundingBox": {
+                  "x": 0,
+                  "y": 2440,
+                  "width": 1440,
+                  "height": 40
+                },
+                "children": []
+              },
+              {
+                "id": "4:17",
+                "name": "Divider",
+                "type": "RECTANGLE"
               }
             ]
           }
@@ -279,10 +586,30 @@
       "name": "Brand/Primary Dark",
       "styleType": "FILL"
     },
-    "S:text": { "key": "k-text", "name": "Neutral/Text", "styleType": "FILL" },
-    "S:surface": { "key": "k-surface", "name": "Neutral/Surface", "styleType": "FILL" },
-    "S:h1": { "key": "k-h1", "name": "Heading/H1", "styleType": "TEXT" },
-    "S:h2": { "key": "k-h2", "name": "Heading/H2", "styleType": "TEXT" },
-    "S:body": { "key": "k-body", "name": "Body/Regular", "styleType": "TEXT" }
+    "S:text": {
+      "key": "k-text",
+      "name": "Neutral/Text",
+      "styleType": "FILL"
+    },
+    "S:surface": {
+      "key": "k-surface",
+      "name": "Neutral/Surface",
+      "styleType": "FILL"
+    },
+    "S:h1": {
+      "key": "k-h1",
+      "name": "Heading/H1",
+      "styleType": "TEXT"
+    },
+    "S:h2": {
+      "key": "k-h2",
+      "name": "Heading/H2",
+      "styleType": "TEXT"
+    },
+    "S:body": {
+      "key": "k-body",
+      "name": "Body/Regular",
+      "styleType": "TEXT"
+    }
   }
 }
