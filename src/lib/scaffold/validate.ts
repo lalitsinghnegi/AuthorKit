@@ -36,8 +36,23 @@ export function validateName(name: string, siblings: readonly TreeNode[] = []): 
   return null;
 }
 
-export function validateTree(tree: ScaffoldTree): TreeIssue[] {
+export type TreeOptions = {
+  /** Names at the root that generated files will occupy (case-insensitive). */
+  reservedRootNames?: readonly string[];
+};
+
+/** Error message if a root-level name collides with a generated file. */
+export function reservedNameError(name: string, reserved: readonly string[] = []): string | null {
+  const hit = reserved.find((r) => r.toLowerCase() === name.toLowerCase());
+  return hit ? `"${hit}" is generated automatically at the package root` : null;
+}
+
+export function validateTree(tree: ScaffoldTree, options: TreeOptions = {}): TreeIssue[] {
   const issues: TreeIssue[] = [];
+  for (const child of tree.children) {
+    const error = reservedNameError(child.name, options.reservedRootNames);
+    if (error) issues.push({ nodeId: child.id, severity: "error", message: error });
+  }
   const templateUse = new Map<string, string[]>();
 
   const visit = (node: TreeNode, parent: FolderNode | null) => {

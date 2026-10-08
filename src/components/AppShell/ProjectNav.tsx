@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./AppShell.module.css";
 
-/** Sub-navigation for one project. Later prompts add Figma, Tokens and Generate. */
+/** Sub-navigation for one project. Later prompts add Figma and Tokens. */
 export function ProjectNav({ id, name }: { id: string; name: string }) {
   const pathname = usePathname();
   const base = `/projects/${id}`;
@@ -12,6 +12,7 @@ export function ProjectNav({ id, name }: { id: string; name: string }) {
     { href: base, label: "Overview" },
     { href: `${base}/breakpoints`, label: "Breakpoints" },
     { href: `${base}/scaffold`, label: "Scaffold" },
+    { href: `${base}/generate`, label: "Generate" },
   ];
 
   return (

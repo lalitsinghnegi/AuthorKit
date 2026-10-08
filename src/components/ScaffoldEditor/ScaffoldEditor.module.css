@@ -233,3 +233,12 @@ button.name:hover {
     opacity: 1;
   }
 }
+
+.row[data-auto] {
+  color: var(--ui-muted);
+}
+
+.row[data-auto] .name {
+  color: var(--ui-muted);
+  cursor: default;
+}

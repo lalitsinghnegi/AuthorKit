@@ -55,8 +55,11 @@ export function normalizeCss(css: string): string {
   );
 }
 
-/** Render one CSS template. Same context in, byte-identical CSS out. */
-export function renderTemplate(id: CssTemplateId, ctx: TemplateContext): string {
+/**
+ * Render one CSS template. Same context in, byte-identical CSS out.
+ * `fileName` is the path shown in the header; defaults to the manifest's file name.
+ */
+export function renderTemplate(id: CssTemplateId, ctx: TemplateContext, fileName?: string): string {
   const manifest = getManifest(id);
   const variables =
     id === "tokens"
@@ -66,7 +69,7 @@ export function renderTemplate(id: CssTemplateId, ctx: TemplateContext): string 
     ...ctx,
     file: {
       id,
-      name: manifest.fileName,
+      name: fileName ?? manifest.fileName,
       title: manifest.name,
       variables,
       variablesVerb: id === "tokens" ? "defined" : "used",

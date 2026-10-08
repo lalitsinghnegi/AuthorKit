@@ -11,6 +11,7 @@ import {
   TokenFile,
 } from "@/lib/model";
 import { listEntries, readJson, removeDataPath, writeJsonAtomic } from "./files";
+import { slugify } from "./slug";
 
 const projectDir = (id: string) => `projects/${id}`;
 const projectFile = (id: string) => `${projectDir(id)}/project.json`;
@@ -22,15 +23,7 @@ function requireId(id: string): void {
   if (!isProjectId(id)) throw new Error(`Invalid project id: ${id}`);
 }
 
-/** Folder-safe slug used for the scaffold root, e.g. "Acme Health" → "acme-health". */
-export function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
+export { slugify } from "./slug";
 
 export type ProjectList = { projects: Project[]; invalid: string[] };
 

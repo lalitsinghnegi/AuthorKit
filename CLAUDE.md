@@ -67,6 +67,18 @@ Rules:
 - **When you change a template,** update its manifest `variables` and `selectors` to match. The tests say exactly what differs.
 - **Prettier** ignores `*.hbs`, because it would reformat Handlebars as HTML.
 
+## Generator
+
+- `generatePackage(project)` (`src/lib/generator/generate.ts`, server-only) builds the whole package in memory. It contains:
+  - `<brand-slug>.css` (the entry file)
+  - `README.md`
+  - every scaffold file, in tree order: templated CSS, header-only CSS for `.css` files without a template, and empty files for other types
+  - every folder, including empty ones
+- Any error from `checkProject` blocks generation. That covers scaffold errors, breakpoint errors, and root names reserved by `reservedRootNames(project)`.
+- `zipStream(pkg)` streams the zip with everything under `<root>/`. It re-checks every path with `assertSafePath` and gives every entry a fixed date (`ZIP_DATE`), so identical input gives identical bytes.
+- `GET /api/projects/[id]/package` returns the zip. It returns 409 with `problems` when generation is blocked.
+- Snapshot tests in `src/lib/generator/__snapshots__/` capture every generated file for both approaches. After an intended template change, update them with `npx vitest run -u` and review the diff.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:

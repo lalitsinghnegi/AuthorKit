@@ -175,4 +175,32 @@ describe("ScaffoldEditor", () => {
     expect(screen.getByText("global.css")).toBeInTheDocument();
     expect(panel.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  it("shows generated root files locked and reserves their names", () => {
+    const { panel } = setup({
+      autoRootFiles: [
+        { name: "acme.css", note: "entry" },
+        { name: "README.md", note: "package guide" },
+      ],
+    });
+    expect(screen.getByText("auto · entry")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Rename acme.css" })).not.toBeInTheDocument();
+    expect(preview().textContent).toMatch(
+      /^acme\/\n├── acme\.css  ← entry\n├── README\.md  ← package guide/,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add file in acme" }));
+    const input = screen.getByLabelText("New name for new-file.css");
+    fireEvent.change(input, { target: { value: "readme.md" } });
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      '"README.md" is generated automatically at the package root',
+    );
+    // Allowed inside sub-folders.
+    fireEvent.keyDown(input, { key: "Escape" });
+    fireEvent.click(screen.getByRole("button", { name: "Add file in css" }));
+    const nested = screen.getAllByLabelText(/New name for new-file/)[0];
+    fireEvent.change(nested, { target: { value: "README.md" } });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(panel.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
 });

@@ -188,6 +188,14 @@ describe("helpers", () => {
     );
   });
 
+  it("renders extra root files first with their notes", () => {
+    expect(
+      renderTreeText(sample(), [{ name: "pkg.css", note: "entry" }, { name: "README.md" }])
+        .split("\n")
+        .slice(0, 4),
+    ).toEqual(["pkg/", "├── pkg.css  ← entry", "├── README.md", "├── css/"]);
+  });
+
   it("reports templates no file uses", () => {
     expect(unusedTemplates(sample())).toEqual(["tokens", "footer", "isi", "modals", "accordion"]);
   });

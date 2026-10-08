@@ -7,24 +7,20 @@ import type {
 } from "@/components/ScaffoldEditor/ScaffoldEditor";
 import { cloneWithNewIds } from "@/lib/scaffold";
 import { checkTree } from "@/lib/scaffold/server";
-import { updateProject } from "@/lib/storage/projects";
+import { reservedRootNames } from "@/lib/generator/naming";
+import { getProject, updateProject } from "@/lib/storage/projects";
 import { availableTemplateId, saveScaffoldTemplate } from "@/lib/storage/scaffoldTemplates";
 
 export async function saveProjectScaffoldAction(
   projectId: string,
   payload: ScaffoldSavePayload,
 ): Promise<SaveResult> {
-  const checked = checkTree(payload?.tree);
+  const project = await getProject(projectId);
+  if (!project) return { ok: false, error: "This project no longer exists." };
+  const checked = checkTree(payload?.tree, { reservedRootNames: reservedRootNames(project) });
   if ("error" in checked) return { ok: false, error: checked.error };
-  try {
-    await updateProject(projectId, (p) => ({ ...p, scaffold: checked.tree }));
-    return { ok: true };
-  } catch (err) {
-    if (err instanceof Error && err.message.startsWith("Project not found")) {
-      return { ok: false, error: "This project no longer exists." };
-    }
-    throw err;
-  }
+  await updateProject(projectId, (p) => ({ ...p, scaffold: checked.tree }));
+  return { ok: true };
 }
 
 export async function saveScaffoldAsPresetAction(

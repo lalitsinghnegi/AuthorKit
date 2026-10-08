@@ -36,6 +36,8 @@ export type ScaffoldSavePayload = { tree: ScaffoldTree; name?: string; descripti
 export type PresetOption = { id: string; name: string; tree: ScaffoldTree };
 export type SaveAsPresetResult =
   { ok: true; id: string; name: string } | { ok: false; error: string };
+/** Files the generator adds at the package root; shown locked, and their names are reserved. */
+export type AutoRootFile = { name: string; note: string };
 
 type Props = {
   initialTree: ScaffoldTree;
@@ -46,6 +48,7 @@ type Props = {
   /** Presets offered by "Apply preset". */
   presets?: PresetOption[];
   onSaveAsPreset?: (name: string, tree: ScaffoldTree) => Promise<SaveAsPresetResult>;
+  autoRootFiles?: AutoRootFile[];
 };
 
 type Status = { kind: "idle" | "saved" | "error"; message?: React.ReactNode };
@@ -66,6 +69,7 @@ export function ScaffoldEditor({
   onSave,
   presets,
   onSaveAsPreset,
+  autoRootFiles = [],
 }: Props) {
   const router = useRouter();
   const history = useHistory<Doc>({ tree: initialTree, meta: initialMeta });
@@ -76,7 +80,11 @@ export function ScaffoldEditor({
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [busy, startTransition] = useTransition();
 
-  const issues = useMemo(() => validateTree(tree), [tree]);
+  const reservedRootNames = useMemo(() => autoRootFiles.map((f) => f.name), [autoRootFiles]);
+  const issues = useMemo(
+    () => validateTree(tree, { reservedRootNames }),
+    [tree, reservedRootNames],
+  );
   const errors = issues.filter((i) => i.severity === "error");
   const warnings = issues.filter((i) => i.severity === "warning");
   const nameError = metaError(meta);
@@ -305,6 +313,7 @@ export function ScaffoldEditor({
           <TreeView
             tree={tree}
             readOnly={readOnly}
+            autoRootFiles={autoRootFiles}
             issuesFor={(id) => issues.filter((i) => i.nodeId === id)}
             collapsed={collapsed}
             toggle={(id) =>
@@ -332,7 +341,7 @@ export function ScaffoldEditor({
               Package preview
             </h2>
             <pre className={styles.preview}>
-              <code>{renderTreeText(tree)}</code>
+              <code>{renderTreeText(tree, autoRootFiles)}</code>
             </pre>
             {unused.length > 0 && (
               <p className={ui.hint}>

@@ -35,6 +35,15 @@ describe("project scaffold actions", () => {
     expect((await getProject(project.id))?.scaffold).toEqual(project.scaffold);
   });
 
+  it("refuses root files that clash with generated names", async () => {
+    const project = await newProject();
+    const tree = addNode(project.scaffold, project.scaffold.id, createFile("ACME.css"));
+    expect(await saveProjectScaffoldAction(project.id, { tree })).toEqual({
+      ok: false,
+      error: '"acme.css" is generated automatically at the package root',
+    });
+  });
+
   it("reports a missing project", async () => {
     const project = await newProject();
     expect(

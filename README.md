@@ -42,6 +42,10 @@ data/
 
 Projects can be exported and imported as a single JSON file from the Projects screen.
 
+## Generating a package
+
+Open a project → **Generate** to preview every file, then **Download zip**. `GET /api/projects/<id>/package` returns the same zip. Generation is deterministic: an unchanged project always produces identical bytes.
+
 ## Health check
 
 `GET /api/health` returns `{"status":"ok","storage":"ok"}` when the data folder is writable, and returns `503` otherwise.
@@ -57,4 +61,9 @@ src/
   components/AppShell # two-pane shell: left action panel + right work area
   lib/model/          # zod schemas: Project, BreakpointSet, ScaffoldTemplate, FigmaLink, DesignToken, Settings
   lib/storage/        # repositories: atomic JSON file storage (zod-validated)
+  lib/breakpoints/    # breakpoint validation and media queries
+  lib/scaffold/       # scaffold tree operations, validation, presets
+  lib/templates/      # CSS template rendering, manifests, cascade, lint config
+  lib/generator/      # package generation (entry file, README, zip)
+  templates/          # Handlebars CSS templates, partials, manifests, default tokens
 ```

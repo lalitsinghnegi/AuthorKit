@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { ScaffoldEditor } from "@/components/ScaffoldEditor/ScaffoldEditor";
 import ui from "@/components/ui/ui.module.css";
+import { README_NAME, entryFileName } from "@/lib/generator/naming";
 import { getProject } from "@/lib/storage/projects";
 import { listScaffoldTemplates } from "@/lib/storage/scaffoldTemplates";
 import { saveProjectScaffoldAction, saveScaffoldAsPresetAction } from "./actions";
@@ -31,6 +32,10 @@ async function Loader({ params }: Pick<PageProps<"/projects/[id]/scaffold">, "pa
         onSave={saveProjectScaffoldAction.bind(null, project.id)}
         presets={presets.map((p) => ({ id: p.id, name: p.name, tree: p.tree }))}
         onSaveAsPreset={saveScaffoldAsPresetAction}
+        autoRootFiles={[
+          { name: entryFileName(project), note: "entry, imports every stylesheet" },
+          { name: README_NAME, note: "package guide" },
+        ]}
       />
     </>
   );

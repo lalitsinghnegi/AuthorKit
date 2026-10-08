@@ -9,7 +9,13 @@ import {
   type ScaffoldTree,
   type TreeNode,
 } from "@/lib/model";
-import { listFolders, moveBlocker, validateName, type TreeIssue } from "@/lib/scaffold";
+import {
+  listFolders,
+  moveBlocker,
+  reservedNameError,
+  validateName,
+  type TreeIssue,
+} from "@/lib/scaffold";
 import styles from "./ScaffoldEditor.module.css";
 
 export type DropPosition = "before" | "after" | "inside";
@@ -18,6 +24,8 @@ export type DropPosition = "before" | "after" | "inside";
 export type TreeContext = {
   tree: ScaffoldTree;
   readOnly: boolean;
+  /** Generated root files: rendered locked at the top of the root folder. */
+  autoRootFiles: { name: string; note: string }[];
   issuesFor: (id: string) => TreeIssue[];
   collapsed: Set<string>;
   toggle: (id: string) => void;
@@ -145,7 +153,11 @@ function Row({
         )}
         <span aria-hidden="true">{isFolder ? "📁" : "📄"}</span>
 
-        <NameCell node={node} siblings={parent?.children.filter((c) => c.id !== node.id) ?? []} />
+        <NameCell
+          node={node}
+          siblings={parent?.children.filter((c) => c.id !== node.id) ?? []}
+          atRoot={parent?.id === ctx.tree.id}
+        />
 
         {node.type === "file" &&
           (ctx.readOnly ? (
@@ -238,22 +250,39 @@ function Row({
         </ul>
       )}
 
-      {node.type === "folder" && open && node.children.length > 0 && (
-        <ul className={styles.tree}>
-          {node.children.map((child, i) => (
-            <Row key={child.id} node={child} parent={node} index={i} depth={depth + 1} />
-          ))}
-        </ul>
-      )}
+      {node.type === "folder" &&
+        open &&
+        (node.children.length > 0 || (isRoot && ctx.autoRootFiles.length > 0)) && (
+          <ul className={styles.tree}>
+            {isRoot &&
+              ctx.autoRootFiles.map((file) => (
+                <AutoRow key={file.name} name={file.name} note={file.note} depth={depth + 1} />
+              ))}
+            {node.children.map((child, i) => (
+              <Row key={child.id} node={child} parent={node} index={i} depth={depth + 1} />
+            ))}
+          </ul>
+        )}
     </li>
   );
 }
 
-function NameCell({ node, siblings }: { node: TreeNode; siblings: TreeNode[] }) {
+function NameCell({
+  node,
+  siblings,
+  atRoot,
+}: {
+  node: TreeNode;
+  siblings: TreeNode[];
+  atRoot: boolean;
+}) {
   const ctx = useTree();
   const editing = ctx.editingId === node.id;
   const [draft, setDraft] = useState(node.name);
-  const error = editing ? validateName(draft.trim(), siblings) : null;
+  const reserved = atRoot ? ctx.autoRootFiles.map((f) => f.name) : [];
+  const error = editing
+    ? (validateName(draft.trim(), siblings) ?? reservedNameError(draft.trim(), reserved))
+    : null;
 
   if (!editing) {
     return ctx.readOnly ? (
@@ -335,5 +364,21 @@ function MoveTo({ node, parentId }: { node: TreeNode; parentId: string }) {
         </option>
       ))}
     </select>
+  );
+}
+
+/** A generated file: shown for context, never editable or draggable. */
+function AutoRow({ name, note, depth }: { name: string; note: string; depth: number }) {
+  return (
+    <li>
+      <div className={styles.row} data-auto style={{ paddingLeft: depth * 20 + 4 }}>
+        <span className={styles.toggle} aria-hidden="true" />
+        <span aria-hidden="true">📄</span>
+        <span className={styles.name}>{name}</span>
+        <span className={styles.templateTag} title="Generated automatically; cannot be edited">
+          auto · {note}
+        </span>
+      </div>
+    </li>
   );
 }
