@@ -33,6 +33,13 @@ const files: ViewFile[] = [
   },
   { path: "README.md", content: "# Acme\n", source: "readme", templateId: null, size: 7 },
   {
+    path: "style-guide/index.html",
+    content: "<!doctype html>",
+    source: "styleguide",
+    templateId: null,
+    size: 15,
+  },
+  {
     path: "css/global.css",
     content: "body {\n  margin: 0;\n}\n",
     source: "template",
@@ -50,7 +57,6 @@ function setup(props: Partial<React.ComponentProps<typeof GenerateView>> = {}) {
       projectId="p1"
       zipName="acme-css-package.zip"
       scaffold={scaffold}
-      autoFiles={["acme.css", "README.md"]}
       approach="mobile-first"
       breakpointCount={3}
       problems={[]}
@@ -75,13 +81,15 @@ describe("GenerateView", () => {
     expect(within(viewer()).getByText("css/global.css")).toBeInTheDocument();
     expect(viewer()).toHaveTextContent("margin: 0;");
     expect(viewer()).toHaveTextContent("2.0 KB · Global (type, links, base) template");
-    expect(screen.getAllByText("auto")).toHaveLength(2);
+    // Two generated root files plus the generated style-guide/ folder.
+    expect(screen.getAllByText("auto")).toHaveLength(3);
+    expect(screen.getByText(/📁 style-guide\//)).toBeInTheDocument();
     expect(screen.getByText("📁 empty/")).toBeInTheDocument();
 
     const link = panel.getByRole("link", { name: "Download zip" });
     expect(link).toHaveAttribute("href", "/api/projects/p1/package");
     expect(link).toHaveAttribute("download", "acme-css-package.zip");
-    expect(panel.getByText("2.0 KB", { exact: false })).toBeInTheDocument();
+    expect(panel.getByText("2.1 KB", { exact: false })).toBeInTheDocument(); // 31 + 7 + 15 + 2048 bytes
   });
 
   it("selects a file, updates the URL and copies its contents", async () => {

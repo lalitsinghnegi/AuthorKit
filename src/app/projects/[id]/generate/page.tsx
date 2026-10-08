@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
 import { buildPackage } from "@/lib/generator/build";
 import { loadGenerationInputs } from "@/lib/generator/load";
-import { README_NAME, entryFileName, zipFileName } from "@/lib/generator/naming";
+import { defaultNpmName, zipFileName } from "@/lib/generator/naming";
 import { getProject } from "@/lib/storage/projects";
 import { GenerateView } from "./GenerateView";
+import { PackageOptions } from "./PackageOptions";
 
 export default function GeneratePage(props: PageProps<"/projects/[id]/generate">) {
   return (
@@ -31,11 +32,15 @@ async function Loader({ params, searchParams }: PageProps<"/projects/[id]/genera
         title="Generate"
         description={`Preview the ${project.brandName} package and download it as a zip. Nothing is stored; the package is built fresh each time.`}
       />
+      <PackageOptions
+        projectId={project.id}
+        initial={project.npm ?? { enabled: false, name: defaultNpmName(project), version: "1.0.0" }}
+      />
+      <div style={{ height: 20 }} />
       <GenerateView
         projectId={project.id}
         zipName={zipFileName(project)}
         scaffold={project.scaffold}
-        autoFiles={[entryFileName(project), README_NAME]}
         approach={project.approach}
         breakpointCount={project.breakpoints.breakpoints.length}
         problems={pkg.problems}

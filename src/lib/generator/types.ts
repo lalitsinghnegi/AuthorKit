@@ -1,7 +1,8 @@
 import type { CssTemplateId } from "@/lib/model";
 import type { GenerationReport } from "@/lib/templates/sources";
 
-export type FileSource = "template" | "entry" | "readme" | "empty-css" | "empty" | "styleguide";
+export type FileSource =
+  "template" | "entry" | "readme" | "empty-css" | "empty" | "styleguide" | "devkit";
 
 export type GeneratedFile = {
   /** Path inside the package root, "/" separated, e.g. "css/global.css". */

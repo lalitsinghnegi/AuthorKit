@@ -2,14 +2,12 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { GeneratedFile } from "@/lib/generator/types";
-import { entryFileName } from "@/lib/generator/naming";
+import { STYLE_GUIDE_DIR, entryFileName } from "@/lib/generator/naming";
 import type { Project } from "@/lib/model";
 import { getManifests } from "@/lib/templates/registry";
 import { renderGuidePage } from "./page";
 import { buildStatesCss } from "./states";
 import { collectVariables } from "./variables";
-
-export const STYLE_GUIDE_DIR = "style-guide";
 
 const ASSETS = path.join(process.cwd(), "src", "templates", "styleguide");
 const asset = (name: string) => readFileSync(path.join(ASSETS, name), "utf8");

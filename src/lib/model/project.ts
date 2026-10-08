@@ -13,6 +13,27 @@ export const Prefix = z
     "2–10 characters: lowercase letters and digits, starting with a letter",
   );
 
+/** npm package names: lowercase, URL-safe, optionally scoped (@scope/name), at most 214 characters. */
+export const NpmName = z
+  .string()
+  .max(214, "npm names are at most 214 characters")
+  .regex(
+    /^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/,
+    "Use lowercase letters, digits, - . _ ~, optionally with a @scope/ prefix",
+  );
+
+/** Plain semantic versions, e.g. 1.2.0 or 2.0.0-beta.1. */
+export const SemVer = z
+  .string()
+  .regex(
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$/,
+    "Use a version such as 1.0.0",
+  );
+
+/** Optional npm-style packaging of the generated CSS. */
+export const NpmOptions = z.object({ enabled: z.boolean(), name: NpmName, version: SemVer });
+export type NpmOptions = z.infer<typeof NpmOptions>;
+
 /** Fields the admin sets when creating a project. */
 export const ProjectInput = z.object({
   name: z.string().trim().min(1, "Name is required").max(80),
@@ -29,6 +50,7 @@ export const Project = ProjectInput.extend({
   breakpoints: BreakpointSet,
   scaffold: ScaffoldTree,
   figmaLinks: z.array(FigmaLink),
+  npm: NpmOptions.optional(),
   createdAt: IsoDate,
   updatedAt: IsoDate,
 }).superRefine((project, ctx) => {

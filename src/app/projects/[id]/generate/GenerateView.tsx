@@ -20,8 +20,6 @@ type Props = {
   projectId: string;
   zipName: string;
   scaffold: ScaffoldTree;
-  /** Generated root files shown first and marked "auto". */
-  autoFiles: string[];
   approach: string;
   breakpointCount: number;
   problems: Problem[];
@@ -52,6 +50,15 @@ export function GenerateView(props: Props) {
   const [copied, setCopied] = useState(false);
 
   const file = selected ? byPath.get(selected) : undefined;
+  // Files AuthorKit adds itself: root files first, then generated folders such as style-guide/.
+  const autoRoot = files.filter(
+    (f) => f.source === "entry" || f.source === "readme" || f.source === "devkit",
+  );
+  const autoFolders = new Map<string, ViewFile[]>();
+  for (const f of files.filter((f) => f.source === "styleguide")) {
+    const folder = f.path.split("/")[0];
+    autoFolders.set(folder, [...(autoFolders.get(folder) ?? []), f]);
+  }
   const total = files.reduce((n, f) => n + f.size, 0);
   const errors = problems.filter((p) => p.severity === "error");
   const warnings = problems.filter((p) => p.severity === "warning");
@@ -154,15 +161,33 @@ export function GenerateView(props: Props) {
               <li>
                 <span className={styles.folder}>📁 {props.scaffold.name}/</span>
                 <ul className={styles.tree}>
-                  {props.autoFiles.map((path) => (
+                  {autoRoot.map((f) => (
                     <FileRow
-                      key={path}
-                      file={byPath.get(path)!}
-                      name={path}
+                      key={f.path}
+                      file={f}
+                      name={f.path}
                       auto
                       selected={selected}
                       onSelect={select}
                     />
+                  ))}
+                  {[...autoFolders].map(([folder, folderFiles]) => (
+                    <li key={folder}>
+                      <span className={styles.folder}>
+                        📁 {folder}/ <span className={styles.auto}>auto</span>
+                      </span>
+                      <ul className={styles.tree}>
+                        {folderFiles.map((f) => (
+                          <FileRow
+                            key={f.path}
+                            file={f}
+                            name={f.path.slice(folder.length + 1)}
+                            selected={selected}
+                            onSelect={select}
+                          />
+                        ))}
+                      </ul>
+                    </li>
                   ))}
                   {props.scaffold.children.map((child) => (
                     <TreeRow

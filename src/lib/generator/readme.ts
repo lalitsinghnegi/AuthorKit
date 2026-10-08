@@ -3,7 +3,7 @@ import { CSS_TEMPLATE_LABELS, type Project } from "@/lib/model";
 import { renderTreeText } from "@/lib/scaffold/render";
 import { getManifests, manifestClasses, type GenerationReport } from "@/lib/templates";
 import { importLabel, orderForImport, type CssFileRef } from "./entry";
-import { README_NAME } from "./naming";
+import { README_NAME, generatedRootEntries } from "./naming";
 
 /** One line, no markdown control characters that could break the layout. */
 const inline = (text: string) => text.replace(/[\r\n]+/g, " ").replace(/[`|]/g, "");
@@ -66,10 +66,14 @@ export function renderReadme(
     (m) => usedTemplates.has(m.id) && m.id !== "tokens",
   );
 
-  const tree = renderTreeText(project.scaffold, [
-    { name: entryName, note: "entry: imports every stylesheet" },
-    { name: README_NAME, note: "this file" },
-  ]);
+  const tree = renderTreeText(
+    project.scaffold,
+    generatedRootEntries(project).map((e) => ({
+      name: e.name,
+      note: e.name === README_NAME ? "this file" : e.note,
+    })),
+  );
+  const npm = project.npm?.enabled ? project.npm : undefined;
 
   const sections = [
     `# ${brand} CSS package`,
@@ -96,6 +100,42 @@ export function renderReadme(
       ? ordered.map((f, i) => `${i + 1}. \`${f.path}\`: ${importLabel(f)}`)
       : ["_No stylesheets in this package yet._"]),
     "",
+    "## Style guide",
+    "",
+    "Open `style-guide/index.html` in a browser. It works offline, straight from the file system:",
+    "live examples of every component, the classes to apply in your AEM components, copyable HTML",
+    "and HTL, states, accessibility notes, and every design token. Use *Inspect classes* to click",
+    "an element in an example and see its classes.",
+    "",
+    "## Sample page",
+    "",
+    "`index.html` is a one-page demo of the components using only the stylesheet above. Its small",
+    "script shows how to wire the documented JavaScript hooks (menu, accordion, safety bar and modals).",
+    "",
+    "## Variables reference",
+    "",
+    "`VARIABLES.md` lists every CSS variable file by file: what each file defines, with per-breakpoint",
+    "values, and which variables it uses.",
+    "",
+    ...(npm
+      ? [
+          "## Installing as an npm package",
+          "",
+          `This folder is an npm package named \`${npm.name}\` (version ${npm.version}). It is marked`,
+          'private so it cannot be published by accident; remove `"private": true` before publishing it',
+          "to your registry. To use it from a local folder:",
+          "",
+          "```bash",
+          `npm install ./${project.scaffold.name}`,
+          "```",
+          "",
+          "```css",
+          `@import "${npm.name}";`,
+          `@import "${npm.name}/tokens.css";`,
+          "```",
+          "",
+        ]
+      : []),
     "## Folder structure",
     "",
     "```",

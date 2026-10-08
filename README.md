@@ -63,6 +63,10 @@ Optional: set `ANTHROPIC_API_KEY` in `.env` to let Claude suggest components for
 
 Open a project → **Generate** to preview every file, then **Download zip**. `GET /api/projects/<id>/package` returns the same zip. Generation is deterministic: an unchanged project always produces identical bytes.
 
+## Testing in a real browser
+
+`npm test` includes a headless-browser test that opens a generated package (sample page and style guide) from `file://`. It uses your installed Google Chrome, or the browser at `CHROME_PATH`, and is skipped with a warning when none is found.
+
 ## Health check
 
 `GET /api/health` returns `{"status":"ok","storage":"ok"}` when the data folder is writable, and returns `503` otherwise.

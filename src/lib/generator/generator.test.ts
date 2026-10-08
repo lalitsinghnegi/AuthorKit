@@ -146,7 +146,7 @@ describe("README", () => {
     const text = readme();
     expect(text).toContain('<link rel="stylesheet" href="acme-health.css">');
     expect(text).toContain("1. `css/tokens.css`: Design tokens");
-    expect(text).toContain("├── acme-health.css  ← entry: imports every stylesheet");
+    expect(text).toContain("├── acme-health.css  ← entry, imports every stylesheet");
     expect(text).toContain("| tablet | 768px – 1023px | `@media (min-width: 768px)` |");
     expect(text).toContain("| mobile | ≤ 767px | base styles (no media query) |");
     expect(text).toContain("- Modifier: `.acme-btn--primary`");
@@ -169,7 +169,16 @@ describe("blocking problems", () => {
   it("blocks on a scaffold file that clashes with a generated name", () => {
     const tree = fixture().scaffold;
     const project = fixture({ scaffold: addNode(tree, tree.id, createFile("ACME-HEALTH.css")) });
-    expect(reservedRootNames(project)).toEqual(["acme-health.css", "README.md"]);
+    expect(reservedRootNames(project)).toEqual([
+      "acme-health.css",
+      "README.md",
+      "VARIABLES.md",
+      "index.html",
+      "style-guide",
+    ]);
+    expect(
+      reservedRootNames({ ...project, npm: { enabled: true, name: "x", version: "1.0.0" } }),
+    ).toContain("package.json");
     const pkg = generatePackage(project);
     expect(pkg.blocked).toBe(true);
     expect(pkg.files).toEqual([]);

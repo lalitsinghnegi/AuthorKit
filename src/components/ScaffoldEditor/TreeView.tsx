@@ -279,7 +279,7 @@ function NameCell({
   const ctx = useTree();
   const editing = ctx.editingId === node.id;
   const [draft, setDraft] = useState(node.name);
-  const reserved = atRoot ? ctx.autoRootFiles.map((f) => f.name) : [];
+  const reserved = atRoot ? ctx.autoRootFiles.map((f) => f.name.replace(/\/$/, "")) : [];
   const error = editing
     ? (validateName(draft.trim(), siblings) ?? reservedNameError(draft.trim(), reserved))
     : null;

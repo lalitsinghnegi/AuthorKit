@@ -80,7 +80,10 @@ export function ScaffoldEditor({
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [busy, startTransition] = useTransition();
 
-  const reservedRootNames = useMemo(() => autoRootFiles.map((f) => f.name), [autoRootFiles]);
+  const reservedRootNames = useMemo(
+    () => autoRootFiles.map((f) => f.name.replace(/\/$/, "")),
+    [autoRootFiles],
+  );
   const issues = useMemo(
     () => validateTree(tree, { reservedRootNames }),
     [tree, reservedRootNames],
