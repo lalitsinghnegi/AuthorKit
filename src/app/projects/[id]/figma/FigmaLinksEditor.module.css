@@ -1,0 +1,57 @@
+.checkRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkOk {
+  color: #2e7d32;
+  font-size: 0.9rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.smallButton {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: var(--ui-radius);
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
+  color: var(--ui-fg);
+  cursor: pointer;
+}
+
+.smallButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.danger {
+  color: #c62828;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

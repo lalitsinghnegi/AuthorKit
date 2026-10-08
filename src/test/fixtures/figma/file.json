@@ -1,0 +1,288 @@
+{
+  "name": "Acme Health: Design System",
+  "lastModified": "2026-09-30T10:00:00Z",
+  "version": "4242424242",
+  "document": {
+    "id": "0:0",
+    "name": "Document",
+    "type": "DOCUMENT",
+    "children": [
+      {
+        "id": "0:1",
+        "name": "Styles",
+        "type": "CANVAS",
+        "children": [
+          {
+            "id": "1:1",
+            "name": "Global / Colors",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 0, "width": 800, "height": 200 },
+            "children": [
+              {
+                "id": "1:10",
+                "name": "Primary",
+                "type": "RECTANGLE",
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                ],
+                "styles": { "fill": "S:primary" }
+              },
+              {
+                "id": "1:11",
+                "name": "Primary Dark",
+                "type": "RECTANGLE",
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.4, "g": 0.0314, "b": 0.2275, "a": 1 } }
+                ],
+                "styles": { "fill": "S:primary-dark" }
+              },
+              {
+                "id": "1:12",
+                "name": "Text",
+                "type": "RECTANGLE",
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.1216, "g": 0.1373, "b": 0.1608, "a": 1 } }
+                ],
+                "styles": { "fill": "S:text" }
+              },
+              {
+                "id": "1:13",
+                "name": "Surface",
+                "type": "RECTANGLE",
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.9725, "g": 0.9529, "b": 0.9647, "a": 1 } }
+                ],
+                "styles": { "fill": "S:surface" }
+              },
+              {
+                "id": "1:14",
+                "name": "One-off accent",
+                "type": "RECTANGLE",
+                "fills": [{ "type": "SOLID", "color": { "r": 0.0, "g": 0.6, "b": 0.5, "a": 1 } }]
+              }
+            ]
+          },
+          {
+            "id": "1:2",
+            "name": "Global / Typography",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 300, "width": 800, "height": 600 },
+            "children": [
+              {
+                "id": "1:20",
+                "name": "H1",
+                "type": "TEXT",
+                "characters": "Heading one",
+                "style": {
+                  "fontFamily": "Inter",
+                  "fontWeight": 700,
+                  "fontSize": 40,
+                  "lineHeightPx": 48,
+                  "letterSpacing": -0.4
+                },
+                "styles": { "text": "S:h1", "fill": "S:text" }
+              },
+              {
+                "id": "1:21",
+                "name": "H2",
+                "type": "TEXT",
+                "characters": "Heading two",
+                "style": {
+                  "fontFamily": "Inter",
+                  "fontWeight": 700,
+                  "fontSize": 32,
+                  "lineHeightPx": 40,
+                  "letterSpacing": -0.32
+                },
+                "styles": { "text": "S:h2" }
+              },
+              {
+                "id": "1:22",
+                "name": "Body",
+                "type": "TEXT",
+                "characters": "Body copy",
+                "style": {
+                  "fontFamily": "Inter",
+                  "fontWeight": 400,
+                  "fontSize": 16,
+                  "lineHeightPx": 24,
+                  "letterSpacing": 0
+                },
+                "styles": { "text": "S:body" }
+              },
+              {
+                "id": "1:23",
+                "name": "Link",
+                "type": "TEXT",
+                "characters": "A link",
+                "style": {
+                  "fontFamily": "Inter",
+                  "fontWeight": 400,
+                  "fontSize": 16,
+                  "lineHeightPx": 24,
+                  "letterSpacing": 0
+                },
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0:2",
+        "name": "Components",
+        "type": "CANVAS",
+        "children": [
+          {
+            "id": "2:1",
+            "name": "Header / Desktop",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 0, "width": 1440, "height": 80 },
+            "layoutMode": "HORIZONTAL",
+            "itemSpacing": 32,
+            "paddingLeft": 32,
+            "paddingRight": 32,
+            "paddingTop": 16,
+            "paddingBottom": 16,
+            "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }],
+            "effects": [
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "color": { "r": 0, "g": 0, "b": 0, "a": 0.08 },
+                "offset": { "x": 0, "y": 1 },
+                "radius": 2,
+                "spread": 0
+              }
+            ],
+            "children": [
+              {
+                "id": "2:10",
+                "name": "Logo",
+                "type": "RECTANGLE",
+                "absoluteBoundingBox": { "x": 32, "y": 20, "width": 120, "height": 40 }
+              },
+              {
+                "id": "2:11",
+                "name": "Nav",
+                "type": "FRAME",
+                "layoutMode": "HORIZONTAL",
+                "itemSpacing": 24,
+                "children": [
+                  {
+                    "id": "2:12",
+                    "name": "Nav link",
+                    "type": "TEXT",
+                    "characters": "About",
+                    "style": {
+                      "fontFamily": "Inter",
+                      "fontWeight": 700,
+                      "fontSize": 16,
+                      "lineHeightPx": 24
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "2:2",
+            "name": "Header / Mobile",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 200, "width": 375, "height": 64 },
+            "layoutMode": "HORIZONTAL",
+            "itemSpacing": 16,
+            "paddingLeft": 16,
+            "paddingRight": 16,
+            "paddingTop": 12,
+            "paddingBottom": 12,
+            "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }],
+            "children": [
+              {
+                "id": "2:20",
+                "name": "Logo",
+                "type": "RECTANGLE",
+                "absoluteBoundingBox": { "x": 16, "y": 16, "width": 96, "height": 32 }
+              },
+              { "id": "2:21", "name": "Menu button", "type": "FRAME" }
+            ]
+          },
+          {
+            "id": "3:1",
+            "name": "CTA / Buttons",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 400, "width": 600, "height": 120 },
+            "children": [
+              {
+                "id": "3:10",
+                "name": "Button / Primary",
+                "type": "INSTANCE",
+                "layoutMode": "HORIZONTAL",
+                "itemSpacing": 8,
+                "paddingLeft": 24,
+                "paddingRight": 24,
+                "paddingTop": 12,
+                "paddingBottom": 12,
+                "cornerRadius": 999,
+                "fills": [
+                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                ],
+                "styles": { "fill": "S:primary" },
+                "children": [
+                  {
+                    "id": "3:11",
+                    "name": "Label",
+                    "type": "TEXT",
+                    "characters": "Learn more",
+                    "style": {
+                      "fontFamily": "Inter",
+                      "fontWeight": 700,
+                      "fontSize": 16,
+                      "lineHeightPx": 18
+                    },
+                    "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }]
+                  }
+                ]
+              },
+              {
+                "id": "3:20",
+                "name": "Button / Secondary",
+                "type": "INSTANCE",
+                "layoutMode": "HORIZONTAL",
+                "paddingLeft": 24,
+                "paddingRight": 24,
+                "paddingTop": 12,
+                "paddingBottom": 12,
+                "cornerRadius": 999,
+                "strokes": [
+                  { "type": "SOLID", "color": { "r": 0.5412, "g": 0.0431, "b": 0.3098, "a": 1 } }
+                ],
+                "strokeWeight": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "styles": {
+    "S:primary": {
+      "key": "k-primary",
+      "name": "Brand/Primary",
+      "styleType": "FILL",
+      "description": "Main brand color"
+    },
+    "S:primary-dark": {
+      "key": "k-primary-dark",
+      "name": "Brand/Primary Dark",
+      "styleType": "FILL"
+    },
+    "S:text": { "key": "k-text", "name": "Neutral/Text", "styleType": "FILL" },
+    "S:surface": { "key": "k-surface", "name": "Neutral/Surface", "styleType": "FILL" },
+    "S:h1": { "key": "k-h1", "name": "Heading/H1", "styleType": "TEXT" },
+    "S:h2": { "key": "k-h2", "name": "Heading/H2", "styleType": "TEXT" },
+    "S:body": { "key": "k-body", "name": "Body/Regular", "styleType": "TEXT" }
+  }
+}

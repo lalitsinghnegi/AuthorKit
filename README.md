@@ -42,6 +42,21 @@ data/
 
 Projects can be exported and imported as a single JSON file from the Projects screen.
 
+## Connecting Figma
+
+1. Set `ENCRYPTION_KEY` in `.env`, then restart the app. To generate a key:
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+   ```
+2. In Figma, create a personal access token: Settings → Security → Personal access tokens, with read access to files.
+3. In AuthorKit, open **Settings**, paste the token and choose **Save & test**. Figma checks it first.
+
+The token is encrypted on the server and is never shown again or sent to the browser.
+
+If `ENCRYPTION_KEY` changes, the saved token can no longer be decrypted, so save it again.
+
+Then add frame links per project under **Figma**.
+
 ## Generating a package
 
 Open a project → **Generate** to preview every file, then **Download zip**. `GET /api/projects/<id>/package` returns the same zip. Generation is deterministic: an unchanged project always produces identical bytes.

@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { hasErrors, validateBreakpoints } from "@/lib/breakpoints";
 import { BreakpointSet, ProjectInput } from "@/lib/model";
-import { updateProject } from "@/lib/storage/projects";
+import { getProject, updateProject } from "@/lib/storage/projects";
 
 const Payload = z.object({
   approach: ProjectInput.shape.approach,
@@ -24,6 +24,18 @@ export async function saveBreakpointsAction(
   const issues = validateBreakpoints(parsed.data.breakpoints.breakpoints);
   if (hasErrors(issues)) {
     return { ok: false, error: issues.find((i) => i.severity === "error")!.message };
+  }
+  const current = await getProject(projectId);
+  if (!current) return { ok: false, error: "This project no longer exists." };
+  // Figma links point at breakpoints by id; removing one they use would orphan the link.
+  const kept = new Set(parsed.data.breakpoints.breakpoints.map((b) => b.id));
+  const orphaned = current.figmaLinks.find((l) => l.breakpointId && !kept.has(l.breakpointId));
+  if (orphaned) {
+    const name = current.breakpoints.breakpoints.find((b) => b.id === orphaned.breakpointId)?.name;
+    return {
+      ok: false,
+      error: `Breakpoint "${name}" is used by the Figma link "${orphaned.label}". Change that link first.`,
+    };
   }
   try {
     const project = await updateProject(projectId, (p) => ({

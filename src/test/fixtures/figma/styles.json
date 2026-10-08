@@ -1,0 +1,58 @@
+{
+  "status": 200,
+  "error": false,
+  "meta": {
+    "styles": [
+      {
+        "key": "k-primary",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:10",
+        "style_type": "FILL",
+        "name": "Brand/Primary",
+        "description": "Main brand color"
+      },
+      {
+        "key": "k-primary-dark",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:11",
+        "style_type": "FILL",
+        "name": "Brand/Primary Dark"
+      },
+      {
+        "key": "k-text",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:12",
+        "style_type": "FILL",
+        "name": "Neutral/Text"
+      },
+      {
+        "key": "k-surface",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:13",
+        "style_type": "FILL",
+        "name": "Neutral/Surface"
+      },
+      {
+        "key": "k-h1",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:20",
+        "style_type": "TEXT",
+        "name": "Heading/H1"
+      },
+      {
+        "key": "k-h2",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:21",
+        "style_type": "TEXT",
+        "name": "Heading/H2"
+      },
+      {
+        "key": "k-body",
+        "file_key": "AbCdEf1234567890XyZ012",
+        "node_id": "1:22",
+        "style_type": "TEXT",
+        "name": "Body/Regular"
+      }
+    ]
+  }
+}

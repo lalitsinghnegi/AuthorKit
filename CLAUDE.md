@@ -116,6 +116,23 @@ Rules:
 - Secrets live only in `.env` (never committed). `.env.example` documents required keys with placeholder values.
 - The Figma personal access token is **stored encrypted server-side** in `data/settings.json`, using AES-256-GCM with `ENCRYPTION_KEY` from `.env`. It is never sent to the browser, never logged, and never included in error messages.
 - Never commit real Figma tokens, file keys tied to private designs, or other credentials. Fixtures must be sanitised.
+- **Handling the token in code:**
+  - Wrap it in `Secret` (`src/lib/secrets/secret.ts`), which prints `[redacted]` everywhere. Call `.reveal()` only to set the `X-Figma-Token` header.
+  - `settings.json` stores the ciphertext, the Figma account (handle and email) and the save date. No part of the token is stored in plain text.
+
+## Figma
+
+- **URLs:** `parseFigmaUrl` (`src/lib/figma/url.ts`) only accepts `https://figma.com` or `https://www.figma.com` design, file, proto and board links. It converts `node-id=1-2` to `1:2` and uses the branch key for branch links. It is browser-safe; the server always re-parses.
+- **API access:**
+  - All calls go through `FigmaClient`. `HttpFigmaClient` only ever requests `https://api.figma.com` (fixed in code), validates file keys and node ids, and does not follow redirects.
+  - It times out after 20 seconds and retries up to 3 times on 429 (honouring `Retry-After`, capped at 60 seconds) and 5xx.
+  - It caches responses for 5 minutes per token hash. `/me` and image renders are never cached.
+  - Failures raise `FigmaError` with a code and fixed, safe text.
+- **Server access:** `getFigmaClient()` (`src/lib/figma/server.ts`) returns a client using the saved token, or throws `no_token`.
+- **Tests never reach the network.**
+  - `vitest.setup.ts` stubs `fetch` to throw.
+  - Use `MockFigmaClient` (`src/test/figma/mockClient.ts`, backed by `src/test/fixtures/figma/*.json`), or inject `fetchImpl` into `HttpFigmaClient`.
+  - Extend the fixtures, not the network, when later prompts need more Figma data.
 
 ## Workflow per build prompt
 
