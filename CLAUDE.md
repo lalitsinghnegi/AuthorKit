@@ -79,6 +79,24 @@ Rules:
 - `GET /api/projects/[id]/package` returns the zip. It returns 409 with `problems` when generation is blocked.
 - Snapshot tests in `src/lib/generator/__snapshots__/` capture every generated file for both approaches. After an intended template change, update them with `npx vitest run -u` and review the diff.
 
+## Design tokens (extraction)
+
+- **`extractTokens(inputs)`** (`src/lib/tokens/extract.ts`) is pure: Figma nodes, styles and variables go in, `ExtractedToken[]` comes out.
+  - **Source priority:** variables beat styles, which beat values scanned from layers.
+  - **Units:** colours as hex, or `rgb(… / a%)` when transparent. Font sizes and spacing in rem (16px base). Line height unitless. Letter spacing in em. Radius, borders and shadows in px.
+- **Names:** tokens are named after template tokens where possible (`naming.ts`), so they fill the CSS. Anything else gets a slug name and is `mapped: false`.
+  - **Spacing** snaps to the 8-step scale (4–64px), radius to sm/md/lg/pill, and shadows to sm/md/lg by blur.
+  - **Conflicting values** for one name: the most trusted, then most used, wins. The others become `-alt` tokens.
+- **Low confidence** = any reason in `meta.reasons`:
+  - a value used once and not saved as a style
+  - far (more than 25%) from its scale step
+  - an unmapped name
+  - one of several conflicting values
+  - failing contrast
+- **Re-extraction:** `mergeTokens(existing, extracted)` keeps the admin's decisions, matched by `meta.sourceKey`, as in its doc comment. Hand-made tokens (no `meta`) are never touched.
+- **Saving:** `saveTokensAction` only changes `name`, `value` and `status`. It re-validates every value with `validateTokenValue`, which refuses `; { } < > \` and comments, because values go into CSS. A value different from Figma's is always saved as `overridden`.
+- **Not used by the generator yet.** Accepted and overridden tokens reach the CSS in Prompt 11.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
