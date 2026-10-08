@@ -332,22 +332,24 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
   },
   {
     "meta": {
-      "confidence": "high",
-      "figmaName": "Auto layout gap/padding 8px",
+      "confidence": "low",
+      "figmaName": "Auto layout gap/padding 10px",
       "mapped": true,
       "origin": "scan",
-      "reasons": [],
+      "reasons": [
+        "Also found 8px near this step; 10px was chosen",
+      ],
       "sourceKey": "scan:spacing:8",
-      "usage": 1,
+      "usage": 2,
     },
     "name": "space-2",
     "source": {
       "fileKey": "K",
-      "nodeId": "3:10",
+      "nodeId": "3:21",
       "nodeName": "Button / Primary",
     },
     "type": "spacing",
-    "value": "0.5rem",
+    "value": "0.625rem",
   },
   {
     "meta": {
@@ -370,13 +372,15 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
   },
   {
     "meta": {
-      "confidence": "high",
+      "confidence": "low",
       "figmaName": "Auto layout gap/padding 16px",
       "mapped": true,
       "origin": "scan",
-      "reasons": [],
+      "reasons": [
+        "Also found 20px near this step; 16px was chosen",
+      ],
       "sourceKey": "scan:spacing:16",
-      "usage": 5,
+      "usage": 7,
     },
     "name": "space-4",
     "source": {
@@ -395,7 +399,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "origin": "scan",
       "reasons": [],
       "sourceKey": "scan:spacing:24",
-      "usage": 5,
+      "usage": 6,
     },
     "name": "space-5",
     "source": {
@@ -414,7 +418,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "origin": "scan",
       "reasons": [],
       "sourceKey": "scan:spacing:32",
-      "usage": 3,
+      "usage": 8,
     },
     "name": "space-6",
     "source": {
@@ -428,12 +432,31 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
   {
     "meta": {
       "confidence": "high",
+      "figmaName": "Auto layout gap/padding 48px",
+      "mapped": true,
+      "origin": "scan",
+      "reasons": [],
+      "sourceKey": "scan:spacing:48",
+      "usage": 2,
+    },
+    "name": "space-7",
+    "source": {
+      "fileKey": "K",
+      "nodeId": "5:1",
+      "nodeName": "Footer / Desktop",
+    },
+    "type": "spacing",
+    "value": "3rem",
+  },
+  {
+    "meta": {
+      "confidence": "high",
       "figmaName": "Corner radius 999px",
       "mapped": true,
       "origin": "scan",
       "reasons": [],
       "sourceKey": "scan:radius:radius-pill",
-      "usage": 2,
+      "usage": 3,
     },
     "name": "radius-pill",
     "source": {

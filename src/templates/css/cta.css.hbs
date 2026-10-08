@@ -1,16 +1,13 @@
 {{> fileHeader}}
 
 .{{prefix}}-btn {
+{{vars "cta" "btn"}}
   --{{prefix}}-btn-bg: transparent;
   --{{prefix}}-btn-color: var(--{{prefix}}-color-primary);
   --{{prefix}}-btn-border-color: var(--{{prefix}}-color-primary);
   --{{prefix}}-btn-bg-hover: var(--{{prefix}}-color-primary);
   --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-on-primary);
   --{{prefix}}-btn-border-color-hover: var(--{{prefix}}-color-primary);
-  --{{prefix}}-btn-padding-y: var(--{{prefix}}-space-3);
-  --{{prefix}}-btn-padding-x: var(--{{prefix}}-space-5);
-  --{{prefix}}-btn-radius: var(--{{prefix}}-radius-pill);
-  --{{prefix}}-btn-font-size: var(--{{prefix}}-font-size-base);
 
   display: inline-flex;
   gap: var(--{{prefix}}-space-2);
@@ -71,8 +68,9 @@
   --{{prefix}}-btn-bg-hover: transparent;
   --{{prefix}}-btn-color-hover: var(--{{prefix}}-color-link-hover);
   --{{prefix}}-btn-border-color-hover: transparent;
-  --{{prefix}}-btn-padding-x: 0;
 
+  /* Set directly, not via --btn-padding-x, so breakpoint overrides cannot undo it */
+  padding-inline: 0;
   text-decoration: underline;
 }
 

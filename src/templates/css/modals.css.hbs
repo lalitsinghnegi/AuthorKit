@@ -2,8 +2,7 @@
 
 /* Built on the native <dialog> element: showModal() provides the focus trap and Escape */
 .{{prefix}}-modal {
-  --{{prefix}}-modal-width: var(--{{prefix}}-size-modal-max);
-  --{{prefix}}-modal-padding: var(--{{prefix}}-space-5);
+{{vars "modals" "modal"}}
   --{{prefix}}-modal-radius: var(--{{prefix}}-radius-lg);
   --{{prefix}}-modal-bg: var(--{{prefix}}-color-background);
 
@@ -83,7 +82,8 @@
 
 /* Leaving-site / interstitial warning */
 .{{prefix}}-modal--interstitial {
-  --{{prefix}}-modal-width: var(--{{prefix}}-size-modal-narrow);
+  /* Caps the width without touching --modal-width, which breakpoints may override */
+  max-width: var(--{{prefix}}-size-modal-narrow);
 }
 
 /* Set on <body> while a modal is open to stop the page scrolling behind it */

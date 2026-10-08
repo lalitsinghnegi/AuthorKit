@@ -111,6 +111,22 @@ Rules:
 - **Tests** use `MockLLMProvider` (`src/test/llm.ts`), or inject `fetch` into `AnthropicProvider` (with `maxRetries: 0`).
 - **Previews:** Figma image links expire, so they are never stored. They are filtered by `isAllowedImageUrl` (Figma's S3 bucket and `*.figma.com`, https only) on both server and client.
 
+## Responsive values (per breakpoint)
+
+- **What's measured:** `SPECS` (`src/lib/responsive/specs.ts`) read each component's responsive variables from one mapped frame.
+  - Paddings, gaps, sizes, the first text size, and corner radius.
+  - The header's drawer or inline layout, detected from a visible menu/hamburger child or a nav child.
+  - `readTypography` reads `font-size-h1…h6` and `font-size-base` from frames mapped to `global`.
+- **Frames used:** `collectFrameRefs(project)` takes every confirmed mapping (`global` → typography) plus a component link's own frame.
+- **`computeEntry` rules:**
+  - Only one frame per breakpoint is used; extras are reported as conflicts.
+  - Untagged links are treated as the base breakpoint.
+  - **Two or more breakpoints measured:** uncovered breakpoints copy the nearest measured one (a tie goes to the smaller), marked `inferred`.
+  - **One breakpoint measured:** rem sizes become `clamp()` between `fluidRange` (smallest breakpoint start → largest breakpoint start, 320px if there's no min). A large-screen frame is the top of the range and the other end is `FLUID_RATIO` (0.75). px values and keywords stay fixed. Marked `fluid`.
+- **Storage:** results are saved to `data/projects/<id>/responsive.json` (`ResponsiveFile`). `renderResponsiveCss` previews them with `cascade()`: base for the first breakpoint, then only the changes per media query.
+- **Template variables that change by breakpoint** are declared through `{{vars "<component>" "<suffix>"}}` with defaults in `tokens.json` → `components`. A variant that must not be undone by breakpoint overrides sets the property directly (`padding-inline: 0` on tertiary buttons, `max-width` on interstitial modals) rather than overriding the shared variable.
+- **Not used by the generator yet.** Prompt 11 feeds `responsive.json` into the generator's context.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:

@@ -144,12 +144,14 @@ describe("extractTokens on the fixture file", () => {
 
   it("maps spacing to the scale, radius to pill, strokes to border width", () => {
     const { tokens } = extract();
+    // 10px (mobile button padding, used twice) beats 8px (once) at the 8px step; footer padding adds 48px.
     expect(tokens.filter((t) => t.type === "spacing").map((t) => [t.name, t.value])).toEqual([
-      ["space-2", "0.5rem"],
+      ["space-2", "0.625rem"],
       ["space-3", "0.75rem"],
       ["space-4", "1rem"],
       ["space-5", "1.5rem"],
       ["space-6", "2rem"],
+      ["space-7", "3rem"],
     ]);
     expect(byName(tokens, "radius-pill")?.value).toBe("999px");
     expect(byName(tokens, "border-width")?.value).toBe("2px");

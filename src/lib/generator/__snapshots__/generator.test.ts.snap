@@ -138,9 +138,9 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
  */
 
 .acme-accordion {
-  --acme-accordion-border-color: var(--acme-color-border);
   --acme-accordion-padding-y: var(--acme-space-4);
   --acme-accordion-title-size: var(--acme-font-size-lg);
+  --acme-accordion-border-color: var(--acme-color-border);
 
   border-top: var(--acme-border-width) solid var(--acme-accordion-border-color);
 }
@@ -250,16 +250,16 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
  */
 
 .acme-btn {
+  --acme-btn-padding-y: var(--acme-space-3);
+  --acme-btn-padding-x: var(--acme-space-5);
+  --acme-btn-font-size: var(--acme-font-size-base);
+  --acme-btn-radius: var(--acme-radius-pill);
   --acme-btn-bg: transparent;
   --acme-btn-color: var(--acme-color-primary);
   --acme-btn-border-color: var(--acme-color-primary);
   --acme-btn-bg-hover: var(--acme-color-primary);
   --acme-btn-color-hover: var(--acme-color-on-primary);
   --acme-btn-border-color-hover: var(--acme-color-primary);
-  --acme-btn-padding-y: var(--acme-space-3);
-  --acme-btn-padding-x: var(--acme-space-5);
-  --acme-btn-radius: var(--acme-radius-pill);
-  --acme-btn-font-size: var(--acme-font-size-base);
 
   display: inline-flex;
   gap: var(--acme-space-2);
@@ -320,8 +320,9 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
   --acme-btn-bg-hover: transparent;
   --acme-btn-color-hover: var(--acme-color-link-hover);
   --acme-btn-border-color-hover: transparent;
-  --acme-btn-padding-x: 0;
 
+  /* Set directly, not via --btn-padding-x, so breakpoint overrides cannot undo it */
+  padding-inline: 0;
   text-decoration: underline;
 }
 
@@ -376,6 +377,7 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
  *   --acme-footer-bg
  *   --acme-footer-color
  *   --acme-footer-direction
+ *   --acme-footer-gap
  *   --acme-footer-link-color
  *   --acme-footer-padding-y
  *   --acme-size-container-max
@@ -391,10 +393,11 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 .acme-footer {
   --acme-footer-direction: row;
   --acme-footer-align: center;
+  --acme-footer-padding-y: var(--acme-space-7);
+  --acme-footer-gap: var(--acme-space-5);
   --acme-footer-bg: var(--acme-color-footer-background);
   --acme-footer-color: var(--acme-color-footer-text);
   --acme-footer-link-color: var(--acme-color-footer-link);
-  --acme-footer-padding-y: var(--acme-space-7);
 
   background-color: var(--acme-footer-bg);
   color: var(--acme-footer-color);
@@ -404,7 +407,7 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 .acme-footer__inner {
   display: flex;
   flex-direction: var(--acme-footer-direction);
-  gap: var(--acme-space-5);
+  gap: var(--acme-footer-gap);
   align-items: var(--acme-footer-align);
   justify-content: space-between;
   max-width: var(--acme-size-container-max);
@@ -484,11 +487,14 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
  *   --acme-font-weight-bold
  *   --acme-header-bg
  *   --acme-header-color
+ *   --acme-header-gap
  *   --acme-header-list-direction
+ *   --acme-header-min-height
  *   --acme-header-nav-display
  *   --acme-header-nav-padding
  *   --acme-header-nav-position
  *   --acme-header-nav-shadow
+ *   --acme-header-padding-x
  *   --acme-header-shadow
  *   --acme-header-toggle-display
  *   --acme-radius-sm
@@ -514,6 +520,9 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
   --acme-header-nav-padding: 0;
   --acme-header-nav-shadow: none;
   --acme-header-list-direction: row;
+  --acme-header-padding-x: var(--acme-size-gutter);
+  --acme-header-gap: var(--acme-space-4);
+  --acme-header-min-height: var(--acme-size-header-height);
   --acme-header-bg: var(--acme-color-header-background);
   --acme-header-color: var(--acme-color-text);
   --acme-header-shadow: var(--acme-shadow-sm);
@@ -532,13 +541,13 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 
 .acme-header__inner {
   display: flex;
-  gap: var(--acme-space-4);
+  gap: var(--acme-header-gap);
   align-items: center;
   justify-content: space-between;
   max-width: var(--acme-size-container-max);
-  min-height: var(--acme-size-header-height);
+  min-height: var(--acme-header-min-height);
   margin: 0 auto;
-  padding: 0 var(--acme-size-gutter);
+  padding: 0 var(--acme-header-padding-x);
 }
 
 .acme-header__logo {
@@ -681,9 +690,9 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 
 /* In-page Important Safety Information */
 .acme-isi {
+  --acme-isi-padding-y: var(--acme-space-6);
   --acme-isi-bg: var(--acme-color-isi-background);
   --acme-isi-color: var(--acme-color-isi-text);
-  --acme-isi-padding-y: var(--acme-space-6);
 
   padding: var(--acme-isi-padding-y) var(--acme-size-gutter);
   background-color: var(--acme-isi-bg);
@@ -919,7 +928,8 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 
 /* Leaving-site / interstitial warning */
 .acme-modal--interstitial {
-  --acme-modal-width: var(--acme-size-modal-narrow);
+  /* Caps the width without touching --modal-width, which breakpoints may override */
+  max-width: var(--acme-size-modal-narrow);
 }
 
 /* Set on <body> while a modal is open to stop the page scrolling behind it */
@@ -1429,9 +1439,9 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
  */
 
 .acme-accordion {
-  --acme-accordion-border-color: var(--acme-color-border);
   --acme-accordion-padding-y: var(--acme-space-4);
   --acme-accordion-title-size: var(--acme-font-size-lg);
+  --acme-accordion-border-color: var(--acme-color-border);
 
   border-top: var(--acme-border-width) solid var(--acme-accordion-border-color);
 }
@@ -1541,16 +1551,16 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
  */
 
 .acme-btn {
+  --acme-btn-padding-y: var(--acme-space-3);
+  --acme-btn-padding-x: var(--acme-space-5);
+  --acme-btn-font-size: var(--acme-font-size-base);
+  --acme-btn-radius: var(--acme-radius-pill);
   --acme-btn-bg: transparent;
   --acme-btn-color: var(--acme-color-primary);
   --acme-btn-border-color: var(--acme-color-primary);
   --acme-btn-bg-hover: var(--acme-color-primary);
   --acme-btn-color-hover: var(--acme-color-on-primary);
   --acme-btn-border-color-hover: var(--acme-color-primary);
-  --acme-btn-padding-y: var(--acme-space-3);
-  --acme-btn-padding-x: var(--acme-space-5);
-  --acme-btn-radius: var(--acme-radius-pill);
-  --acme-btn-font-size: var(--acme-font-size-base);
 
   display: inline-flex;
   gap: var(--acme-space-2);
@@ -1611,8 +1621,9 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
   --acme-btn-bg-hover: transparent;
   --acme-btn-color-hover: var(--acme-color-link-hover);
   --acme-btn-border-color-hover: transparent;
-  --acme-btn-padding-x: 0;
 
+  /* Set directly, not via --btn-padding-x, so breakpoint overrides cannot undo it */
+  padding-inline: 0;
   text-decoration: underline;
 }
 
@@ -1667,6 +1678,7 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
  *   --acme-footer-bg
  *   --acme-footer-color
  *   --acme-footer-direction
+ *   --acme-footer-gap
  *   --acme-footer-link-color
  *   --acme-footer-padding-y
  *   --acme-size-container-max
@@ -1682,10 +1694,11 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 .acme-footer {
   --acme-footer-direction: column;
   --acme-footer-align: flex-start;
+  --acme-footer-padding-y: var(--acme-space-7);
+  --acme-footer-gap: var(--acme-space-5);
   --acme-footer-bg: var(--acme-color-footer-background);
   --acme-footer-color: var(--acme-color-footer-text);
   --acme-footer-link-color: var(--acme-color-footer-link);
-  --acme-footer-padding-y: var(--acme-space-7);
 
   background-color: var(--acme-footer-bg);
   color: var(--acme-footer-color);
@@ -1695,7 +1708,7 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 .acme-footer__inner {
   display: flex;
   flex-direction: var(--acme-footer-direction);
-  gap: var(--acme-space-5);
+  gap: var(--acme-footer-gap);
   align-items: var(--acme-footer-align);
   justify-content: space-between;
   max-width: var(--acme-size-container-max);
@@ -1775,11 +1788,14 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
  *   --acme-font-weight-bold
  *   --acme-header-bg
  *   --acme-header-color
+ *   --acme-header-gap
  *   --acme-header-list-direction
+ *   --acme-header-min-height
  *   --acme-header-nav-display
  *   --acme-header-nav-padding
  *   --acme-header-nav-position
  *   --acme-header-nav-shadow
+ *   --acme-header-padding-x
  *   --acme-header-shadow
  *   --acme-header-toggle-display
  *   --acme-radius-sm
@@ -1805,6 +1821,9 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
   --acme-header-nav-padding: var(--acme-space-4) var(--acme-size-gutter);
   --acme-header-nav-shadow: var(--acme-shadow-md);
   --acme-header-list-direction: column;
+  --acme-header-padding-x: var(--acme-size-gutter);
+  --acme-header-gap: var(--acme-space-4);
+  --acme-header-min-height: var(--acme-size-header-height);
   --acme-header-bg: var(--acme-color-header-background);
   --acme-header-color: var(--acme-color-text);
   --acme-header-shadow: var(--acme-shadow-sm);
@@ -1823,13 +1842,13 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 
 .acme-header__inner {
   display: flex;
-  gap: var(--acme-space-4);
+  gap: var(--acme-header-gap);
   align-items: center;
   justify-content: space-between;
   max-width: var(--acme-size-container-max);
-  min-height: var(--acme-size-header-height);
+  min-height: var(--acme-header-min-height);
   margin: 0 auto;
-  padding: 0 var(--acme-size-gutter);
+  padding: 0 var(--acme-header-padding-x);
 }
 
 .acme-header__logo {
@@ -1972,9 +1991,9 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 
 /* In-page Important Safety Information */
 .acme-isi {
+  --acme-isi-padding-y: var(--acme-space-6);
   --acme-isi-bg: var(--acme-color-isi-background);
   --acme-isi-color: var(--acme-color-isi-text);
-  --acme-isi-padding-y: var(--acme-space-6);
 
   padding: var(--acme-isi-padding-y) var(--acme-size-gutter);
   background-color: var(--acme-isi-bg);
@@ -2210,7 +2229,8 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 
 /* Leaving-site / interstitial warning */
 .acme-modal--interstitial {
-  --acme-modal-width: var(--acme-size-modal-narrow);
+  /* Caps the width without touching --modal-width, which breakpoints may override */
+  max-width: var(--acme-size-modal-narrow);
 }
 
 /* Set on <body> while a modal is open to stop the page scrolling behind it */

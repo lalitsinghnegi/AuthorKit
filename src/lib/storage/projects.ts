@@ -8,6 +8,7 @@ import {
   ProjectExport,
   ProjectInput,
   SCHEMA_VERSION,
+  ResponsiveFile,
   TokenFile,
 } from "@/lib/model";
 import { listEntries, readJson, removeDataPath, writeJsonAtomic } from "./files";
@@ -16,6 +17,7 @@ import { slugify } from "./slug";
 const projectDir = (id: string) => `projects/${id}`;
 const projectFile = (id: string) => `${projectDir(id)}/project.json`;
 const tokensFile = (id: string) => `${projectDir(id)}/tokens.json`;
+const responsiveFile = (id: string) => `${projectDir(id)}/responsive.json`;
 
 const isProjectId = (id: string) => z.uuid().safeParse(id).success;
 
@@ -126,4 +128,14 @@ export async function importProject(data: unknown): Promise<Project> {
   await writeJsonAtomic(projectFile(project.id), project);
   if (parsed.tokens.length > 0) await saveTokens(project.id, parsed.tokens);
   return project;
+}
+
+export async function getResponsive(id: string): Promise<ResponsiveFile | null> {
+  requireId(id);
+  return readJson(responsiveFile(id), ResponsiveFile);
+}
+
+export async function saveResponsive(id: string, data: ResponsiveFile): Promise<void> {
+  requireId(id);
+  await writeJsonAtomic(responsiveFile(id), ResponsiveFile.parse(data));
 }
