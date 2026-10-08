@@ -141,6 +141,28 @@ Rules:
 - **Colours from Figma use short hex** when possible (`#fff`), as the output lint rules require.
 - **Test project:** `src/lib/generator/figma.test.ts` builds a full project through the real extraction code and snapshots every file and the report.
 
+## Quality checks
+
+- **`buildPackage(project, inputs)`** (`src/lib/generator/build.ts`) runs `generatePackage`, then `runQualityChecks` (`src/lib/quality/run.ts`). The zip route and the Generate page use it, never `generatePackage` alone.
+- **Automatic fixes, applied first:**
+  - `dedupeCss` removes exact duplicate rules (same scope) and duplicate declarations
+  - `formatCss` (PostCSS) normalises layout only: 2-space indentation, `: `, one selector per line, a blank line between rules, kept single blank lines, and multi-line values re-indented
+  - both are idempotent on template output, so the snapshots don't change
+- **Errors (block the download; the route returns 409 with `quality`):**
+  - any stylelint warning (`outputStylelintConfig`)
+  - a `var()` with no definition in the package
+  - media queries out of cascade order, or of the wrong kind for the approach
+  - classes in a templated file not matching its manifest, in either direction
+- **Warnings:**
+  - a `var()` with a fallback but no definition
+  - unused component variables (unused tokens are grouped into one note; extra values are skipped)
+  - query widths that aren't project breakpoints
+  - literal design values
+  - files over 50 KB, or a package over 250 KB
+- **Size report:** bytes, gzip size, rules and declarations per file.
+- **Stylelint is a `serverExternalPackages` entry** in `next.config.ts`; bundling it breaks its config resolution.
+- **Tests:** `src/lib/quality/quality.test.ts` breaks the output on purpose, one defect per test. Add a case there for every new check.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:

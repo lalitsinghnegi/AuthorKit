@@ -183,4 +183,38 @@ describe("GenerateView", () => {
     expect(within(section).getByText("Measured per breakpoint")).toBeInTheDocument();
     expect(section).toHaveTextContent("cta.css: --acme-btn-radius");
   });
+
+  it("shows quality checks, issues, fixes and sizes; errors keep the files visible but block download", () => {
+    const { panel } = setup({
+      blocked: true,
+      quality: {
+        checks: [
+          { id: "stylelint", label: "Stylelint rules", errors: 1, warnings: 0 },
+          { id: "unused", label: "Unused variables", errors: 0, warnings: 1 },
+          { id: "classes", label: "Classes match the component docs", errors: 0, warnings: 0 },
+        ],
+        issues: [
+          {
+            check: "stylelint",
+            severity: "error",
+            message: 'Class ".btn" must be BEM',
+            path: "css/global.css",
+            line: 12,
+          },
+          { check: "unused", severity: "warning", message: "6 tokens are defined but not used" },
+        ],
+        fixes: [{ path: "css/global.css", description: "Duplicate rule .acme-btn" }],
+        sizes: [{ path: "css/global.css", bytes: 2048, gzip: 700, rules: 10, declarations: 30 }],
+        blocked: true,
+      },
+    });
+    const card = screen.getByRole("region", { name: /Quality checks/ });
+    expect(card).toHaveTextContent("1 error: download blocked");
+    expect(card).toHaveTextContent("✗ Stylelint rules 1 error");
+    expect(card).toHaveTextContent('css/global.css:12: Class ".btn" must be BEM');
+    expect(card).toHaveTextContent("Automatic fixes (1)");
+    expect(card).toHaveTextContent("File sizes (2.0 KB, 700 B gzipped)");
+    expect(panel.getByRole("button", { name: "Download zip" })).toBeDisabled();
+    expect(screen.getByRole("region", { name: "File contents" })).toBeInTheDocument();
+  });
 });

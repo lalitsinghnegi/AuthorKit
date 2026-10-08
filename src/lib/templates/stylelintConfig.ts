@@ -13,7 +13,10 @@ export function outputStylelintConfig(prefix: string): Config {
     rules: {
       "selector-class-pattern": [
         bemClassPattern(prefix),
-        { message: (c: string) => `Class ".${c}" must be BEM with the "${prefix}-" prefix` },
+        {
+          message: (c: string) =>
+            `Class ".${c.replace(/^\./, "")}" must be BEM with the "${prefix}-" prefix`,
+        },
       ],
       "custom-property-pattern": [
         new RegExp(`^${prefix}-[a-z0-9]+(?:-[a-z0-9]+)*$`),

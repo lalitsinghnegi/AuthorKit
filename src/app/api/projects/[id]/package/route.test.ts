@@ -3,7 +3,28 @@ import { describe, expect, it } from "vitest";
 import { addNode, createFile } from "@/lib/scaffold";
 import { createProject, saveResponsive, saveTokens, updateProject } from "@/lib/storage/projects";
 import { withTempDataDir } from "@/test/tempDataDir";
-import { GET } from "./route";
+import { vi } from "vitest";
+
+let forceQualityError = false;
+vi.mock("@/lib/quality/run", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/lib/quality/run")>();
+  return {
+    ...real,
+    runQualityChecks: async (...args: Parameters<typeof real.runQualityChecks>) => {
+      const result = await real.runQualityChecks(...args);
+      if (!forceQualityError) return result;
+      const issue = {
+        check: "variables" as const,
+        severity: "error" as const,
+        message: "--acme-x is used but never defined",
+        path: "css/x.css",
+      };
+      return { ...result, quality: { ...result.quality, issues: [issue], blocked: true } };
+    },
+  };
+});
+
+const { GET } = await import("./route");
 
 withTempDataDir();
 
@@ -97,6 +118,25 @@ describe("GET /api/projects/[id]/package", () => {
       severity: "error",
       message: '"README.md" is generated automatically at the package root',
     });
+  });
+
+  it("returns 409 with the quality errors when a check fails", async () => {
+    const project = await newProject();
+    forceQualityError = true;
+    try {
+      const res = await call(project.id);
+      expect(res.status).toBe(409);
+      expect((await res.json()).quality).toEqual([
+        {
+          check: "variables",
+          severity: "error",
+          message: "--acme-x is used but never defined",
+          path: "css/x.css",
+        },
+      ]);
+    } finally {
+      forceQualityError = false;
+    }
   });
 
   it("returns 404 for unknown projects", async () => {

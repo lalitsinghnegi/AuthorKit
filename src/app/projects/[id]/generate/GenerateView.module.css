@@ -198,3 +198,46 @@
   gap: 6px;
   font-size: 0.85rem;
 }
+
+.qualityBadge {
+  margin-left: 8px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #fde7e7;
+  color: #a51d1d;
+}
+
+.qualityBadge[data-ok] {
+  background: #e6f4ea;
+  color: #1e5e2a;
+}
+
+.checks {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 4px 16px;
+  font-size: 0.9rem;
+}
+
+.checks [data-state="ok"] span:first-child {
+  color: #2e7d32;
+}
+
+.checks [data-state="warning"] span:first-child {
+  color: #9a6700;
+}
+
+.checks [data-state="error"] {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.checkCounts {
+  font-size: 0.8rem;
+  color: var(--ui-muted);
+}

@@ -9,6 +9,7 @@ import { analyzeCss, literalDesignValues, outputStylelintConfig } from "@/lib/te
 import { extractTokens, mergeTokens } from "@/lib/tokens";
 import file from "@/test/fixtures/figma/file.json";
 import { generatePackage, type GenerationInputs } from "./generate";
+import { runQualityChecks } from "@/lib/quality/run";
 import { zipBuffer } from "./zip";
 
 /**
@@ -186,4 +187,15 @@ describe("package generated from Figma", () => {
     const zip = await JSZip.loadAsync(a);
     expect(await zip.file("acme-health/css/tokens.css")!.async("string")).toContain("#5a0632");
   });
+
+  it.each(["mobile-first", "desktop-first"] as const)(
+    "passes the quality checks with no errors or fixes (%s)",
+    async (approach) => {
+      const pkg = generate(approach);
+      const { files, quality } = await runQualityChecks(pkg, project(approach));
+      expect(quality.issues.filter((i) => i.severity === "error")).toEqual([]);
+      expect(quality.fixes).toEqual([]);
+      expect(files).toEqual(pkg.files);
+    },
+  );
 });

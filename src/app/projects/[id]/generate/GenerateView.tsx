@@ -9,7 +9,9 @@ import ui from "@/components/ui/ui.module.css";
 import type { GeneratedFile, Problem } from "@/lib/generator/types";
 import { CSS_TEMPLATE_LABELS, type ScaffoldTree, type TreeNode } from "@/lib/model";
 import type { GenerationReport } from "@/lib/templates/sources";
+import type { QualityReport } from "@/lib/quality/run";
 import { DesignSources } from "./DesignSources";
+import { QualityCard } from "./QualityCard";
 import styles from "./GenerateView.module.css";
 
 export type ViewFile = GeneratedFile & { size: number };
@@ -29,6 +31,8 @@ type Props = {
   /** Where every value came from (absent when generation is blocked). */
   report?: GenerationReport;
   prefix?: string;
+  /** Automatic fixes and checks; errors block the download. */
+  quality?: QualityReport;
 };
 
 export function formatBytes(bytes: number): string {
@@ -130,6 +134,8 @@ export function GenerateView(props: Props) {
         </section>
       )}
 
+      {props.quality && <QualityCard quality={props.quality} />}
+
       {props.report && (
         <DesignSources
           report={props.report}
@@ -138,7 +144,7 @@ export function GenerateView(props: Props) {
         />
       )}
 
-      {!blocked && (
+      {files.length > 0 && (
         <div className={styles.columns}>
           <section className={ui.card} aria-labelledby="gen-files">
             <h2 id="gen-files" className={ui.sectionHeading}>
