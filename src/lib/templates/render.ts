@@ -63,7 +63,7 @@ export function renderTemplate(id: CssTemplateId, ctx: TemplateContext, fileName
   const manifest = getManifest(id);
   const variables =
     id === "tokens"
-      ? ctx.tokens.map((t) => `--${ctx.prefix}-${t.name}`)
+      ? [...ctx.tokens, ...ctx.extraTokens].map((t) => `--${ctx.prefix}-${t.name}`)
       : manifest.variables.map((v) => `--${ctx.prefix}-${v}`);
   const css = template(id)({
     ...ctx,

@@ -1,4 +1,5 @@
 import type { CssTemplateId } from "@/lib/model";
+import type { GenerationReport } from "@/lib/templates/sources";
 
 export type FileSource = "template" | "entry" | "readme" | "empty-css" | "empty";
 
@@ -21,4 +22,6 @@ export type GeneratedPackage = {
   problems: Problem[];
   /** True when any problem is an error; files are then not produced. */
   blocked: boolean;
+  /** Where every template value came from; absent when generation is blocked. */
+  report?: GenerationReport;
 };

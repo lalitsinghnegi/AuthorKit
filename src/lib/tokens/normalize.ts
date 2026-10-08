@@ -16,7 +16,11 @@ const hex2 = (n: number) => n.toString(16).padStart(2, "0");
 export function colorToCss(color: FigmaColor, opacity = 1): string {
   const [r, g, b] = [channel(color.r), channel(color.g), channel(color.b)];
   const alpha = Math.min(1, Math.max(0, (color.a ?? 1) * opacity));
-  if (alpha >= 0.999) return `#${hex2(r)}${hex2(g)}${hex2(b)}`;
+  if (alpha >= 0.999) {
+    const hex = `${hex2(r)}${hex2(g)}${hex2(b)}`;
+    // Short form when every pair repeats (#ffffff → #fff), as the output lint rules require.
+    return /^(.)\1(.)\2(.)\3$/.test(hex) ? `#${hex[0]}${hex[2]}${hex[4]}` : `#${hex}`;
+  }
   return `rgb(${r} ${g} ${b} / ${num(alpha * 100, 1)}%)`;
 }
 

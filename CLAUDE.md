@@ -95,7 +95,6 @@ Rules:
   - failing contrast
 - **Re-extraction:** `mergeTokens(existing, extracted)` keeps the admin's decisions, matched by `meta.sourceKey`, as in its doc comment. Hand-made tokens (no `meta`) are never touched.
 - **Saving:** `saveTokensAction` only changes `name`, `value` and `status`. It re-validates every value with `validateTokenValue`, which refuses `; { } < > \` and comments, because values go into CSS. A value different from Figma's is always saved as `overridden`.
-- **Not used by the generator yet.** Accepted and overridden tokens reach the CSS in Prompt 11.
 
 ## Component mapping and AI
 
@@ -125,7 +124,22 @@ Rules:
   - **One breakpoint measured:** rem sizes become `clamp()` between `fluidRange` (smallest breakpoint start → largest breakpoint start, 320px if there's no min). A large-screen frame is the top of the range and the other end is `FLUID_RATIO` (0.75). px values and keywords stay fixed. Marked `fluid`.
 - **Storage:** results are saved to `data/projects/<id>/responsive.json` (`ResponsiveFile`). `renderResponsiveCss` previews them with `cascade()`: base for the first breakpoint, then only the changes per media query.
 - **Template variables that change by breakpoint** are declared through `{{vars "<component>" "<suffix>"}}` with defaults in `tokens.json` → `components`. A variant that must not be undone by breakpoint overrides sets the property directly (`padding-inline: 0` on tertiary buttons, `max-width` on interstitial modals) rather than overriding the shared variable.
-- **Not used by the generator yet.** Prompt 11 feeds `responsive.json` into the generator's context.
+
+## Figma values in the output
+
+- **`resolveDesignValues`** (`src/lib/templates/sources.ts`) decides every template value per breakpoint and builds the `GenerationReport`. `buildTemplateContext` / `buildTemplateContextWithReport` use it, and without Figma inputs the output is byte-identical to the defaults.
+- **Priority:**
+  - **tokens:** responsive typography > accepted or overridden token (every breakpoint; drops the built-in large-screen override) > default (+ large-screen default)
+  - **component variables:** responsive value > default (+ large-screen default)
+  - **not used:** tokens with status `auto` or `excluded`
+- **Extra tokens:** accepted tokens with non-template names are written to `tokens.css` after the template tokens as "Extra values from Figma".
+- **Report contents:**
+  - `rows` give the source of every template token and component variable; the defaults-used list comes from these
+  - `extras` lists the extra tokens
+  - `attention` holds warnings with the screen to fix them on: token vs responsive conflicts, multi-valued or missing tokens, invalid values, tokens waiting for review, contrast on the final colours, and responsive notes
+- **Loading inputs:** `generatePackage(project, { tokens, responsive })`. The zip route and the Generate page load them with `loadGenerationInputs(projectId)`.
+- **Colours from Figma use short hex** when possible (`#fff`), as the output lint rules require.
+- **Test project:** `src/lib/generator/figma.test.ts` builds a full project through the real extraction code and snapshots every file and the report.
 
 ## Storage (keep it simple)
 

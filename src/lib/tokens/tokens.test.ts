@@ -53,7 +53,8 @@ const rect = (
 describe("normalise", () => {
   it.each([
     [{ r: 0.5412, g: 0.0431, b: 0.3098, a: 1 }, 1, "#8a0b4f"],
-    [{ r: 1, g: 1, b: 1, a: 1 }, 1, "#ffffff"],
+    [{ r: 1, g: 1, b: 1, a: 1 }, 1, "#fff"],
+    [{ r: 0.2, g: 0.4, b: 0.6, a: 1 }, 1, "#369"],
     [{ r: 0, g: 0, b: 0, a: 0.6 }, 1, "rgb(0 0 0 / 60%)"],
     [{ r: 0, g: 0, b: 0, a: 1 }, 0.5, "rgb(0 0 0 / 50%)"],
     [{ r: 1.2, g: -0.1, b: 0.5, a: 1 }, 1, "#ff0080"],
@@ -215,14 +216,14 @@ describe("extractTokens edge cases", () => {
     ]);
     const { tokens } = extractTokens([{ fileKey: "K", roots: [root], styles }]);
     expect(byName(tokens, "color-primary")).toMatchObject({
-      value: "#ff0000",
+      value: "#f00",
       meta: { origin: "style", confidence: "low" },
     });
     expect(byName(tokens, "color-primary")!.meta.reasons[0]).toMatch(
-      /2 different values for color-primary; #ff0000 was chosen/,
+      /2 different values for color-primary; #f00 was chosen/,
     );
     expect(byName(tokens, "color-primary-alt")).toMatchObject({
-      value: "#0000ff",
+      value: "#00f",
       meta: { mapped: false, usage: 2 },
     });
   });

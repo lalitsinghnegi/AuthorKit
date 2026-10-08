@@ -6,3 +6,4 @@ export * from "./defaults";
 export * from "./manifest";
 export * from "./registry";
 export * from "./stylelintConfig";
+export * from "./sources";

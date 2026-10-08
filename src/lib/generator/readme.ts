@@ -1,17 +1,59 @@
 import { describeRange, mediaQueries } from "@/lib/breakpoints";
 import { CSS_TEMPLATE_LABELS, type Project } from "@/lib/model";
 import { renderTreeText } from "@/lib/scaffold/render";
-import { getManifests, manifestClasses } from "@/lib/templates";
+import { getManifests, manifestClasses, type GenerationReport } from "@/lib/templates";
 import { importLabel, orderForImport, type CssFileRef } from "./entry";
 import { README_NAME } from "./naming";
 
 /** One line, no markdown control characters that could break the layout. */
 const inline = (text: string) => text.replace(/[\r\n]+/g, " ").replace(/[`|]/g, "");
 
+/** "Design sources": how much came from Figma and which values are still template defaults. */
+function designSources(
+  report: GenerationReport,
+  prefix: string,
+  cssFiles: readonly CssFileRef[],
+): string[] {
+  // Only count values for templates this package actually contains.
+  const files = new Set(cssFiles.flatMap((f) => (f.templateId ? [`${f.templateId}.css`] : [])));
+  const rows = report.rows.filter((r) => files.has(r.file));
+  const fromFigma = rows.filter((r) => r.source !== "default").length;
+  const defaults = rows.filter((r) => r.source === "default");
+  if (fromFigma === 0 && report.extras.length === 0) {
+    return [
+      "## Design sources",
+      "",
+      "No values from Figma yet: every value uses AuthorKit's defaults. Connect the project to Figma in AuthorKit and regenerate.",
+      "",
+    ];
+  }
+  const lines = [
+    "## Design sources",
+    "",
+    `- **From Figma:** ${fromFigma} value${fromFigma === 1 ? "" : "s"} (design tokens and per-breakpoint component values)`,
+    `- **AuthorKit defaults:** ${defaults.length} value${defaults.length === 1 ? "" : "s"} not yet defined in the design`,
+  ];
+  if (report.extras.length) {
+    lines.push(
+      `- **Extra values from Figma:** ${report.extras.map((n) => `\`--${prefix}-${n}\``).join(", ")} (in \`tokens.css\`, for your own CSS)`,
+    );
+  }
+  if (defaults.length) {
+    lines.push("", "Values still using defaults:", "");
+    const byFile = new Map<string, string[]>();
+    for (const r of defaults)
+      byFile.set(r.file, [...(byFile.get(r.file) ?? []), `\`--${prefix}-${r.name}\``]);
+    for (const [file, names] of byFile) lines.push(`- \`${file}\`: ${names.join(", ")}`);
+  }
+  lines.push("");
+  return lines;
+}
+
 export function renderReadme(
   project: Project,
   entryName: string,
   cssFiles: readonly CssFileRef[],
+  report?: GenerationReport,
 ): string {
   const p = project.prefix;
   const brand = inline(project.brandName);
@@ -103,6 +145,8 @@ export function renderReadme(
     "```",
     "",
   ];
+
+  if (report) sections.push(...designSources(report, p, cssFiles));
 
   if (manifests.length) {
     sections.push("## Components", "", "| File | Component | Classes |", "| --- | --- | --- |");

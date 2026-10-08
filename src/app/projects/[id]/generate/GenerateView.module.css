@@ -164,3 +164,37 @@
   text-align: right;
   user-select: none;
 }
+
+.subheading {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.attention {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-left: 4px solid #e09b00;
+  border-radius: var(--ui-radius);
+  background: color-mix(in srgb, #e09b00 8%, transparent);
+}
+
+.attention ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.sourceTable {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.defaultsList {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+}

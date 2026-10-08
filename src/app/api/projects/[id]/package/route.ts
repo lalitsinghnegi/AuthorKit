@@ -1,6 +1,7 @@
 import { Readable } from "node:stream";
 import type { NextRequest } from "next/server";
 import { generatePackage } from "@/lib/generator/generate";
+import { loadGenerationInputs } from "@/lib/generator/load";
 import { zipFileName } from "@/lib/generator/naming";
 import { zipStream } from "@/lib/generator/zip";
 import { getProject } from "@/lib/storage/projects";
@@ -11,7 +12,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/projects/[i
   const project = await getProject(id);
   if (!project) return Response.json({ error: "Project not found" }, { status: 404 });
 
-  const pkg = generatePackage(project);
+  const pkg = generatePackage(project, await loadGenerationInputs(project.id));
   if (pkg.blocked) {
     return Response.json(
       { error: "The package has errors and cannot be generated", problems: pkg.problems },

@@ -1,8 +1,8 @@
 import "server-only";
 import { validateBreakpoints } from "@/lib/breakpoints";
-import type { Project, TreeNode } from "@/lib/model";
+import type { DesignToken, Project, ResponsiveFile, TreeNode } from "@/lib/model";
 import { nodePath, validateTree } from "@/lib/scaffold";
-import { buildTemplateContext, commentSafe } from "@/lib/templates/context";
+import { buildTemplateContextWithReport, commentSafe } from "@/lib/templates/context";
 import { renderTemplate } from "@/lib/templates/render";
 import { renderEntry, type CssFileRef } from "./entry";
 import { README_NAME, entryFileName, reservedRootNames } from "./naming";
@@ -34,17 +34,25 @@ export function checkProject(project: Project): Problem[] {
  * Build the whole package in memory. Deterministic: the same project always
  * produces the same files in the same order with the same content.
  */
-export function generatePackage(project: Project): GeneratedPackage {
+/** Saved Figma-derived inputs; both optional (defaults are used without them). */
+export type GenerationInputs = {
+  tokens?: readonly DesignToken[];
+  responsive?: ResponsiveFile | null;
+};
+
+export function generatePackage(project: Project, inputs: GenerationInputs = {}): GeneratedPackage {
   const problems = checkProject(project);
   const blocked = problems.some((p) => p.severity === "error");
   const rootName = project.scaffold.name;
   if (blocked) return { rootName, files: [], folders: [], problems, blocked };
 
-  const ctx = buildTemplateContext({
+  const { context: ctx, report } = buildTemplateContextWithReport({
     brandName: project.brandName,
     prefix: project.prefix,
     approach: project.approach,
     breakpoints: project.breakpoints.breakpoints,
+    tokens: inputs.tokens,
+    responsive: inputs.responsive,
   });
 
   const scaffoldFiles: GeneratedFile[] = [];
@@ -96,11 +104,11 @@ export function generatePackage(project: Project): GeneratedPackage {
     },
     {
       path: README_NAME,
-      content: renderReadme(project, entryName, cssRefs),
+      content: renderReadme(project, entryName, cssRefs, report),
       source: "readme",
       templateId: null,
     },
     ...scaffoldFiles,
   ];
-  return { rootName, files, folders, problems, blocked };
+  return { rootName, files, folders, problems, blocked, report };
 }

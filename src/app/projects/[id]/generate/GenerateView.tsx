@@ -8,6 +8,8 @@ import panel from "@/components/AppShell/AppShell.module.css";
 import ui from "@/components/ui/ui.module.css";
 import type { GeneratedFile, Problem } from "@/lib/generator/types";
 import { CSS_TEMPLATE_LABELS, type ScaffoldTree, type TreeNode } from "@/lib/model";
+import type { GenerationReport } from "@/lib/templates/sources";
+import { DesignSources } from "./DesignSources";
 import styles from "./GenerateView.module.css";
 
 export type ViewFile = GeneratedFile & { size: number };
@@ -24,6 +26,9 @@ type Props = {
   blocked: boolean;
   files: ViewFile[];
   initialPath?: string;
+  /** Where every value came from (absent when generation is blocked). */
+  report?: GenerationReport;
+  prefix?: string;
 };
 
 export function formatBytes(bytes: number): string {
@@ -123,6 +128,14 @@ export function GenerateView(props: Props) {
             ))}
           </ul>
         </section>
+      )}
+
+      {props.report && (
+        <DesignSources
+          report={props.report}
+          prefix={props.prefix ?? ""}
+          projectId={props.projectId}
+        />
       )}
 
       {!blocked && (

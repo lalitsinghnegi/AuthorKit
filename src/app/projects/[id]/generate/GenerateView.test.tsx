@@ -132,4 +132,55 @@ describe("GenerateView", () => {
     expect(formatBytes(512)).toBe("512 B");
     expect(formatBytes(1536)).toBe("1.5 KB");
   });
+
+  it("shows design sources, needs attention with links, and defaults by file", () => {
+    setup({
+      prefix: "acme",
+      report: {
+        rows: [
+          {
+            kind: "token",
+            name: "color-primary",
+            file: "tokens.css",
+            source: "figma-token",
+            value: "#8a0b4f",
+          },
+          {
+            kind: "component",
+            name: "footer-gap",
+            file: "footer.css",
+            source: "responsive",
+            value: "1.5rem",
+          },
+          {
+            kind: "token",
+            name: "color-text",
+            file: "tokens.css",
+            source: "default",
+            value: "#1f2329",
+          },
+          {
+            kind: "component",
+            name: "btn-radius",
+            file: "cta.css",
+            source: "default",
+            value: "var(--{{prefix}}-radius-pill)",
+          },
+        ],
+        extras: ["color-teal"],
+        attention: [
+          { message: "2 tokens are waiting for review and not used yet.", screen: "tokens" },
+        ],
+      },
+    });
+    const section = screen.getByRole("region", { name: "Design sources" });
+    expect(section).toHaveTextContent("2 values from Figma · 2 defaults · 1 extra variable");
+    expect(within(section).getByText(/waiting for review/)).toBeInTheDocument();
+    expect(within(section).getByRole("link", { name: "Open Tokens" })).toHaveAttribute(
+      "href",
+      "/projects/p1/tokens",
+    );
+    expect(within(section).getByText("Measured per breakpoint")).toBeInTheDocument();
+    expect(section).toHaveTextContent("cta.css: --acme-btn-radius");
+  });
 });

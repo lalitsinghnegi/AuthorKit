@@ -9,7 +9,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "mapped": true,
       "origin": "scan",
       "reasons": [],
-      "sourceKey": "scan:color:#ffffff",
+      "sourceKey": "scan:color:#fff",
       "usage": 3,
     },
     "name": "color-header-background",
@@ -19,7 +19,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Header / Desktop",
     },
     "type": "color",
-    "value": "#ffffff",
+    "value": "#fff",
   },
   {
     "meta": {

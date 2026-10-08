@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
 import { generatePackage } from "@/lib/generator/generate";
+import { loadGenerationInputs } from "@/lib/generator/load";
 import { README_NAME, entryFileName, zipFileName } from "@/lib/generator/naming";
 import { getProject } from "@/lib/storage/projects";
 import { GenerateView } from "./GenerateView";
@@ -20,7 +21,7 @@ async function Loader({ params, searchParams }: PageProps<"/projects/[id]/genera
   const project = await getProject(id);
   if (!project) notFound();
 
-  const pkg = generatePackage(project);
+  const pkg = generatePackage(project, await loadGenerationInputs(project.id));
   const encoder = new TextEncoder();
   const file = typeof query.file === "string" ? query.file : undefined;
 
@@ -41,6 +42,8 @@ async function Loader({ params, searchParams }: PageProps<"/projects/[id]/genera
         blocked={pkg.blocked}
         files={pkg.files.map((f) => ({ ...f, size: encoder.encode(f.content).length }))}
         initialPath={file}
+        report={pkg.report}
+        prefix={project.prefix}
       />
     </>
   );

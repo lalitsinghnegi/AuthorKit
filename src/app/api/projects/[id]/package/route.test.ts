@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { describe, expect, it } from "vitest";
 import { addNode, createFile } from "@/lib/scaffold";
-import { createProject, updateProject } from "@/lib/storage/projects";
+import { createProject, saveResponsive, saveTokens, updateProject } from "@/lib/storage/projects";
 import { withTempDataDir } from "@/test/tempDataDir";
 import { GET } from "./route";
 
@@ -33,6 +33,54 @@ describe("GET /api/projects/[id]/package", () => {
     expect(Object.keys(zip.files)).toContain("acme-health/css/components/cta.css");
     expect(await zip.file("acme-health/acme-health.css")!.async("string")).toContain(
       '@import url("css/tokens.css");',
+    );
+  });
+
+  it("uses the saved tokens and responsive values", async () => {
+    const project = await newProject();
+    const [m, , d] = project.breakpoints.breakpoints;
+    await saveTokens(project.id, [
+      {
+        id: "t1",
+        name: "color-primary",
+        type: "color",
+        value: "#123456",
+        originalValue: "#123456",
+        status: "accepted",
+      },
+      {
+        id: "t2",
+        name: "color-text",
+        type: "color",
+        value: "#000000",
+        originalValue: "#000000",
+        status: "auto",
+      },
+    ]);
+    await saveResponsive(project.id, {
+      schemaVersion: 1,
+      components: {
+        footer: {
+          mode: "breakpoints",
+          frames: [],
+          values: {
+            [m.id]: { "footer-gap": { value: "1.5rem", source: "frame" } },
+            [project.breakpoints.breakpoints[1].id]: {
+              "footer-gap": { value: "1.5rem", source: "inferred" },
+            },
+            [d.id]: { "footer-gap": { value: "2rem", source: "frame" } },
+          },
+          notes: [],
+        },
+      },
+    });
+    const zip = await JSZip.loadAsync(Buffer.from(await (await call(project.id)).arrayBuffer()));
+    const tokens = await zip.file("acme-health/css/tokens.css")!.async("string");
+    expect(tokens).toContain("--acme-color-primary: #123456;");
+    expect(tokens).toContain("--acme-color-text: #1f2329;"); // still to review → default
+    const footer = await zip.file("acme-health/css/components/footer.css")!.async("string");
+    expect(footer).toMatch(
+      /@media \(min-width: 1024px\) \{\n {2}\.acme-footer \{[\s\S]*--acme-footer-gap: 2rem;/,
     );
   });
 
