@@ -163,6 +163,23 @@ Rules:
 - **Stylelint is a `serverExternalPackages` entry** in `next.config.ts`; bundling it breaks its config resolution.
 - **Tests:** `src/lib/quality/quality.test.ts` breaks the output on purpose, one defect per test. Add a case there for every new check.
 
+## Developer style guide
+
+- **`generateStyleGuide(project, files, extras)`** (`src/lib/styleguide/generate.ts`, server-only) returns static files under `style-guide/`:
+  - `index.html`, from `renderGuidePage` in `page.ts`
+  - `styleguide.css` and `styleguide.js`, copied from `src/templates/styleguide/`; plain browser code, no build step, works from `file://`
+  - `states.css`
+- **Built from the package's checked files and the manifests,** never hand-written, so it can't drift from the package.
+- **Live examples render in `srcdoc` iframes** (`loading="lazy"`) that link `../<entry>.css` and `states.css`. Global element styles therefore never touch the guide's own UI. Only `tokens.css`, which holds just `:root` variables, is linked by the guide page for token previews.
+- **Examples are adjusted for the live view only;** the copyable code is unchanged:
+  - `autofocus` becomes `data-sg-autofocus`, otherwise it steals focus and scrolls the guide on load
+  - relative `<img src>` becomes a placeholder data URI, so missing files like `logo.svg` don't fail to load
+- **Forced states:** `buildStatesCss` copies `:hover` / `:focus(-visible)` / `:active` rules as `[data-sg-state~=…]`. `styleguide.js` sets that attribute on the manifest state's `appliesTo` elements.
+- **Escaping:** everything interpolated into the page goes through `esc()`; `srcdoc` documents are escaped as attribute values.
+- **Serving in the app:** `GET /api/projects/[id]/styleguide/[...path]` serves the guide and the package from one virtual root (exact path match only), via `buildPackage`. The Style guide screen frames it.
+- **Browser checks:** `playwright-core` (dev) drives the installed Chrome (`channel: "chrome"`). Prompt 14 adds the automated headless test.
+- **Test project:** `src/test/figmaProject.ts` builds the full Figma test project used by several tests.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:

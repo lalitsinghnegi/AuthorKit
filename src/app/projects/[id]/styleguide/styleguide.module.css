@@ -1,0 +1,9 @@
+.frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 180px);
+  min-height: 480px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: #fff;
+}

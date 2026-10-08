@@ -17,6 +17,7 @@ export function ProjectNav({ id, name }: { id: string; name: string }) {
     { href: `${base}/tokens`, label: "Tokens" },
     { href: `${base}/responsive`, label: "Responsive" },
     { href: `${base}/generate`, label: "Generate" },
+    { href: `${base}/styleguide`, label: "Style guide" },
   ];
 
   return (

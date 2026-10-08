@@ -37,3 +37,18 @@ export function PanelDownload({ href, children }: { href: string; children: Reac
     </a>
   );
 }
+
+/** Plain anchor that opens in a new tab (e.g. a standalone page served by an API route). */
+export function PanelExternal({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.panelButton}
+      data-variant="secondary"
+    >
+      {children}
+    </a>
+  );
+}
