@@ -278,7 +278,7 @@ Rules:
   - All calls go through `FigmaClient`. `HttpFigmaClient` only ever requests `https://api.figma.com` (fixed in code), validates file keys and node ids, and does not follow redirects.
   - It times out after 20 seconds and retries up to 3 times on 429 (honouring `Retry-After`, capped at 60 seconds) and 5xx.
   - It caches responses for 5 minutes per token hash. `/me` and image renders are never cached.
-  - Failures raise `FigmaError` with a code and fixed, safe text.
+  - Failures raise `FigmaError` with a code and fixed, safe text. A 403 mentioning scopes is `missing_scope`; any other 403 on `/v1/me` is `invalid_token`. Figma's own reason is logged with `logWarn("figma_error")`, never shown.
 - **Server access:** `getFigmaClient()` (`src/lib/figma/server.ts`) returns a client using the saved token, or throws `no_token`.
 - **Tests never reach the network.**
   - `vitest.setup.ts` stubs `fetch` to throw.

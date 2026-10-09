@@ -62,7 +62,14 @@ Projects can be exported and imported as a single JSON file from the Projects sc
    ```bash
    node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
    ```
-2. In Figma, create a personal access token: Settings → Security → Personal access tokens, with read access to files.
+2. In Figma, create a personal access token: Settings → Security → Personal access tokens. Give it these **read-only** scopes:
+   - **Current user: Read** (used to check the token)
+   - **File content: Read** (frames, layers, previews)
+   - **Library content: Read** (styles)
+   - **File variables: Read** is optional; it needs an Enterprise plan, and styles are used without it.
+
+   A token without these scopes is refused with "missing a permission"; create a new one, since scopes can't be added later.
+
 3. In AuthorKit, open **Settings**, paste the token and choose **Save & test**. Figma checks it first.
 
 The token is encrypted on the server and is never shown again or sent to the browser.

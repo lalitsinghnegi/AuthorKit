@@ -1,5 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import { logWarn } from "@/lib/log";
 import type { Secret } from "@/lib/secrets/secret";
 import { FigmaError } from "./errors";
 import type {
@@ -170,7 +171,7 @@ export class HttpFigmaClient implements FigmaClient {
         );
         continue;
       }
-      throw await this.toError(res, opts.variables === true);
+      throw await this.toError(res, url.pathname, opts.variables === true);
     }
   }
 
@@ -190,19 +191,27 @@ export class HttpFigmaClient implements FigmaClient {
     this.cache.set(key, { expires: this.now() + this.cacheTtlMs, value });
   }
 
-  private async toError(res: Response, variables: boolean): Promise<FigmaError> {
+  private async toError(res: Response, path: string, variables: boolean): Promise<FigmaError> {
     let detail = "";
     try {
       const body = (await res.json()) as { err?: string; message?: string };
-      detail = `${body.err ?? ""} ${body.message ?? ""}`.toLowerCase();
+      detail = `${body.err ?? ""} ${body.message ?? ""}`.trim();
     } catch {
       // Body is not JSON; the status code is enough.
     }
+    // Figma's own reason, for the server log only (the user sees fixed text).
+    logWarn("figma_error", { status: res.status, path, reason: detail.slice(0, 200) });
+    const reason = detail.toLowerCase();
     if (res.status === 401) return new FigmaError("invalid_token", 401);
     if (res.status === 403) {
-      if (detail.includes("invalid token") || detail.includes("token expired"))
+      if (reason.includes("invalid token") || reason.includes("token expired"))
         return new FigmaError("invalid_token", 403);
-      return new FigmaError(variables ? "plan_limit" : "no_access", 403);
+      // Variables need an Enterprise plan (and scope); callers fall back to styles.
+      if (variables) return new FigmaError("plan_limit", 403);
+      if (reason.includes("scope")) return new FigmaError("missing_scope", 403);
+      // /me involves no file, so a refusal there is about the token itself.
+      if (path === "/v1/me") return new FigmaError("invalid_token", 403);
+      return new FigmaError("no_access", 403);
     }
     if (res.status === 404) return new FigmaError("not_found", 404);
     if (res.status === 429) return new FigmaError("rate_limited", 429);

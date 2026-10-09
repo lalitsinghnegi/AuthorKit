@@ -133,6 +133,20 @@ describe("HttpFigmaClient", () => {
     [403, { status: 403, err: "Invalid token" }, "getFile", "invalid_token"],
     [403, { status: 403, err: "Forbidden" }, "getFile", "no_access"],
     [403, { status: 403, err: "Forbidden" }, "getLocalVariables", "plan_limit"],
+    [
+      403,
+      { status: 403, err: "Invalid scope(s): This endpoint requires the file_content:read scope" },
+      "getFile",
+      "missing_scope",
+    ],
+    [
+      403,
+      { status: 403, err: "Invalid scope(s): requires the current_user:read scope" },
+      "getMe",
+      "missing_scope",
+    ],
+    [403, { status: 403, err: "Forbidden" }, "getMe", "invalid_token"],
+    [403, { status: 403, err: "Invalid scope(s)" }, "getLocalVariables", "plan_limit"],
     [404, { status: 404, err: "Not found" }, "getFile", "not_found"],
     [400, { status: 400, err: "Bad" }, "getFile", "bad_request"],
   ] as const)("maps %i %j from %s to %s", async (status, body, method, code) => {

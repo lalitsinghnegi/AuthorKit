@@ -2,6 +2,7 @@ export type FigmaErrorCode =
   | "no_token"
   | "invalid_token"
   | "no_access"
+  | "missing_scope"
   | "not_found"
   | "plan_limit"
   | "rate_limited"
@@ -14,6 +15,8 @@ const MESSAGES: Record<FigmaErrorCode, string> = {
   invalid_token:
     "Figma rejected the token. It may be expired or revoked; save a new one in Settings.",
   no_access: "This Figma account cannot open that file. Ask the file owner to share it.",
+  missing_scope:
+    "The Figma token is missing a permission AuthorKit needs. Create a new token with read access to Current user, File content and Library content, then save it in Settings.",
   not_found: "Figma could not find that file or frame. Check the link.",
   plan_limit: "Figma variables need an Enterprise plan; AuthorKit will use styles instead.",
   rate_limited: "Figma is limiting requests right now. Wait a minute and try again.",
