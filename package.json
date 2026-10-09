@@ -20,6 +20,7 @@
     "archiver": "^8.0.0",
     "handlebars": "^4.7.10",
     "next": "16.4.0",
+    "parse5": "^8.0.1",
     "postcss": "^8.5.29",
     "postcss-selector-parser": "^7.1.6",
     "react": "19.3.0",

@@ -9,6 +9,7 @@ import {
   ProjectInput,
   SCHEMA_VERSION,
   ResponsiveFile,
+  SiteFile,
   TokenFile,
 } from "@/lib/model";
 import { listEntries, readJson, removeDataPath, writeJsonAtomic } from "./files";
@@ -18,6 +19,7 @@ const projectDir = (id: string) => `projects/${id}`;
 const projectFile = (id: string) => `${projectDir(id)}/project.json`;
 const tokensFile = (id: string) => `${projectDir(id)}/tokens.json`;
 const responsiveFile = (id: string) => `${projectDir(id)}/responsive.json`;
+const siteFile = (id: string) => `${projectDir(id)}/site.json`;
 
 const isProjectId = (id: string) => z.uuid().safeParse(id).success;
 
@@ -138,4 +140,15 @@ export async function getResponsive(id: string): Promise<ResponsiveFile | null> 
 export async function saveResponsive(id: string, data: ResponsiveFile): Promise<void> {
   requireId(id);
   await writeJsonAtomic(responsiveFile(id), ResponsiveFile.parse(data));
+}
+
+/** What was found the last time the project's site was read (null if never read). */
+export async function getSite(id: string): Promise<SiteFile | null> {
+  requireId(id);
+  return readJson(siteFile(id), SiteFile);
+}
+
+export async function saveSite(id: string, data: SiteFile): Promise<void> {
+  requireId(id);
+  await writeJsonAtomic(siteFile(id), SiteFile.parse(data));
 }

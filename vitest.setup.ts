@@ -14,6 +14,7 @@ afterEach(() => {
   limits?.cache.clear();
   limits?.perUser.clear();
   (globalThis as { __akBudgets?: Map<string, unknown> }).__akBudgets?.clear();
+  (globalThis as { __akSiteCache?: Map<string, unknown> }).__akSiteCache?.clear();
 });
 
 // `server-only` throws outside the React Server bundle; tests import server modules directly.

@@ -14,7 +14,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium, type Browser, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { createProject } from "@/lib/storage/projects";
+import { readFileSync } from "node:fs";
+import { analyzeSite, partsFromManifests } from "@/lib/site";
+import { createProject, saveSite, updateProject } from "@/lib/storage/projects";
+import { getManifests } from "@/lib/templates/registry";
 import { createUser } from "@/lib/storage/users";
 import { CHROME, axeViolations } from "./chrome";
 
@@ -68,6 +71,21 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
         approach: "mobile-first",
       })
     ).id;
+    // A saved site read, so the Site structure screen shows a full report.
+    await updateProject(projectId, (p) => ({ ...p, siteUrl: "https://www.acme.com/en.html" }));
+    const pages = ["aem-home", "aem-safety"].map((n) => ({
+      url: `https://www.acme.com/${n}.html`,
+      html: readFileSync(`src/test/fixtures/site/${n}.html`, "utf8"),
+    }));
+    const analysis = analyzeSite(pages, partsFromManifests(getManifests()));
+    await saveSite(projectId, {
+      schemaVersion: 1,
+      readAt: new Date(0).toISOString(),
+      pages: analysis.pages.map((page) => ({ ...page, ok: true })),
+      parts: analysis.parts,
+      classes: analysis.classes,
+      notes: analysis.notes,
+    });
     process.env.DATA_DIR = previous;
 
     const port = await freePort();
@@ -135,6 +153,7 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
       `${p}/figma`,
       `${p}/tokens`,
       `${p}/mapping`,
+      `${p}/site`,
       `${p}/responsive`,
       `${p}/generate`,
       `${p}/styleguide`,
@@ -167,6 +186,16 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
     expect(await page.getByRole("link", { name: "Open site" }).getAttribute("href")).toBe(
       "https://www.acme.com/",
     );
+    expect(errors).toEqual([]);
+  }, 60_000);
+
+  it("shows the site structure report", async () => {
+    const { page, errors } = await signIn(ADMIN);
+    await page.goto(`${base}/projects/${projectId}/site`);
+    await page.getByRole("heading", { name: "Accordion" }).waitFor();
+    const row = page.getByRole("row", { name: /acme-accordion__trigger/ });
+    expect(await row.textContent()).toContain(".cmp-accordion__button");
+    expect(await page.getByRole("button", { name: "Read site" }).isEnabled()).toBe(true);
     expect(errors).toEqual([]);
   }, 60_000);
 

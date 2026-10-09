@@ -47,6 +47,7 @@ Rules:
 - **Component manifests** (one per template) describe selectors, modifiers, states, HTML/HTL examples, accessibility notes, and the variables used. CSS, style guide and consistency checks all derive from them.
 - **LLM is optional and advisory only.** It may suggest which Figma frame maps to which component, behind an `LLMProvider` interface with a mock for tests. It never writes CSS, and the admin must confirm every suggestion.
 - **Figma access** goes through a single `FigmaClient` (caching, retries, rate-limit handling, typed errors). Only the Figma API host is allowed (SSRF protection).
+- **Site access** (reading the project's public site) goes through a single `SiteReader`, limited to the site URL's host and public addresses. No other outbound requests exist.
 - Core logic (breakpoints, scaffold tree operations, token extraction, generator, quality checks) lives in **pure TypeScript modules** independent of Next.js, so it is unit-testable.
 
 ## CSS templates
@@ -221,7 +222,7 @@ Rules:
 
 - **Checklist:** `docs/SECURITY.md` lists every risk and its state. Update it when you add an input, a route, an external call or a limit.
 - **Package builds:** pages and routes call `buildForUser(project, userId)` (`src/lib/generator/limit.ts`), never `buildPackage` directly. It shares identical builds for 60 s, runs at most 2 at once and 2 per user, and throws `BusyError` (show `<BusyNote>` on pages, return 429 from routes).
-- **External calls:** every action that calls Figma or the AI provider spends a per-user budget first (`spend(FIGMA_BUDGET | AI_BUDGET, user.id)` from `src/lib/security/rateLimit.ts`), right after the auth check.
+- **External calls:** every action that calls Figma, the AI provider or the site spends a per-user budget first (`spend(FIGMA_BUDGET | AI_BUDGET | SITE_BUDGET, user.id)` from `src/lib/security/rateLimit.ts`), right after the auth check.
 - **Login throttle** (`src/lib/auth/rateLimit.ts`): per email + IP (5) and per email from any IP (20), 15 minutes, capped at 10 000 entries.
 - **Input limits:** every array and string in a schema has a `max`. Recursive input (scaffold trees) goes through `treeShapeProblem` before the recursive schema. Server-action bodies are limited to 3 MB in `next.config.ts`.
 - **Headers:** `src/lib/security/headers.ts` (applied in `next.config.ts`). The style guide route sets `STYLE_GUIDE_CSP` itself. New inline scripts or third-party hosts need a CSP change.
@@ -229,10 +230,27 @@ Rules:
 - **Accessibility:** `npm run test:app` runs axe-core on every screen; a new screen must have no serious or critical violations.
 - **In-memory state** (throttles, budgets, build cache) lives on `globalThis` and is cleared in `vitest.setup.ts` after each test.
 
+## Site structure (reading the published site)
+
+- **Purpose:** find which classes the published (AEM) site uses for each template part, so the CSS can target the real markup. This screen only suggests; mapping and generation come next.
+- **Inputs:** `project.siteUrl` (overview) plus up to 20 `project.sitePages` paths on the same site (`SitePath`: starts with `/`, never `//`).
+- **Reading:** `SiteReader` (`src/lib/site/fetch.ts`, server-only) through `getSiteReader()` (`src/lib/site/server.ts`, mocked in tests).
+  - http(s) on ports 80/443, same host as the site URL, no credentials.
+  - `safeLookup` refuses a name unless **every** address is public (`isPublicAddress`, `address.ts`), and the connection uses that address (no DNS rebinding).
+  - Redirects followed by hand: at most 3, same host, re-checked. 15 s timeout, 5 MB cap before and after decompression, HTML only, 5-minute cache.
+  - Failures are `SiteError` with fixed text; a failed page is reported, not fatal.
+- **Analysis:** `analyzeSite(pages, partsFromManifests(getManifests()))` (`analyze.ts`) is pure and deterministic. Parts are each manifest's block, element and modifier classes. Class names are split BEM-style (noise such as `cmp-` and `js-` dropped) and scored with vocabularies per block, element and variant:
+  - **high:** component and part both match, or the class is named only after the component (`.cmp-accordion__button`, `.cmp-isi-tray`)
+  - **medium:** the part matches inside the component (ancestor class, or `<header>`/`<footer>`/dialog landmarks), a longer name mentions the component, or a variant names it
+  - classes with a modifier are never suggested for blocks or elements (they're states); ties prefer `cmp-` classes, then use count, then name
+- **Storage:** `data/projects/<id>/site.json` (`SiteFile`): pages, suggestions with short samples, the most used classes and notes. Never whole pages.
+- **Limits:** `SITE_BUDGET` (10 reads per user per 10 minutes).
+- **Tests:** fixtures in `src/test/fixtures/site/` (AEM Core Components markup). Extend them, never the network.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
-  - `data/projects/<project-id>/project.json` holds the brand, prefix, optional site URL (`SiteUrl`: http(s), no credentials; stored only, never fetched), approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
+  - `data/projects/<project-id>/project.json` holds the brand, prefix, optional site URL (`SiteUrl`: http(s), no credentials) and extra site pages, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
   - `data/users.json` holds users (scrypt hashes, never passwords), and `data/audit.log` holds the audit trail.
   - `data/scaffold-templates/*.json` holds the scaffold presets. Built-in presets (Basic, Component-based) live in code (`src/lib/scaffold/presets.ts`), can't be changed or deleted, and are merged into listings.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.

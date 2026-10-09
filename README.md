@@ -51,6 +51,7 @@ data/
   projects/<id>/project.json     # brand, prefix, site URL, breakpoints, scaffold, Figma links
   projects/<id>/tokens.json      # design tokens
   projects/<id>/responsive.json  # per-breakpoint values measured from Figma
+  projects/<id>/site.json        # what the last site read found
   scaffold-templates/<id>.json   # scaffold presets
 ```
 
@@ -80,6 +81,12 @@ Then add frame links per project under **Figma**, and match frames to components
 
 Optional: set `ANTHROPIC_API_KEY` in `.env` to let Claude suggest components for frames whose names are ambiguous. Only frame names, paths and sizes are sent, and suggestions always need your confirmation.
 
+## Reading the published site
+
+Add the brand's public site URL on the project overview, then open **Site structure** and choose **Read site**. AuthorKit reads the page (and up to 20 extra pages you list, such as one with the ISI or a modal) and suggests which of the site's classes match each template part, for example `.cmp-accordion__button` for the accordion trigger. It shows how sure it is, how often each class appears, and a short sample of the markup.
+
+Only public sites can be read: the server refuses private and internal addresses, other hosts and non-standard ports, and limits time, size and how often you can read. Internal preview sites (behind SSO or a VPN) aren't supported yet.
+
 ## Generating a package
 
 Open a project → **Generate** to preview every file, then **Download zip**. `GET /api/projects/<id>/package` returns the same zip. Generation is deterministic: an unchanged project always produces identical bytes.
@@ -97,7 +104,7 @@ The full risk checklist is in [`docs/SECURITY.md`](./docs/SECURITY.md). In short
 - **Deploy behind an HTTPS reverse proxy** that overwrites `X-Forwarded-For`. HSTS and the `Secure` cookie flag are only sent in production.
 - **Limits** (in memory, per server process, so run a single instance):
   - sign-in: 5 failures per email and IP, or 20 per email from any IP, lock for 15 minutes
-  - Figma calls: 30 per user per minute; AI suggestions: 10 per user per 10 minutes
+  - Figma calls: 30 per user per minute; AI suggestions and site reads: 10 per user per 10 minutes
   - package builds: 2 at a time and 2 per user; identical builds are shared for 60 seconds; others wait up to 10 seconds, then get "busy" (HTTP 429 from the API)
   - uploads: project import 2 MB, preset import 1 MB; scaffolds up to 32 levels and 2000 entries
 - **Headers:** a Content Security Policy on every page (scripts from this origin only), no framing, `nosniff`, a strict referrer policy. The generated style guide has a stricter policy of its own.
@@ -128,6 +135,7 @@ src/
   lib/figma/          # URL parser, API client (Figma host only)
   lib/tokens/ lib/mapping/ lib/responsive/  # extraction from Figma
   lib/llm/            # optional AI suggestions (Anthropic)
+  lib/site/           # reading the public site (safe fetch) and matching its classes
   lib/templates/      # CSS template rendering, manifests, cascade, lint config
   lib/generator/      # package generation, build limits, zip
   lib/quality/        # quality checks and automatic fixes

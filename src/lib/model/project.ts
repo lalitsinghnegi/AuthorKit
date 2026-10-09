@@ -3,6 +3,7 @@ import { BreakpointSet } from "./breakpoints";
 import { findDuplicate, IsoDate, SchemaVersion } from "./common";
 import { FigmaLink } from "./figmaLink";
 import { ScaffoldTree, treeIdsAreUnique } from "./scaffold";
+import { MAX_SITE_PAGES, SitePath } from "./site";
 import { DesignToken, MAX_TOKENS } from "./tokens";
 
 /** Prefix for every class and custom property: "ak" → .ak-btn, --ak-color-primary. */
@@ -75,6 +76,8 @@ export const Project = ProjectInput.extend({
   scaffold: ScaffoldTree,
   figmaLinks: z.array(FigmaLink).max(200),
   npm: NpmOptions.optional(),
+  /** Extra pages on the site to read, besides siteUrl itself. */
+  sitePages: z.array(SitePath).max(MAX_SITE_PAGES).optional(),
   createdAt: IsoDate,
   updatedAt: IsoDate,
 }).superRefine((project, ctx) => {

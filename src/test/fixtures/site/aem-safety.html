@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Acme Health | Safety information</title>
+  </head>
+  <body class="page basicpage">
+    <main class="container responsivegrid">
+      <div class="isi-section">
+        <div class="cmp-isi" id="isi">
+          <h2 class="cmp-isi__title">Important Safety Information</h2>
+          <div class="cmp-isi__content">
+            <div class="cmp-isi__section"><p>Do not take Acme if you are allergic to it.</p></div>
+            <div class="cmp-isi__section">
+              <p>Tell your doctor about all medicines you take.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cmp-isi-tray" data-cmp-is="isi-tray">
+        <div class="cmp-isi-tray__header">
+          <p class="cmp-isi-tray__title">Important Safety Information</p>
+          <button
+            class="cmp-isi-tray__toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="isi-tray-content"
+          >
+            <span class="cmp-isi-tray__icon" aria-hidden="true"></span>Expand
+          </button>
+        </div>
+        <div class="cmp-isi-tray__content" id="isi-tray-content">
+          <p>Do not take Acme if you are allergic to it.</p>
+        </div>
+      </div>
+      <div class="modal">
+        <div
+          class="cmp-modal cmp-modal--interstitial"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="leaving-title"
+          hidden
+        >
+          <div class="cmp-modal__header">
+            <h2 class="cmp-modal__title" id="leaving-title">You are leaving acmehealth.com</h2>
+            <button class="cmp-modal__close" type="button" aria-label="Close">×</button>
+          </div>
+          <div class="cmp-modal__body">
+            <p>The site you are going to is not run by Acme Health.</p>
+          </div>
+          <div class="cmp-modal__footer"><a class="cmp-button" href="#">Continue</a></div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -18,6 +18,14 @@ export const AI_BUDGET: Budget = {
   message: "Too many AI suggestion requests. Wait a few minutes and try again.",
 };
 
+/** Reading the project's public site (up to 21 pages per use). */
+export const SITE_BUDGET: Budget = {
+  name: "site",
+  max: 10,
+  windowMs: 10 * 60_000,
+  message: "Too many site reads. Wait a few minutes and try again.",
+};
+
 type Window = { start: number; count: number };
 const windows: Map<string, Window> = ((
   globalThis as { __akBudgets?: Map<string, Window> }
