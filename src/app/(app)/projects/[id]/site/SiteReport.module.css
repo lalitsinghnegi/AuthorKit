@@ -70,3 +70,23 @@
   padding: 0;
   list-style: none;
 }
+
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.scope {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+
+.warn {
+  margin: 4px 0 0;
+  color: #7a5200;
+  font-size: 0.8rem;
+}

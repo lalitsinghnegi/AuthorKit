@@ -2,6 +2,7 @@ import { describeRange, mediaQueries } from "@/lib/breakpoints";
 import { CSS_TEMPLATE_LABELS, type Project } from "@/lib/model";
 import { renderTreeText } from "@/lib/scaffold/render";
 import { getManifests, manifestClasses, type GenerationReport } from "@/lib/templates";
+import { classMapFor, mapManifests } from "@/lib/selectors/map";
 import { importLabel, orderForImport, type CssFileRef } from "./entry";
 import { README_NAME, generatedRootEntries } from "./naming";
 
@@ -62,7 +63,7 @@ export function renderReadme(
   const byId = new Map(project.breakpoints.breakpoints.map((b) => [b.id, b]));
   const smallestFirst = project.approach === "mobile-first";
   const usedTemplates = new Set(cssFiles.flatMap((f) => (f.templateId ? [f.templateId] : [])));
-  const manifests = Object.values(getManifests()).filter(
+  const manifests = Object.values(mapManifests(getManifests(), classMapFor(project))).filter(
     (m) => usedTemplates.has(m.id) && m.id !== "tokens",
   );
 

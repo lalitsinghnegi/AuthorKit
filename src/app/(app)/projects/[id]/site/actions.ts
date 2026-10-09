@@ -2,8 +2,15 @@
 
 import { audit } from "@/lib/audit/log";
 import { actorOf, checkAdmin } from "@/lib/auth/session";
-import { MAX_SITE_PAGES, SCHEMA_VERSION, SitePath, type SiteFile } from "@/lib/model";
+import {
+  MAX_SITE_PAGES,
+  SCHEMA_VERSION,
+  SitePath,
+  SiteSelectors,
+  type SiteFile,
+} from "@/lib/model";
 import { SITE_BUDGET, spend } from "@/lib/security/rateLimit";
+import { mappableParts, validateMappings, type MappingProblem } from "@/lib/selectors/map";
 import { analyzeSite, partsFromManifests } from "@/lib/site";
 import { SiteError, type SitePage } from "@/lib/site/fetch";
 import { getSiteReader } from "@/lib/site/server";
@@ -105,4 +112,43 @@ export async function saveSitePagesAction(projectId: string, raw: unknown): Prom
     details: `${pages.length} extra page${pages.length === 1 ? "" : "s"}`,
   });
   return { ok: true, pages };
+}
+
+export type SelectorsResult =
+  { ok: true } | { ok: false; error: string; problems?: MappingProblem[] };
+
+/**
+ * Save which site class replaces each template part, and whether the package
+ * uses them. Every confirmed mapping is checked, whether or not the switch is on.
+ */
+export async function saveSiteSelectorsAction(
+  projectId: string,
+  input: unknown,
+): Promise<SelectorsResult> {
+  const auth = await checkAdmin();
+  if (!auth.user) return { ok: false, error: auth.denied };
+  const parsed = SiteSelectors.safeParse(input);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    return { ok: false, error: `Invalid mapping: ${issue?.message ?? "check the classes"}` };
+  }
+  const project = await getProject(projectId);
+  if (!project) return { ok: false, error: "This project no longer exists." };
+  const problems = validateMappings(
+    parsed.data.mappings,
+    mappableParts(getManifests()),
+    project.prefix,
+  );
+  if (problems.length > 0)
+    return { ok: false, error: "Fix the problems shown in the table to save.", problems };
+
+  await updateProject(projectId, (p) => ({ ...p, siteSelectors: parsed.data }));
+  const confirmed = parsed.data.mappings.filter((m) => m.state === "confirmed").length;
+  const ignored = parsed.data.mappings.length - confirmed;
+  await audit(actorOf(auth.user), {
+    action: "site.selectors",
+    target: { type: "project", id: project.id, name: project.name },
+    details: `${confirmed} confirmed, ${ignored} kept, site selectors ${parsed.data.enabled ? "on" : "off"}`,
+  });
+  return { ok: true };
 }

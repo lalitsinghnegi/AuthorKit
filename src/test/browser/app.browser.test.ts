@@ -189,13 +189,25 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
     expect(errors).toEqual([]);
   }, 60_000);
 
-  it("shows the site structure report", async () => {
+  it("maps site selectors and generates with them", async () => {
     const { page, errors } = await signIn(ADMIN);
     await page.goto(`${base}/projects/${projectId}/site`);
     await page.getByRole("heading", { name: "Accordion" }).waitFor();
-    const row = page.getByRole("row", { name: /acme-accordion__trigger/ });
-    expect(await row.textContent()).toContain(".cmp-accordion__button");
-    expect(await page.getByRole("button", { name: "Read site" }).isEnabled()).toBe(true);
+    expect(await page.getByLabel(".acme-accordion__trigger", { exact: true }).inputValue()).toBe(
+      ".cmp-accordion__button",
+    );
+    await page.getByRole("button", { name: "Confirm all high-confidence" }).click();
+    await page.getByLabel(/Use site selectors/).check();
+    await page.getByRole("button", { name: "Save mappings" }).click();
+    await page.waitForSelector("text=The package now uses the confirmed site classes.");
+
+    await page.goto(`${base}/projects/${projectId}/generate`);
+    await page.waitForSelector("text=Site selectors are on:");
+    expect(await page.getByRole("link", { name: "Download zip" }).count()).toBe(1);
+    const css = await page.request.get(
+      `${base}/api/projects/${projectId}/styleguide/css/components/accordion.css`,
+    );
+    expect(await css.text()).toContain(".cmp-accordion__button");
     expect(errors).toEqual([]);
   }, 60_000);
 

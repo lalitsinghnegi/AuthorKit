@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { EditGate } from "@/components/ReadOnly/EditGate";
@@ -41,6 +42,14 @@ async function Loader({ params, searchParams }: PageProps<"/projects/[id]/genera
         title="Generate"
         description={`Preview the ${project.brandName} package and download it as a zip. Nothing is stored; the package is built fresh each time.`}
       />
+      {project.siteSelectors?.enabled && (
+        <p className={ui.hint} style={{ marginTop: 0 }} role="note">
+          Site selectors are on:{" "}
+          {project.siteSelectors.mappings.filter((m) => m.state === "confirmed").length} template
+          classes are replaced by classes from the site. Change this under{" "}
+          <Link href={`/projects/${project.id}/site`}>Site structure</Link>.
+        </p>
+      )}
       <EditGate>
         <PackageOptions
           projectId={project.id}

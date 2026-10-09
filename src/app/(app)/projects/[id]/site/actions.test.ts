@@ -24,7 +24,7 @@ vi.mock("@/lib/site/server", () => ({
     }),
 }));
 
-const { readSiteAction, saveSitePagesAction } = await import("./actions");
+const { readSiteAction, saveSitePagesAction, saveSiteSelectorsAction } = await import("./actions");
 
 withTempDataDir();
 withSignedIn("admin");
@@ -128,5 +128,52 @@ describe("saveSitePagesAction", () => {
       ok: false,
       error: "Add at most 20 pages.",
     });
+  });
+});
+
+describe("saveSiteSelectorsAction", () => {
+  const trigger = {
+    componentId: "accordion",
+    part: "accordion__trigger",
+    state: "confirmed",
+    selector: ".cmp-accordion__button",
+    scoped: false,
+  } as const;
+
+  it("saves valid mappings and audits them", async () => {
+    const { id } = await newProject("https://www.acme.com/");
+    const input = { enabled: true, mappings: [trigger] };
+    expect(await saveSiteSelectorsAction(id, input)).toEqual({ ok: true });
+    expect((await getProject(id))?.siteSelectors).toEqual(input);
+    expect((await readAudit()).entries[0]).toMatchObject({
+      action: "site.selectors",
+      details: "1 confirmed, 0 kept, site selectors on",
+    });
+  });
+
+  it("returns problems per part and saves nothing", async () => {
+    const { id } = await newProject("https://www.acme.com/");
+    const result = await saveSiteSelectorsAction(id, {
+      enabled: false,
+      mappings: [{ ...trigger, scoped: true }],
+    });
+    expect(result).toMatchObject({
+      ok: false,
+      problems: [
+        { part: "accordion__trigger", message: expect.stringMatching(/Confirm a site class/) },
+      ],
+    });
+    expect((await getProject(id))?.siteSelectors).toBeUndefined();
+  });
+
+  it.each([
+    { enabled: true, mappings: [{ ...trigger, selector: ".a b" }] },
+    { enabled: true, mappings: [{ ...trigger, selector: "*" }] },
+    { enabled: true, mappings: [{ ...trigger, selector: undefined }] },
+    { enabled: "yes", mappings: [] },
+    "nonsense",
+  ])("refuses malformed input %#", async (input) => {
+    const { id } = await newProject("https://www.acme.com/");
+    expect((await saveSiteSelectorsAction(id, input)).ok).toBe(false);
   });
 });

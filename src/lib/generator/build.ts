@@ -5,6 +5,8 @@ import { renderVariablesDoc } from "@/lib/devkit/variablesDoc";
 import type { CssTemplateId, Project } from "@/lib/model";
 import { runQualityChecks, type QualityReport } from "@/lib/quality/run";
 import { generateStyleGuide } from "@/lib/styleguide/generate";
+import { classMapFor, mapManifests, mappedClasses } from "@/lib/selectors/map";
+import type { ComponentManifest } from "@/lib/templates/manifest";
 import { getManifests } from "@/lib/templates/registry";
 import { generatePackage, type GenerationInputs } from "./generate";
 import { PACKAGE_JSON, SAMPLE_PAGE, STYLE_GUIDE_DIR, VARIABLES_DOC, entryFileName } from "./naming";
@@ -24,8 +26,17 @@ export async function buildPackage(
 ): Promise<BuiltPackage> {
   const pkg = generatePackage(project, inputs);
   if (pkg.blocked) return pkg;
-  const { files, quality } = await runQualityChecks(pkg, project);
-  const withExtras = addDeveloperExtras(project, files, pkg.report);
+  // With site selectors on, the CSS uses site classes, so every check and doc uses them too.
+  const classMap = classMapFor(project);
+  const manifests = mapManifests(getManifests(), classMap);
+  const { files, quality } = await runQualityChecks(pkg, project, {
+    manifests,
+    siteClasses: mappedClasses(classMap),
+  });
+  const withExtras = addDeveloperExtras(project, files, pkg.report, manifests, (part) => {
+    const target = classMap?.targets.get(part);
+    return target ? target.cls : `${project.prefix}-${part}`;
+  });
   return {
     ...pkg,
     files: withExtras,
@@ -40,6 +51,8 @@ export function addDeveloperExtras(
   project: Project,
   files: GeneratedFile[],
   report: GeneratedPackage["report"],
+  manifests: Record<CssTemplateId, ComponentManifest> = getManifests(),
+  classOf?: (part: string) => string,
 ): GeneratedFile[] {
   const entryName = entryFileName(project);
   const included = new Set(
@@ -57,11 +70,11 @@ export function addDeveloperExtras(
   return [
     ...rootGenerated,
     extra(VARIABLES_DOC, renderVariablesDoc(project, files, report)),
-    extra(SAMPLE_PAGE, renderSamplePage(project, entryName, included, getManifests())),
+    extra(SAMPLE_PAGE, renderSamplePage(project, entryName, included, manifests, classOf)),
     ...(project.npm?.enabled
       ? [extra(PACKAGE_JSON, renderPackageJson(project, project.npm, entryName, files))]
       : []),
-    ...generateStyleGuide(project, files, report?.extras),
+    ...generateStyleGuide(project, files, report?.extras, manifests),
     ...rest,
   ];
 }

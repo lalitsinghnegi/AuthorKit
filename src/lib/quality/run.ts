@@ -1,7 +1,8 @@
 import "server-only";
 import stylelint from "stylelint";
 import type { GeneratedFile, GeneratedPackage } from "@/lib/generator/types";
-import type { Project } from "@/lib/model";
+import type { CssTemplateId, Project } from "@/lib/model";
+import type { ComponentManifest } from "@/lib/templates/manifest";
 import { outputStylelintConfig } from "@/lib/templates/stylelintConfig";
 import {
   checkClasses,
@@ -38,8 +39,12 @@ export const CHECK_LABELS: Record<CheckId, string> = {
 
 const isCss = (f: GeneratedFile) => f.path.endsWith(".css");
 
-async function lint(files: GeneratedFile[], prefix: string): Promise<QualityIssue[]> {
-  const config = outputStylelintConfig(prefix);
+async function lint(
+  files: GeneratedFile[],
+  prefix: string,
+  siteClasses: readonly string[],
+): Promise<QualityIssue[]> {
+  const config = outputStylelintConfig(prefix, siteClasses);
   const issues: QualityIssue[] = [];
   for (const file of files.filter(isCss)) {
     const result = await stylelint.lint({ code: file.content, config });
@@ -63,6 +68,8 @@ async function lint(files: GeneratedFile[], prefix: string): Promise<QualityIssu
 export async function runQualityChecks(
   pkg: GeneratedPackage,
   project: Pick<Project, "prefix" | "approach" | "breakpoints">,
+  /** The project's mapped manifests and site classes when site selectors are on. */
+  selectors: { manifests?: Record<CssTemplateId, ComponentManifest>; siteClasses?: string[] } = {},
 ): Promise<{ files: GeneratedFile[]; quality: QualityReport }> {
   const fixes: Removal[] = [];
   const files = pkg.files.map((file) => {
@@ -76,11 +83,11 @@ export async function runQualityChecks(
 
   const { sizes, issues: sizeIssues } = measureSizes(files);
   const issues = [
-    ...(await lint(files, project.prefix)),
+    ...(await lint(files, project.prefix, selectors.siteClasses ?? [])),
     ...checkVariables(files),
     ...checkUnused(files, project.prefix, pkg.report?.extras),
     ...checkMediaOrder(files, project.approach, project.breakpoints.breakpoints),
-    ...checkClasses(files, project.prefix),
+    ...checkClasses(files, project.prefix, selectors.manifests),
     ...checkLiterals(files),
     ...sizeIssues,
   ];

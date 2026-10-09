@@ -173,7 +173,9 @@ function componentSection(id: CssTemplateId, input: GuideInput): string {
     .map((s) => {
       const selector = withPrefix(s.selector, p);
       const isClass = selector.startsWith(".");
-      return `<tr><td><code>${esc(selector)}</code>${isClass ? ` ${copyButton(selector.slice(1), `Copy class ${selector.slice(1)}`)}` : ""}</td><td>${esc(s.type)}</td><td>${esc(s.purpose)}</td><td>${esc(statesFor(s.selector).join(", ") || "—")}</td><td>${filePaths.map((f) => `<code>${esc(f)}</code>`).join("<br>")}</td></tr>`;
+      // Scoped site classes only apply inside their block, so show the full selector.
+      const shown = "scope" in s && s.scope ? `${s.scope} ${selector}` : selector;
+      return `<tr><td><code>${esc(shown)}</code>${isClass ? ` ${copyButton(selector.slice(1), `Copy class ${selector.slice(1)}`)}` : ""}</td><td>${esc(s.type)}</td><td>${esc(s.purpose)}</td><td>${esc(statesFor(s.selector).join(", ") || "—")}</td><td>${filePaths.map((f) => `<code>${esc(f)}</code>`).join("<br>")}</td></tr>`;
     })
     .join("");
 

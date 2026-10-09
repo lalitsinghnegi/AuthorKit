@@ -4,7 +4,7 @@ import selectorParser from "postcss-selector-parser";
 import type { GeneratedFile } from "@/lib/generator/types";
 import type { Breakpoint, Project } from "@/lib/model";
 import { literalDesignValues } from "@/lib/templates/analyze";
-import { manifestClasses } from "@/lib/templates/manifest";
+import { manifestClasses, type ComponentManifest } from "@/lib/templates/manifest";
 import { getManifests } from "@/lib/templates/registry";
 import { TEMPLATE_DEFAULTS } from "@/lib/templates/defaults";
 
@@ -181,8 +181,11 @@ export function checkMediaOrder(
 }
 
 /** Templated files must contain exactly the classes their manifest documents. */
-export function checkClasses(files: GeneratedFile[], prefix: string): QualityIssue[] {
-  const manifests = getManifests();
+export function checkClasses(
+  files: GeneratedFile[],
+  prefix: string,
+  manifests: Record<string, ComponentManifest> = getManifests(),
+): QualityIssue[] {
   const issues: QualityIssue[] = [];
   for (const file of files.filter((f) => f.templateId && isCss(f))) {
     const documented = new Set(manifestClasses(manifests[file.templateId!], prefix));

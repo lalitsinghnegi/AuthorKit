@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { GeneratedFile } from "@/lib/generator/types";
 import { STYLE_GUIDE_DIR, entryFileName } from "@/lib/generator/naming";
-import type { Project } from "@/lib/model";
+import type { CssTemplateId, Project } from "@/lib/model";
+import type { ComponentManifest } from "@/lib/templates/manifest";
 import { getManifests } from "@/lib/templates/registry";
 import { renderGuidePage } from "./page";
 import { buildStatesCss } from "./states";
@@ -22,11 +23,12 @@ export function generateStyleGuide(
   project: Pick<Project, "brandName" | "prefix" | "approach" | "breakpoints">,
   files: GeneratedFile[],
   extras: readonly string[] = [],
+  manifests: Record<CssTemplateId, ComponentManifest> = getManifests(),
 ): GeneratedFile[] {
   const css = files.filter((f) => f.path.endsWith(".css"));
   const page = renderGuidePage({
     project,
-    manifests: getManifests(),
+    manifests,
     files,
     entryName: entryFileName(project),
     variables: collectVariables(css),

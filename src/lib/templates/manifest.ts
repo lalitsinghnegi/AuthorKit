@@ -11,6 +11,8 @@ export const ManifestSelector = z.discriminatedUnion("type", [
     type: z.enum(["block", "element", "modifier", "utility"]),
     selector: PrefixedClass,
     purpose: z.string().min(1),
+    /** Set only in a project's mapped manifests: the block class this element is scoped to. */
+    scope: z.string().optional(),
   }),
   z.object({
     type: z.literal("html-element"),

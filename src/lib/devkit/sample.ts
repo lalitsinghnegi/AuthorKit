@@ -2,22 +2,40 @@ import type { CssTemplateId, Project } from "@/lib/model";
 import { esc, placeholderImages } from "@/lib/styleguide/page";
 import { withPrefix, type ComponentManifest } from "@/lib/templates/manifest";
 
-/** Plain-JavaScript wiring for the documented hooks. Prefix-aware, no dependencies. */
-export function sampleScript(prefix: string): string {
+/** Template parts the sample script looks up; site selectors may rename them. */
+const SCRIPT_PARTS = [
+  "header__toggle",
+  "accordion__trigger",
+  "isi-bar",
+  "isi-bar__toggle",
+  "isi-bar--expanded",
+  "modal",
+] as const;
+
+/**
+ * Plain-JavaScript wiring for the documented hooks. Prefix-aware, no dependencies.
+ * `classOf` gives the class used for a template part (a site class when mapped).
+ */
+export function sampleScript(
+  prefix: string,
+  classOf: (part: string) => string = (part) => `${prefix}-${part}`,
+): string {
+  const classes = Object.fromEntries(SCRIPT_PARTS.map((part) => [part, classOf(part)]));
   return `(function () {
   "use strict";
   var P = ${JSON.stringify(prefix)};
+  var C = ${JSON.stringify(classes)};
   var q = function (selector) { return Array.prototype.slice.call(document.querySelectorAll(selector)); };
 
   // Header: the menu button toggles aria-expanded; CSS shows the nav that follows it.
-  q("." + P + "-header__toggle").forEach(function (button) {
+  q("." + C["header__toggle"]).forEach(function (button) {
     button.addEventListener("click", function () {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     });
   });
   document.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") return;
-    var open = document.querySelector("." + P + "-header__toggle[aria-expanded='true']");
+    var open = document.querySelector("." + C["header__toggle"] + "[aria-expanded='true']");
     if (open) {
       open.setAttribute("aria-expanded", "false");
       open.focus();
@@ -25,7 +43,7 @@ export function sampleScript(prefix: string): string {
   });
 
   // Accordion: keep aria-expanded on the trigger and hidden on its panel in sync.
-  q("." + P + "-accordion__trigger").forEach(function (trigger) {
+  q("." + C["accordion__trigger"]).forEach(function (trigger) {
     trigger.addEventListener("click", function () {
       var expanded = trigger.getAttribute("aria-expanded") === "true";
       trigger.setAttribute("aria-expanded", String(!expanded));
@@ -35,12 +53,12 @@ export function sampleScript(prefix: string): string {
   });
 
   // ISI safety bar: toggle aria-expanded and the --expanded modifier together.
-  q("." + P + "-isi-bar__toggle").forEach(function (toggle) {
-    var bar = toggle.closest("." + P + "-isi-bar");
+  q("." + C["isi-bar__toggle"]).forEach(function (toggle) {
+    var bar = toggle.closest("." + C["isi-bar"]);
     toggle.addEventListener("click", function () {
       var expanded = toggle.getAttribute("aria-expanded") === "true";
       toggle.setAttribute("aria-expanded", String(!expanded));
-      if (bar) bar.classList.toggle(P + "-isi-bar--expanded", !expanded);
+      if (bar) bar.classList.toggle(C["isi-bar--expanded"], !expanded);
     });
   });
 
@@ -63,7 +81,7 @@ export function sampleScript(prefix: string): string {
       if (parent) parent.close();
     }
   });
-  q("dialog." + P + "-modal").forEach(function (dialog) {
+  q("dialog." + C["modal"]).forEach(function (dialog) {
     dialog.addEventListener("close", function () {
       document.body.classList.remove(P + "-modal-open");
       if (opener) opener.focus();
@@ -90,6 +108,7 @@ export function renderSamplePage(
   entryName: string,
   included: ReadonlySet<CssTemplateId>,
   manifests: Record<CssTemplateId, ComponentManifest>,
+  classOf?: (part: string) => string,
 ): string {
   const p = project.prefix;
   const brand = esc(project.brandName);
@@ -149,7 +168,7 @@ export function renderSamplePage(
 <body>
 ${placeholderImages(body.join("\n"))}
 <script>
-${sampleScript(p)}</script>
+${sampleScript(p, classOf)}</script>
 </body>
 </html>
 `;

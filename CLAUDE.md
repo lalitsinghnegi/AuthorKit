@@ -232,7 +232,7 @@ Rules:
 
 ## Site structure (reading the published site)
 
-- **Purpose:** find which classes the published (AEM) site uses for each template part, so the CSS can target the real markup. This screen only suggests; mapping and generation come next.
+- **Purpose:** find which classes the published (AEM) site uses for each template part, confirm them, and generate CSS that targets the real markup.
 - **Inputs:** `project.siteUrl` (overview) plus up to 20 `project.sitePages` paths on the same site (`SitePath`: starts with `/`, never `//`).
 - **Reading:** `SiteReader` (`src/lib/site/fetch.ts`, server-only) through `getSiteReader()` (`src/lib/site/server.ts`, mocked in tests).
   - http(s) on ports 80/443, same host as the site URL, no credentials.
@@ -245,7 +245,14 @@ Rules:
   - classes with a modifier are never suggested for blocks or elements (they're states); ties prefer `cmp-` classes, then use count, then name
 - **Storage:** `data/projects/<id>/site.json` (`SiteFile`): pages, suggestions with short samples, the most used classes and notes. Never whole pages.
 - **Limits:** `SITE_BUDGET` (10 reads per user per 10 minutes).
-- **Tests:** fixtures in `src/test/fixtures/site/` (AEM Core Components markup). Extend them, never the network.
+- **Mapping (`project.siteSelectors`):** `{ enabled, mappings }`; each `SelectorMapping` is `confirmed` (with one class, `SiteSelector`) or `ignored` (keep the template class), and only elements may be `scoped` (limited to their block's site class). Undecided parts aren't stored. `SelectorEditor` prefills from the latest suggestions and keeps only explicit edits in state.
+- **Rules (`validateMappings`, `src/lib/selectors/map.ts`):** parts must exist in the manifests, each at most once; a site class can't be a template class; scoped elements need their block confirmed; two parts may share a site class only when their full selectors differ (both scoped to different blocks). `saveSiteSelectorsAction` refuses problems; `checkProject` reports them as errors (blocking generation) when the switch is on.
+- **Generation:** `classMapFor(project)` (null when off or nothing is confirmed) is applied in one place each:
+  - `generatePackage`: templated CSS through `mapCss` (PostCSS selector rewrite; a scoped element gets its block's site class as an ancestor unless the selector already has it), plus a "Site selectors" table in the README
+  - `buildPackage`: `mapManifests` (site classes in selectors, examples, states, HTL; `scope` on scoped selectors) feeds the class check, the lint allow-list (`outputStylelintConfig(prefix, siteClasses)`), the sample page, its script (`sampleScript(prefix, classOf)`) and the style guide
+  - custom properties always keep the prefix; `mapText` never touches them
+  - with the switch off the output is byte-identical (tested)
+- **Tests:** fixtures in `src/test/fixtures/site/` (AEM Core Components markup). Extend them, never the network. `src/test/siteSelectorsProject.ts` builds the Figma test project with every high-confidence suggestion confirmed; `siteSelectors.test.ts` and `siteSelectors.browser.test.ts` check the package passes every quality check and works in Chrome.
 
 ## Storage (keep it simple)
 

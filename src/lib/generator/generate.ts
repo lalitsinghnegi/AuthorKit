@@ -2,7 +2,15 @@ import "server-only";
 import { validateBreakpoints } from "@/lib/breakpoints";
 import type { DesignToken, Project, ResponsiveFile, TreeNode } from "@/lib/model";
 import { nodePath, validateTree } from "@/lib/scaffold";
+import {
+  classMapFor,
+  mapCss,
+  mappableParts,
+  validateMappings,
+  type ClassMap,
+} from "@/lib/selectors/map";
 import { buildTemplateContextWithReport, commentSafe } from "@/lib/templates/context";
+import { getManifests } from "@/lib/templates/registry";
 import { renderTemplate } from "@/lib/templates/render";
 import { renderEntry, type CssFileRef } from "./entry";
 import { README_NAME, entryFileName, reservedRootNames } from "./naming";
@@ -24,6 +32,12 @@ export function checkProject(project: Project): Problem[] {
   }
   for (const issue of validateBreakpoints(project.breakpoints.breakpoints)) {
     problems.push({ severity: issue.severity, message: `Breakpoints: ${issue.message}` });
+  }
+  if (project.siteSelectors?.enabled) {
+    const parts = mappableParts(getManifests());
+    for (const issue of validateMappings(project.siteSelectors.mappings, parts, project.prefix)) {
+      problems.push({ severity: "error", message: `Site selectors: ${issue.message}` });
+    }
   }
   return problems.sort(
     (a, b) => Number(a.severity === "warning") - Number(b.severity === "warning"),
@@ -55,6 +69,7 @@ export function generatePackage(project: Project, inputs: GenerationInputs = {})
     responsive: inputs.responsive,
   });
 
+  const classMap = classMapFor(project);
   const scaffoldFiles: GeneratedFile[] = [];
   const folders: string[] = [];
   const visit = (node: TreeNode, path: string) => {
@@ -66,7 +81,7 @@ export function generatePackage(project: Project, inputs: GenerationInputs = {})
     if (node.cssTemplateId) {
       scaffoldFiles.push({
         path,
-        content: renderTemplate(node.cssTemplateId, ctx, path),
+        content: mapped(renderTemplate(node.cssTemplateId, ctx, path), classMap),
         source: "template",
         templateId: node.cssTemplateId,
       });
@@ -104,11 +119,35 @@ export function generatePackage(project: Project, inputs: GenerationInputs = {})
     },
     {
       path: README_NAME,
-      content: renderReadme(project, entryName, cssRefs, report),
+      content: renderReadme(project, entryName, cssRefs, report) + selectorsReadme(classMap),
       source: "readme",
       templateId: null,
     },
     ...scaffoldFiles,
   ];
   return { rootName, files, folders, problems, blocked, report };
+}
+
+const mapped = (css: string, map: ClassMap | null) => (map ? mapCss(css, map) : css);
+
+/** README section listing the site classes used instead of template classes. */
+function selectorsReadme(map: ClassMap | null): string {
+  if (!map) return "";
+  const rows = [...map.targets]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(
+      ([part, t]) =>
+        `| \`.${map.prefix}-${part}\` | \`${t.scope ? `.${t.scope} ` : ""}.${t.cls}\` |`,
+    );
+  return [
+    "",
+    "## Site selectors",
+    "",
+    "These classes from the published site are used instead of the template classes, so the CSS styles the site's markup as it is. The style guide and sample page use them too.",
+    "",
+    "| Template class | Site selector |",
+    "| --- | --- |",
+    ...rows,
+    "",
+  ].join("\n");
 }

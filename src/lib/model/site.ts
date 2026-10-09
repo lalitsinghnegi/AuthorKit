@@ -39,7 +39,7 @@ export type SiteSuggestion = z.infer<typeof SiteSuggestion>;
 export const SitePart = z.object({
   componentId: CssTemplateId,
   /** The template class without the prefix, e.g. "accordion__trigger". */
-  part: z.string().regex(/^[a-z][a-z0-9-]*(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?$/),
+  part: z.lazy(() => PartKey),
   kind: z.enum(["block", "element", "modifier"]),
   suggestions: z.array(SiteSuggestion).max(5),
 });
@@ -66,3 +66,33 @@ export const SiteFile = z.object({
   notes: z.array(z.string().max(500)).max(100),
 });
 export type SiteFile = z.infer<typeof SiteFile>;
+
+/** A template class without the prefix, e.g. "accordion__trigger" or "btn--primary". */
+export const PartKey = z.string().regex(/^[a-z][a-z0-9-]*(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?$/);
+
+/**
+ * The admin's decision for one template part: use this site class instead
+ * (confirmed), or keep the template class (ignored). `scoped` limits an
+ * element to inside its component's block, e.g. ".cmp-experiencefragment--header
+ * .cmp-image" for the header logo, when the site uses the class elsewhere too.
+ */
+export const SelectorMapping = z
+  .object({
+    componentId: CssTemplateId,
+    part: PartKey,
+    state: z.enum(["confirmed", "ignored"]),
+    selector: SiteSelector.optional(),
+    scoped: z.boolean(),
+  })
+  .refine((m) => m.state !== "confirmed" || m.selector !== undefined, {
+    message: "A confirmed mapping needs a site class",
+    path: ["selector"],
+  });
+export type SelectorMapping = z.infer<typeof SelectorMapping>;
+
+export const SiteSelectors = z.object({
+  /** Use the confirmed site classes in the generated CSS, style guide and sample page. */
+  enabled: z.boolean(),
+  mappings: z.array(SelectorMapping).max(200),
+});
+export type SiteSelectors = z.infer<typeof SiteSelectors>;

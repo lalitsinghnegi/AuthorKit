@@ -85,6 +85,8 @@ Optional: set `ANTHROPIC_API_KEY` in `.env` to let Claude suggest components for
 
 Add the brand's public site URL on the project overview, then open **Site structure** and choose **Read site**. AuthorKit reads the page (and up to 20 extra pages you list, such as one with the ISI or a modal) and suggests which of the site's classes match each template part, for example `.cmp-accordion__button` for the accordion trigger. It shows how sure it is, how often each class appears, and a short sample of the markup.
 
+Then decide, part by part, whether the package uses the **site class** or keeps its **template class** (or choose **Confirm all high-confidence**), and turn on **Use site selectors**. The generated CSS, the style guide, the sample page and the package README then use the site's classes (custom properties keep the prefix). If the site uses one class in several places, such as `.cmp-image` for both logos, limit the part to its block: the CSS becomes `.cmp-experiencefragment--header .cmp-image`. Turn the switch off to go back to the template classes.
+
 Only public sites can be read: the server refuses private and internal addresses, other hosts and non-standard ports, and limits time, size and how often you can read. Internal preview sites (behind SSO or a VPN) aren't supported yet.
 
 ## Generating a package

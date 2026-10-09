@@ -7,12 +7,19 @@ export function bemClassPattern(prefix: string): RegExp {
 }
 
 /** Lint rules for generated packages (also used by the quality gates later). */
-export function outputStylelintConfig(prefix: string): Config {
+export function outputStylelintConfig(prefix: string, siteClasses: readonly string[] = []): Config {
+  const bem = bemClassPattern(prefix);
+  // Site classes chosen on the Site structure screen are allowed as they are.
+  const classPattern = siteClasses.length
+    ? new RegExp(
+        `(?:${bem.source})|^(?:${siteClasses.map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})$`,
+      )
+    : bem;
   return {
     extends: ["stylelint-config-standard"],
     rules: {
       "selector-class-pattern": [
-        bemClassPattern(prefix),
+        classPattern,
         {
           message: (c: string) =>
             `Class ".${c.replace(/^\./, "")}" must be BEM with the "${prefix}-" prefix`,
