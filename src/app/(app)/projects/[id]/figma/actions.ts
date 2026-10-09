@@ -8,6 +8,7 @@ import { FigmaError } from "@/lib/figma/errors";
 import { getFigmaClient } from "@/lib/figma/server";
 import { parseFigmaUrl } from "@/lib/figma/url";
 import { CssTemplateId, FigmaLink, Id } from "@/lib/model";
+import { FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import { getProject, updateProject } from "@/lib/storage/projects";
 
 /** What the link form sends. The file key and node id are always derived on the server. */
@@ -100,6 +101,8 @@ export type CheckResult =
 export async function checkFigmaLinkAction(rawUrl: string): Promise<CheckResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const url = parseFigmaUrl(String(rawUrl ?? ""));
   if (!url.ok) return { ok: false, error: url.error };
   try {

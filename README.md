@@ -2,7 +2,7 @@
 
 A CSS package generator for content authoring teams. An admin sets up a project (brand, CSS prefix, breakpoints, folder scaffold, Figma links), and AuthorKit generates a downloadable zip containing responsive, BEM-named CSS and a developer style guide.
 
-See [`CLAUDE.md`](./CLAUDE.md) for goals and conventions, and [`docs/BUILD_PROMPTS.md`](./docs/BUILD_PROMPTS.md) for the build plan.
+See [`CLAUDE.md`](./CLAUDE.md) for goals and conventions, [`docs/BUILD_PROMPTS.md`](./docs/BUILD_PROMPTS.md) for the build plan, and [`docs/SECURITY.md`](./docs/SECURITY.md) for the security checklist.
 
 ## Requirements
 
@@ -27,15 +27,17 @@ Everyone can change their own password on the **Account** page. **Settings → A
 
 ## Scripts
 
-| Command             | What it does                                   |
-| ------------------- | ---------------------------------------------- |
-| `npm run dev`       | Start the dev server                           |
-| `npm run build`     | Production build                               |
-| `npm start`         | Serve the production build                     |
-| `npm test`          | Run tests once (`npm run test:watch` to watch) |
-| `npm run lint`      | ESLint                                         |
-| `npm run typecheck` | Generate route types and run `tsc --noEmit`    |
-| `npm run format`    | Format with Prettier                           |
+| Command                 | What it does                                            |
+| ----------------------- | ------------------------------------------------------- |
+| `npm run dev`           | Start the dev server                                    |
+| `npm run build`         | Production build                                        |
+| `npm start`             | Serve the production build                              |
+| `npm test`              | Run tests once (`npm run test:watch` to watch)          |
+| `npm run test:coverage` | Tests with a coverage summary                           |
+| `npm run test:app`      | Production build, then browser tests of the running app |
+| `npm run lint`          | ESLint                                                  |
+| `npm run typecheck`     | Generate route types and run `tsc --noEmit`             |
+| `npm run format`        | Format with Prettier                                    |
 
 ## Storage
 
@@ -43,11 +45,12 @@ There is no database. Project configuration is saved as JSON files under `DATA_D
 
 ```
 data/
-  settings.json                  # encrypted Figma token (Prompt 7)
+  settings.json                  # encrypted Figma token, AI component patterns
   users.json                     # users and password hashes
   audit.log                      # who changed what (JSON lines)
   projects/<id>/project.json     # brand, prefix, breakpoints, scaffold, Figma links
   projects/<id>/tokens.json      # design tokens
+  projects/<id>/responsive.json  # per-breakpoint values measured from Figma
   scaffold-templates/<id>.json   # scaffold presets
 ```
 
@@ -78,6 +81,22 @@ Open a project → **Generate** to preview every file, then **Download zip**. `G
 
 `npm test` includes a headless-browser test that opens a generated package (sample page and style guide) from `file://`. It uses your installed Google Chrome, or the browser at `CHROME_PATH`, and is skipped with a warning when none is found.
 
+`npm run test:app` builds the app, starts it against a temporary data folder and checks every screen in Chrome: security headers, no console or CSP errors, no serious accessibility violations (axe-core, WCAG 2.1 AA) and read-only screens for viewers.
+
+## Security and operations
+
+The full risk checklist is in [`docs/SECURITY.md`](./docs/SECURITY.md). In short:
+
+- **Deploy behind an HTTPS reverse proxy** that overwrites `X-Forwarded-For`. HSTS and the `Secure` cookie flag are only sent in production.
+- **Limits** (in memory, per server process, so run a single instance):
+  - sign-in: 5 failures per email and IP, or 20 per email from any IP, lock for 15 minutes
+  - Figma calls: 30 per user per minute; AI suggestions: 10 per user per 10 minutes
+  - package builds: 2 at a time and 2 per user; identical builds are shared for 60 seconds; others wait up to 10 seconds, then get "busy" (HTTP 429 from the API)
+  - uploads: project import 2 MB, preset import 1 MB; scaffolds up to 32 levels and 2000 entries
+- **Headers:** a Content Security Policy on every page (scripts from this origin only), no framing, `nosniff`, a strict referrer policy. The generated style guide has a stricter policy of its own.
+- **Logs:** server errors are written as JSON lines to stderr with secrets redacted. Error screens show a **reference**; search the log for that `digest` to find the details.
+- **Backups:** `data/` holds users, the encrypted Figma token, projects and the audit log. Back it up and keep it readable only by the app's user.
+
 ## Health check
 
 `GET /api/health` returns `{"status":"ok","storage":"ok"}` when the data folder is writable, and returns `503` otherwise.
@@ -87,15 +106,28 @@ Open a project → **Generate** to preview every file, then **Download zip**. `G
 ```
 src/
   app/
-    @actions/         # left-panel actions per screen (parallel route)
-    api/health/       # health check
-    projects/ templates/ settings/
+    (app)/            # signed-in screens: projects, templates, settings, account
+    (app)/@actions/   # left-panel actions per screen (parallel route)
+    (auth)/           # /login and /setup
+    api/              # health, package zip, style guide, project and preset export
   components/AppShell # two-pane shell: left action panel + right work area
-  lib/model/          # zod schemas: Project, BreakpointSet, ScaffoldTemplate, FigmaLink, DesignToken, Settings
+  proxy.ts            # session check for every page and API
+  lib/model/          # zod schemas and input limits
   lib/storage/        # repositories: atomic JSON file storage (zod-validated)
+  lib/auth/ lib/audit # passwords, sessions, login throttle, audit log
+  lib/security/       # HTTP headers, per-user request budgets
   lib/breakpoints/    # breakpoint validation and media queries
   lib/scaffold/       # scaffold tree operations, validation, presets
+  lib/figma/          # URL parser, API client (Figma host only)
+  lib/tokens/ lib/mapping/ lib/responsive/  # extraction from Figma
+  lib/llm/            # optional AI suggestions (Anthropic)
   lib/templates/      # CSS template rendering, manifests, cascade, lint config
-  lib/generator/      # package generation (entry file, README, zip)
-  templates/          # Handlebars CSS templates, partials, manifests, default tokens
+  lib/generator/      # package generation, build limits, zip
+  lib/quality/        # quality checks and automatic fixes
+  lib/styleguide/     # developer style guide
+  lib/devkit/         # VARIABLES.md, sample page, package.json
+  lib/secrets/        # token encryption and the Secret wrapper
+  lib/log.ts          # redacted server logging
+  templates/          # Handlebars CSS templates, partials, manifests, default tokens, style guide assets
+  test/               # mocks, fixtures, browser tests
 ```

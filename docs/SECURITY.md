@@ -1,0 +1,95 @@
+# Security and quality checklist
+
+The Prompt 16 review of AuthorKit. Each row is a risk, how serious it is for this app (an internal admin tool with a few trusted admins and some viewers), and its current state.
+
+**Severity:** High = account takeover, data loss, secret exposure or server compromise. Medium = abuse by a signed-in user, denial of service, or information leaks. Low = defence in depth or quality.
+
+**Status:** ✅ fixed or already handled · ⚠️ accepted, with the reason · 📝 to do when the deployment changes.
+
+## Input validation
+
+| Risk                                                                                                             | Sev.   | Status                                                                                                                                                                                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Forms or action arguments with unexpected shapes reach storage                                                   | High   | ✅ Every server action validates with zod before use; repositories validate again on every read and write (`src/lib/model/`).                                                                                                                                                                                                                                |
+| Huge or deeply nested JSON (project import, preset import, scaffold save) exhausts memory or overflows the stack | Medium | ✅ Imports are capped (project 2 MB, preset 1 MB). The server-action body limit is 3 MB, so the import's own message is shown. `treeShapeProblem` refuses trees deeper than 32 levels or larger than 2000 nodes **before** the recursive schema runs. Arrays and strings have maximums (breakpoints 12, tokens 2000, Figma links 200, notes 200, users 500). |
+| A token value breaks out of a CSS declaration                                                                    | High   | ✅ `validateTokenValue` refuses `; { } < > \` and comments; the output also has to pass stylelint.                                                                                                                                                                                                                                                           |
+| Route parameters used as file paths (`data/projects/<id>`)                                                       | High   | ✅ Project ids must be UUIDs before any path is built.                                                                                                                                                                                                                                                                                                       |
+| Malformed URL escapes in the style guide route throw                                                             | Low    | ✅ `decodePath` returns 404 for bad escapes; tests cover `%00`, `..`, `\`, absolute paths and encoded dots.                                                                                                                                                                                                                                                  |
+
+## Path traversal in the zip
+
+| Risk                                                                       | Sev. | Status                                                                                                                                                                                              |
+| -------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scaffold names write outside the zip root (`../`, absolute, drive letters) | High | ✅ Names are validated in the scaffold schema, and `assertSafePath` re-checks every entry before zipping: no empty, `.` or `..` segments, no `\`, leading `/`, drive letters or control characters. |
+| Style guide route serves files outside the package                         | High | ✅ Exact match against the in-memory package paths only; there is no file system access.                                                                                                            |
+
+## SSRF
+
+| Risk                                                    | Sev.   | Status                                                                                                                                                                                                                       |
+| ------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Server-side requests to arbitrary hosts via Figma links | High   | ✅ `parseFigmaUrl` only accepts figma.com links, and `HttpFigmaClient` only requests the fixed `https://api.figma.com` with validated file keys and node ids, `redirect: "error"` and a 20 s timeout.                        |
+| Preview image URLs pointing anywhere                    | Medium | ✅ `isAllowedImageUrl` (Figma's S3 bucket and `*.figma.com`, https only) on server and client; never stored. The CSP `img-src` limits the browser too (it allows any `*.amazonaws.com`, because CSP has no region wildcard). |
+| The AI provider                                         | Low    | ✅ Only the Anthropic SDK's own host, only when `ANTHROPIC_API_KEY` is set; only frame names, paths and sizes are sent.                                                                                                      |
+
+## Secrets and logging
+
+| Risk                                                | Sev.   | Status                                                                                                                                                                                                                                                                |
+| --------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Figma token leaks to the browser, logs or errors    | High   | ✅ AES-256-GCM at rest, wrapped in `Secret` (prints `[redacted]`), revealed only for the `X-Figma-Token` header. `FigmaError` messages are fixed text.                                                                                                                |
+| Secrets in server logs from unexpected errors       | High   | ✅ All server logging goes through `src/lib/log.ts`: JSON lines on stderr, with the configured secrets, `figd_…`, `sk-ant-…`, bearer tokens, session cookies and password/token fields redacted. `onRequestError` logs each server error once, without query strings. |
+| Internal details in error screens                   | Medium | ✅ `error.tsx` and `global-error.tsx` show a plain message and the error digest, which matches the log line.                                                                                                                                                          |
+| Passwords or tokens in the audit log                | High   | ✅ Only summaries; failed sign-ins record the email only.                                                                                                                                                                                                             |
+| Weak or missing `SESSION_SECRET` / `ENCRYPTION_KEY` | High   | ✅ Both are required with minimum lengths; the app explains how to generate them.                                                                                                                                                                                     |
+
+## Authentication, sessions and CSRF
+
+| Risk                                                 | Sev.   | Status                                                                                                                                                                                                                                   |
+| ---------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Password guessing                                    | High   | ✅ scrypt (N=2^15). Lockout after 5 failures per email + IP, **and** 20 failures per email from any IP within 15 minutes. The second limit was added in this review because `x-forwarded-for` can be forged when no proxy overwrites it. |
+| Lockout of an admin by someone who knows their email | Low    | ⚠️ Accepted: at most 15 minutes, and the account's password is never at risk. Other admins are unaffected.                                                                                                                               |
+| Throttle memory growth from many random emails       | Medium | ✅ Fixed in this review: expired entries are pruned and the store is capped at 10 000 entries.                                                                                                                                           |
+| Session theft or forgery                             | High   | ✅ HMAC-signed, HttpOnly, SameSite=Lax, Secure in production, 8-hour expiry, revoked by role, status and password changes.                                                                                                               |
+| Viewer reaches an admin action                       | High   | ✅ `checkAdmin()` first in every action; `allServerActions.test.ts` calls every action as a viewer and signed out.                                                                                                                       |
+| CSRF                                                 | Medium | ✅ Server actions are POST-only with Next.js' Origin check; API routes are GET-only and read-only (the zip download is only audited); SameSite=Lax cookie.                                                                               |
+| Clickjacking                                         | Medium | ✅ `X-Frame-Options: DENY` and `frame-ancestors 'none'`; the style guide may be framed by this app only.                                                                                                                                 |
+
+## Rate limiting and concurrency
+
+| Risk                                                         | Sev.   | Status                                                                                                                                                                                                          |
+| ------------------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A user exhausts the Figma rate limit or the AI budget        | Medium | ✅ Per-user budgets: Figma 30 calls per minute, AI 10 per 10 minutes (`src/lib/security/rateLimit.ts`).                                                                                                         |
+| Many package builds at once exhaust CPU (stylelint, PostCSS) | Medium | ✅ `buildForUser` (`src/lib/generator/limit.ts`): identical inputs share one build (60 s cache), at most 2 builds run at once and 2 per user, and others queue for up to 10 s, then get a 429 or a "busy" note. |
+| Limits are per server process                                | Low    | 📝 All throttles live in memory. When running more than one instance, move them to a shared store (Redis) or use sticky sessions.                                                                               |
+
+## Browser security headers
+
+| Risk                                             | Sev.   | Status                                                                                                                                                                                    |
+| ------------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| XSS through generated content in the style guide | High   | ✅ Everything interpolated goes through `esc()`; examples run in `srcdoc` iframes. The style guide CSP allows only its own scripts (`script-src 'self'`), no network access and no forms. |
+| XSS in the app                                   | Medium | ✅ React escaping. CSP restricts scripts to this origin.                                                                                                                                  |
+| CSP allows `'unsafe-inline'` scripts in the app  | Low    | ⚠️ Accepted: Partial Prerendering can't carry per-request nonces, and Next.js needs its inline bootstrap scripts. Other script sources are blocked.                                       |
+| HSTS                                             | Low    | ✅ Sent in production only (HTTPS is terminated by the proxy).                                                                                                                            |
+
+## Accessibility of the admin UI
+
+| Risk                                                 | Sev. | Status                                                                                                                                                         |
+| ---------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keyboard users can't skip the action panel           | Low  | ✅ "Skip to content" link to the work area.                                                                                                                    |
+| Low-contrast text (row actions, breakpoint bars)     | Low  | ✅ Fixed to meet WCAG AA.                                                                                                                                      |
+| Scrollable code and examples unreachable by keyboard | Low  | ✅ Focusable, labelled regions in the style guide.                                                                                                             |
+| Regressions                                          | Low  | ✅ axe-core (WCAG 2.1 A/AA, serious and critical) runs on every app screen (`npm run test:app`) and on the generated sample page and style guide (`npm test`). |
+
+## Test coverage
+
+| Area                              | Status                                                                                                                                                                                                      |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Overall (`npm run test:coverage`) | ✅ 87% statements, 77% branches, 84% functions, 88% lines.                                                                                                                                                  |
+| Security tests                    | ✅ Zip paths, style guide paths, headers, budgets, build limits, log redaction, schema limits, login throttle (incl. a changing forwarded IP), every server action as viewer and signed out, export routes. |
+| Real browser                      | ✅ The generated package from `file://` (`npm test`), and the production app (`npm run test:app`). Both are skipped when Chrome isn't installed.                                                            |
+
+## Deployment notes
+
+- Run behind a reverse proxy that terminates HTTPS and **overwrites** `X-Forwarded-For`. Without one, the per-IP login limit can be bypassed (the per-account limit still applies).
+- Run one instance, or move the in-memory limits to a shared store (see above).
+- Keep `data/` on persistent storage, back it up, and make it readable only by the app user: it holds password hashes, the encrypted Figma token and the audit log.
+- Keep `.env` out of git and out of images; changing `SESSION_SECRET` signs everyone out, and changing `ENCRYPTION_KEY` means the Figma token has to be saved again.

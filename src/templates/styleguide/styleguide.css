@@ -108,6 +108,10 @@ pre {
   color: #fff;
 }
 
+.sg-topbar button[aria-pressed="true"] span {
+  opacity: 1;
+}
+
 .sg-layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -200,6 +204,7 @@ pre {
 
 .sg-frame-wrap {
   overflow-x: auto;
+  outline-offset: 2px;
   padding: 8px;
   border: 1px dashed var(--sg-border);
   border-radius: 8px;

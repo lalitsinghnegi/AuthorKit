@@ -11,9 +11,9 @@ export const EncryptedSecret = z.object({
 
 /** The Figma account a token belongs to, from /v1/me. Shown instead of any part of the token. */
 export const FigmaAccount = z.object({
-  id: z.string(),
-  handle: z.string(),
-  email: z.string().optional(),
+  id: z.string().max(64),
+  handle: z.string().max(200),
+  email: z.string().max(254).optional(),
 });
 export type FigmaAccount = z.infer<typeof FigmaAccount>;
 

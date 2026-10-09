@@ -13,6 +13,7 @@ export function assertSafePath(path: string): void {
     path === "" ||
     path.startsWith("/") ||
     path.includes("\\") ||
+    /[\u0000-\u001f\u007f]/.test(path) ||
     /^[a-zA-Z]:/.test(path) ||
     parts.some((p) => p === "" || p === "." || p === "..")
   ) {

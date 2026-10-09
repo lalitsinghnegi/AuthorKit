@@ -84,11 +84,12 @@ function frame(title: string, html: string, entryName: string, extra = ""): stri
     ENTRY_PLACEHOLDER,
     entryName,
   );
-  return `<div class="sg-frame-wrap"><iframe class="sg-frame" title="${esc(title)}" loading="lazy" srcdoc="${esc(doc)}"${extra}></iframe></div>`;
+  // Focusable and labelled so keyboard users can scroll wide examples sideways.
+  return `<div class="sg-frame-wrap" tabindex="0" role="region" aria-label="${esc(title)}, scrollable"><iframe class="sg-frame" title="${esc(title)}" loading="lazy" srcdoc="${esc(doc)}"${extra}></iframe></div>`;
 }
 
 function codeBlock(id: string, code: string, label: string): string {
-  return `<div class="sg-code"><pre><code id="${id}">${esc(code)}</code></pre><button type="button" class="sg-copy" data-sg-copy-from="${id}" aria-label="${esc(`Copy ${label}`)}">Copy</button></div>`;
+  return `<div class="sg-code"><pre tabindex="0" aria-label="${esc(label)}"><code id="${id}">${esc(code)}</code></pre><button type="button" class="sg-copy" data-sg-copy-from="${id}" aria-label="${esc(`Copy ${label}`)}">Copy</button></div>`;
 }
 
 function tabs(groupId: string, panels: { label: string; body: string }[]): string {

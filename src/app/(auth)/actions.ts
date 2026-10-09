@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { audit } from "@/lib/audit/log";
 import { verifyPassword } from "@/lib/auth/password";
-import { clearFailures, isLocked, recordFailure } from "@/lib/auth/rateLimit";
+import { MAX_EMAIL_FAILURES, clearFailures, isLocked, recordFailure } from "@/lib/auth/rateLimit";
 import { checkSetupCode, clearSetupCode } from "@/lib/auth/setup";
 import { actorOf, endSession, getCurrentUser, startSession } from "@/lib/auth/session";
 import { safeNext } from "@/lib/auth/next";
@@ -30,8 +30,11 @@ export async function loginAction(
     .slice(0, 254);
   const password = String(formData.get("password") ?? "").slice(0, 200);
   const key = `${email}|${await clientIp()}`;
+  // Per account across all IPs, since the forwarded IP can be forged.
+  const emailKey = `${email}|*`;
 
-  if (isLocked(key)) return { error: "Too many attempts. Wait 15 minutes and try again.", email };
+  if (isLocked(key) || isLocked(emailKey, Date.now(), MAX_EMAIL_FAILURES))
+    return { error: "Too many attempts. Wait 15 minutes and try again.", email };
   try {
     const user = await getUserByEmail(email);
     // Always run one hash comparison so response time does not reveal whether the email exists.
@@ -42,10 +45,12 @@ export async function loginAction(
     );
     if (!user || !ok || user.disabled) {
       recordFailure(key);
+      recordFailure(emailKey);
       await audit(null, { action: "auth.login_failed", details: `email ${email || "(empty)"}` });
       return { error: GENERIC, email };
     }
     clearFailures(key);
+    clearFailures(emailKey);
     await startSession(user);
     await audit(actorOf(user), { action: "auth.login" });
   } catch (err) {

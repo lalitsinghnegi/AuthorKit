@@ -326,3 +326,19 @@ a.panelButton {
   color: var(--ui-panel-fg);
   cursor: pointer;
 }
+
+.skipLink {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 8px 12px;
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+  color: var(--ui-fg);
+  transform: translateY(-200%);
+}
+
+.skipLink:focus {
+  transform: none;
+}

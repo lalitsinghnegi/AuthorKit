@@ -35,6 +35,9 @@ export function AppShell({ actions, account, children }: Props) {
 
   return (
     <div className={styles.shell} data-collapsed={collapsed} data-drawer-open={drawerOpen}>
+      <a href="#work-area" className={styles.skipLink}>
+        Skip to content
+      </a>
       <header className={styles.topBar}>
         <button
           type="button"
@@ -78,7 +81,9 @@ export function AppShell({ actions, account, children }: Props) {
 
       {drawerOpen && <div className={styles.backdrop} onClick={closeDrawer} aria-hidden="true" />}
 
-      <main className={styles.workArea}>{children}</main>
+      <main id="work-area" tabIndex={-1} className={styles.workArea}>
+        {children}
+      </main>
     </div>
   );
 }

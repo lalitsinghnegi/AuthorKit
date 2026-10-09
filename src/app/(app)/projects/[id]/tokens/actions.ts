@@ -16,6 +16,7 @@ import {
   type ExtractInput,
   type MergeSummary,
 } from "@/lib/tokens";
+import { FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import { getProject, getTokens, saveTokens } from "@/lib/storage/projects";
 
 export type ExtractResult =
@@ -29,6 +30,8 @@ export type ExtractResult =
 export async function extractTokensAction(projectId: string): Promise<ExtractResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const project = await getProject(projectId);
   if (!project) return { ok: false, error: "This project no longer exists." };
   const links = project.figmaLinks.filter((l) => l.scope === "global" || l.scope === "component");

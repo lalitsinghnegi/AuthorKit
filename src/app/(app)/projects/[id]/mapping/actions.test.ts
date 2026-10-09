@@ -264,3 +264,16 @@ describe("saveMappingsAction", () => {
     });
   });
 });
+
+describe("AI request budget", () => {
+  it("refuses AI suggestions once the per-user budget is spent", async () => {
+    const { AI_BUDGET, spend } = await import("@/lib/security/rateLimit");
+    const { getCurrentUser } = await import("@/lib/auth/session");
+    const me = (await getCurrentUser())!;
+    for (let i = 0; i < AI_BUDGET.max; i++) spend(AI_BUDGET, me.id);
+    expect(await suggestWithAIAction("any-project")).toEqual({
+      ok: false,
+      error: AI_BUDGET.message,
+    });
+  });
+});

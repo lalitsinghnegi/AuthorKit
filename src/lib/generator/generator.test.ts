@@ -236,7 +236,18 @@ describe("zip", () => {
   });
 
   it("refuses unsafe paths and blocked packages", async () => {
-    for (const bad of ["../x", "/abs", "a/../../b", "a\\b", "C:/x", "a//b", ""]) {
+    for (const bad of [
+      "../x",
+      "/abs",
+      "a/../../b",
+      "a\\b",
+      "C:/x",
+      "a//b",
+      "",
+      "a\0b",
+      "a\nb",
+      "./x",
+    ]) {
       expect(() => assertSafePath(bad), bad).toThrow(/Unsafe path/);
     }
     const pkg = generatePackage(fixture());

@@ -163,7 +163,8 @@ button.name:hover {
   display: inline-flex;
   gap: 4px;
   margin-left: auto;
-  opacity: 0.35;
+  /* Quieter until the row is hovered or focused, but still readable (WCAG AA). */
+  opacity: 0.7;
 }
 
 .row:hover .actions,

@@ -61,4 +61,22 @@ describe("GET /api/projects/[id]/styleguide/[...path]", () => {
       (await call("00000000-0000-4000-8000-000000000000", ["style-guide", "index.html"])).status,
     ).toBe(404);
   });
+  it("refuses malformed or escaping paths and sets a strict policy", async () => {
+    const { id } = await newProject();
+    for (const path of [
+      ["%E0%A4%A"],
+      ["style-guide%00", "index.html"],
+      ["..\\acme-health.css"],
+      ["/etc/passwd"],
+      ["style-guide", "%2e%2e", "README.md"],
+    ]) {
+      const res = await call(id, path);
+      expect(res.status, path.join("/")).toBe(404);
+    }
+    const res = await call(id, ["style-guide", "index.html"]);
+    const csp = res.headers.get("content-security-policy")!;
+    expect(csp).toMatch(/script-src 'self';/);
+    expect(csp).toContain("frame-ancestors 'self'");
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+  });
 });

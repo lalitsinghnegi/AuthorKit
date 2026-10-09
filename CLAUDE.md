@@ -217,6 +217,18 @@ Rules:
   - Shown newest first at Settings → Audit log, with filters and 50 entries per page.
 - **Tests:** `src/test/session.ts` provides `withSignedIn(role)`, `signInAs`, `addTestUser` and the cookie and header `jar` behind the global `next/headers` mock in `vitest.setup.ts`. Action and route tests sign in first.
 
+## Hardening
+
+- **Checklist:** `docs/SECURITY.md` lists every risk and its state. Update it when you add an input, a route, an external call or a limit.
+- **Package builds:** pages and routes call `buildForUser(project, userId)` (`src/lib/generator/limit.ts`), never `buildPackage` directly. It shares identical builds for 60 s, runs at most 2 at once and 2 per user, and throws `BusyError` (show `<BusyNote>` on pages, return 429 from routes).
+- **External calls:** every action that calls Figma or the AI provider spends a per-user budget first (`spend(FIGMA_BUDGET | AI_BUDGET, user.id)` from `src/lib/security/rateLimit.ts`), right after the auth check.
+- **Login throttle** (`src/lib/auth/rateLimit.ts`): per email + IP (5) and per email from any IP (20), 15 minutes, capped at 10 000 entries.
+- **Input limits:** every array and string in a schema has a `max`. Recursive input (scaffold trees) goes through `treeShapeProblem` before the recursive schema. Server-action bodies are limited to 3 MB in `next.config.ts`.
+- **Headers:** `src/lib/security/headers.ts` (applied in `next.config.ts`). The style guide route sets `STYLE_GUIDE_CSP` itself. New inline scripts or third-party hosts need a CSP change.
+- **Logging:** use `logError` / `logWarn` from `src/lib/log.ts`, never `console`, so secrets are redacted. `onRequestError` in `instrumentation.ts` logs unexpected errors with the digest that `error.tsx` shows.
+- **Accessibility:** `npm run test:app` runs axe-core on every screen; a new screen must have no serious or critical violations.
+- **In-memory state** (throttles, budgets, build cache) lives on `globalThis` and is cleared in `vitest.setup.ts` after each test.
+
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
@@ -302,6 +314,8 @@ These decisions override the build prompts wherever they conflict:
 ```bash
 npm run dev          # dev server on http://localhost:3000
 npm test             # Vitest, single run (npm run test:watch for watch mode)
+npm run test:coverage  # Vitest with a coverage summary
+npm run test:app     # production build, then browser tests of the running app (needs Chrome)
 npm run lint         # ESLint
 npm run typecheck    # generate Next route types, then tsc --noEmit
 npm run format       # Prettier

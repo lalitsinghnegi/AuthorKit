@@ -3,8 +3,9 @@ import { Suspense } from "react";
 import { EditGate } from "@/components/ReadOnly/EditGate";
 import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
-import { buildPackage } from "@/lib/generator/build";
-import { loadGenerationInputs } from "@/lib/generator/load";
+import { BusyError, buildForUser } from "@/lib/generator/limit";
+import { requireUser } from "@/lib/auth/session";
+import { BusyNote } from "@/components/BusyNote";
 import { defaultNpmName, zipFileName } from "@/lib/generator/naming";
 import { getProject } from "@/lib/storage/projects";
 import { GenerateView } from "./GenerateView";
@@ -23,7 +24,14 @@ async function Loader({ params, searchParams }: PageProps<"/projects/[id]/genera
   const project = await getProject(id);
   if (!project) notFound();
 
-  const pkg = await buildPackage(project, await loadGenerationInputs(project.id));
+  const user = await requireUser();
+  let pkg;
+  try {
+    pkg = await buildForUser(project, user.id);
+  } catch (err) {
+    if (err instanceof BusyError) return <BusyNote message={err.message} />;
+    throw err;
+  }
   const encoder = new TextEncoder();
   const file = typeof query.file === "string" ? query.file : undefined;
 

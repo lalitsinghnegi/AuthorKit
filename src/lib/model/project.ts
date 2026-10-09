@@ -3,7 +3,7 @@ import { BreakpointSet } from "./breakpoints";
 import { findDuplicate, IsoDate, SchemaVersion } from "./common";
 import { FigmaLink } from "./figmaLink";
 import { ScaffoldTree, treeIdsAreUnique } from "./scaffold";
-import { DesignToken } from "./tokens";
+import { DesignToken, MAX_TOKENS } from "./tokens";
 
 /** Prefix for every class and custom property: "ak" → .ak-btn, --ak-color-primary. */
 export const Prefix = z
@@ -49,7 +49,7 @@ export const Project = ProjectInput.extend({
   id: z.uuid(),
   breakpoints: BreakpointSet,
   scaffold: ScaffoldTree,
-  figmaLinks: z.array(FigmaLink),
+  figmaLinks: z.array(FigmaLink).max(200),
   npm: NpmOptions.optional(),
   createdAt: IsoDate,
   updatedAt: IsoDate,
@@ -87,6 +87,6 @@ export const ProjectExport = z.object({
   schemaVersion: SchemaVersion,
   kind: z.literal("authorkit-project"),
   project: Project,
-  tokens: z.array(DesignToken),
+  tokens: z.array(DesignToken).max(MAX_TOKENS),
 });
 export type ProjectExport = z.infer<typeof ProjectExport>;

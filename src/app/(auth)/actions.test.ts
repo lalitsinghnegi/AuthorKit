@@ -3,7 +3,7 @@ import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser } from "@/lib/auth/session";
 import { clearSetupCode, ensureSetupCode } from "@/lib/auth/setup";
-import { MAX_FAILURES, resetThrottle } from "@/lib/auth/rateLimit";
+import { MAX_EMAIL_FAILURES, MAX_FAILURES, resetThrottle } from "@/lib/auth/rateLimit";
 import { SESSION_COOKIE } from "@/lib/auth/token";
 import { listUsers, setPassword, updateUser } from "@/lib/storage/users";
 import { TEST_PASSWORD, addTestUser, jar, setSessionCookie } from "@/test/session";
@@ -110,6 +110,20 @@ describe("login", () => {
       to: "/projects",
     });
   });
+
+  it("caps guesses per account when the forwarded IP keeps changing", async () => {
+    await addTestUser("admin", { email: "eve@example.com" });
+    for (let i = 0; i < MAX_EMAIL_FAILURES; i++) {
+      jar.headers.set("x-forwarded-for", `192.0.2.${i}`);
+      await loginAction({}, form({ email: "eve@example.com", password: "nope nope nope" }));
+    }
+    jar.headers.set("x-forwarded-for", "192.0.2.250");
+    const locked = await loginAction(
+      {},
+      form({ email: "eve@example.com", password: TEST_PASSWORD }),
+    );
+    expect(locked.error).toMatch(/Too many attempts/);
+  }, 30_000);
 });
 
 describe("sessions", () => {

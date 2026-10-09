@@ -16,7 +16,7 @@ import {
   type Issue,
   type QueryMode,
 } from "@/lib/breakpoints";
-import type { Breakpoint, Project } from "@/lib/model";
+import { MAX_BREAKPOINTS, type Breakpoint, type Project } from "@/lib/model";
 import { saveBreakpointsAction } from "./actions";
 import { applyChanges, parseRows, sortRows, toRow, uniqueName, type Row } from "./rows";
 import styles from "./BreakpointEditor.module.css";
@@ -130,9 +130,16 @@ export function BreakpointEditor({
               Fix the errors to save.
             </p>
           )}
-          <PanelButton variant="secondary" onClick={addRow}>
+          <PanelButton
+            variant="secondary"
+            onClick={addRow}
+            disabled={rows.length >= MAX_BREAKPOINTS}
+          >
             Add breakpoint
           </PanelButton>
+          {rows.length >= MAX_BREAKPOINTS && (
+            <p className={panel.panelHint}>Up to {MAX_BREAKPOINTS} breakpoints.</p>
+          )}
           <PanelButton variant="secondary" onClick={runFixAll} disabled={!fixable}>
             Fix all
           </PanelButton>

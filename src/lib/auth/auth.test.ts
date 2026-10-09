@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { hashPassword, passwordProblem, verifyPassword } from "./password";
 import {
+  MAX_EMAIL_FAILURES,
+  MAX_ENTRIES,
   MAX_FAILURES,
   WINDOW_MS,
   clearFailures,
   isLocked,
   recordFailure,
   resetThrottle,
+  throttleSize,
 } from "./rateLimit";
 import { getSessionSecret, signSession, verifySession } from "./token";
 import { safeNext } from "./next";
@@ -93,6 +96,22 @@ describe("login throttle", () => {
     for (let i = 0; i < MAX_FAILURES; i++) recordFailure("c|ip");
     clearFailures("c|ip");
     expect(isLocked("c|ip")).toBe(false);
+  });
+
+  it("stays bounded when many keys fail, dropping expired entries first", () => {
+    resetThrottle();
+    const t = 1_000_000;
+    recordFailure("old|ip", t);
+    for (let i = 0; i < MAX_ENTRIES + 50; i++) recordFailure(`spray${i}|ip`, t + WINDOW_MS + 2);
+    expect(throttleSize()).toBeLessThanOrEqual(MAX_ENTRIES);
+    expect(isLocked("old|ip", t + 1)).toBe(false);
+  });
+
+  it("uses a per-call limit for the email-wide key", () => {
+    resetThrottle();
+    for (let i = 0; i < MAX_FAILURES; i++) recordFailure("d|*");
+    expect(isLocked("d|*")).toBe(true);
+    expect(isLocked("d|*", Date.now(), MAX_EMAIL_FAILURES)).toBe(false);
   });
 });
 

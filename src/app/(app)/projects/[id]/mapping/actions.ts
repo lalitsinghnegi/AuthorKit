@@ -20,6 +20,7 @@ import {
   type MappableComponent,
 } from "@/lib/mapping";
 import { CSS_TEMPLATE_LABELS, type FigmaLink, type FrameMapping, type Project } from "@/lib/model";
+import { AI_BUDGET, FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import { getProject, updateProject } from "@/lib/storage/projects";
 import { getComponentPatterns } from "@/lib/storage/settings";
 import { getManifests } from "@/lib/templates/registry";
@@ -62,6 +63,8 @@ async function fetchRoots(
 export async function detectFramesAction(projectId: string): Promise<MappingResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const project = await getProject(projectId);
   if (!project) return { ok: false, error: "This project no longer exists." };
   if (project.figmaLinks.length === 0)
@@ -117,6 +120,8 @@ export type PreviewResult =
 export async function loadPreviewsAction(projectId: string): Promise<PreviewResult> {
   const auth = await checkSignedIn();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const project = await getProject(projectId);
   if (!project) return { ok: false, error: "This project no longer exists." };
   try {
@@ -155,6 +160,8 @@ export type AiResult =
 export async function suggestWithAIAction(projectId: string): Promise<AiResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(AI_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const provider = getLLMProvider();
   if (!provider)
     return {

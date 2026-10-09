@@ -37,6 +37,9 @@ export const TokenMeta = z.object({
 });
 export type TokenMeta = z.infer<typeof TokenMeta>;
 
+/** Far above any real design system; keeps files and review screens bounded. */
+export const MAX_TOKENS = 2000;
+
 export const DesignToken = z.object({
   id: Id,
   /** Becomes --{prefix}-{name}. */
@@ -47,7 +50,11 @@ export const DesignToken = z.object({
   /** Value as extracted from Figma; kept when the admin overrides it. */
   originalValue: z.string().max(500),
   source: z
-    .object({ fileKey: z.string(), nodeId: z.string(), nodeName: z.string().optional() })
+    .object({
+      fileKey: z.string().max(64),
+      nodeId: z.string().max(64),
+      nodeName: z.string().max(300).optional(),
+    })
     .optional(),
   /** auto = extracted and awaiting review. */
   status: z.enum(["auto", "accepted", "overridden", "excluded"]),
@@ -56,7 +63,7 @@ export const DesignToken = z.object({
 export type DesignToken = z.infer<typeof DesignToken>;
 
 export const TokenFile = z
-  .object({ schemaVersion: SchemaVersion, tokens: z.array(DesignToken) })
+  .object({ schemaVersion: SchemaVersion, tokens: z.array(DesignToken).max(MAX_TOKENS) })
   .superRefine((file, ctx) => {
     const dupId = findDuplicate(file.tokens.map((t) => t.id));
     if (dupId) ctx.addIssue({ code: "custom", message: `Duplicate token id "${dupId}"` });

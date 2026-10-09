@@ -4,7 +4,6 @@
  * developer would after unzipping it. Uses the locally installed Chrome
  * (or CHROME_PATH); skipped when no Chrome is available, e.g. on bare CI.
  */
-import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -12,15 +11,7 @@ import { chromium, type Browser, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildPackage } from "@/lib/generator/build";
 import { inputs, project } from "@/test/figmaProject";
-
-const CHROME = [
-  process.env.CHROME_PATH,
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "/usr/bin/google-chrome",
-  "/usr/bin/google-chrome-stable",
-  "/usr/bin/chromium",
-  "/usr/bin/chromium-browser",
-].find((p): p is string => Boolean(p && existsSync(p)));
+import { CHROME, axeViolations } from "./chrome";
 
 if (!CHROME) console.warn("Skipping browser tests: no Chrome found (set CHROME_PATH to run them).");
 
@@ -163,5 +154,13 @@ describe.skipIf(!CHROME)("generated package in a real browser", () => {
     expect(await page.locator("#sg-accordion").isVisible()).toBe(true);
     expect(errors).toEqual([]);
     await page.close();
+  }, 60_000);
+
+  it("sample page and style guide have no serious accessibility violations", async () => {
+    for (const p of ["index.html", "style-guide/index.html"]) {
+      const { page } = await open(p);
+      expect(await axeViolations(page), p).toEqual([]);
+      await page.close();
+    }
   }, 60_000);
 });

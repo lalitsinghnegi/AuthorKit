@@ -50,8 +50,36 @@ export const FolderNode: z.ZodType<FolderNode> = z.lazy(() =>
     }),
 );
 
+export const MAX_TREE_DEPTH = 32;
+export const MAX_TREE_NODES = 2000;
+
+/**
+ * Size check that runs before the recursive schema, without recursion, so a
+ * deeply nested upload is refused instead of overflowing the stack.
+ */
+export function treeShapeProblem(input: unknown): string | null {
+  const stack: { node: unknown; depth: number }[] = [{ node: input, depth: 1 }];
+  let count = 0;
+  while (stack.length) {
+    const { node, depth } = stack.pop()!;
+    if (++count > MAX_TREE_NODES)
+      return `The scaffold has more than ${MAX_TREE_NODES} files and folders`;
+    if (depth > MAX_TREE_DEPTH)
+      return `The scaffold is nested more than ${MAX_TREE_DEPTH} levels deep`;
+    const children = (node as { children?: unknown } | null)?.children;
+    if (Array.isArray(children))
+      for (const child of children) stack.push({ node: child, depth: depth + 1 });
+  }
+  return null;
+}
+
 /** The root folder stands for the package root; its name becomes the zip's top folder. */
-export const ScaffoldTree = FolderNode;
+export const ScaffoldTree: z.ZodType<FolderNode> = z.preprocess((input, ctx) => {
+  const problem = treeShapeProblem(input);
+  if (!problem) return input;
+  ctx.addIssue({ code: "custom", message: problem, input });
+  return z.NEVER;
+}, FolderNode) as z.ZodType<FolderNode>;
 export type ScaffoldTree = FolderNode;
 
 export function* walkTree(node: TreeNode): Generator<TreeNode> {

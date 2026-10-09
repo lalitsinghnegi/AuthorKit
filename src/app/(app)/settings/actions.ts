@@ -7,6 +7,7 @@ import { FigmaError } from "@/lib/figma/errors";
 import { getFigmaClient } from "@/lib/figma/server";
 import { KEY_HELP, isEncryptionConfigured } from "@/lib/secrets/crypto";
 import { Secret } from "@/lib/secrets/secret";
+import { FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import {
   getFigmaStatus,
   removeFigmaToken,
@@ -31,6 +32,8 @@ export async function saveFigmaTokenAction(
 ): Promise<SettingsResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const raw = String(formData.get("token") ?? "").trim();
   if (!raw) return { ok: false, error: "Paste a Figma personal access token." };
   if (raw.length > 300 || /\s/.test(raw))
@@ -55,6 +58,8 @@ export async function saveFigmaTokenAction(
 export async function testFigmaConnectionAction(): Promise<SettingsResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   try {
     const me = await (await getFigmaClient()).getMe();
     return {

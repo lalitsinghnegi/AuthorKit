@@ -7,6 +7,7 @@ import { getFigmaClient } from "@/lib/figma/server";
 import type { FigmaStyleMeta } from "@/lib/figma/types";
 import type { ResponsiveFile } from "@/lib/model";
 import { collectFrameRefs, computeResponsive, type SourceFrame } from "@/lib/responsive";
+import { FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import { getProject, saveResponsive } from "@/lib/storage/projects";
 
 export type ResponsiveResult =
@@ -16,6 +17,8 @@ export type ResponsiveResult =
 export async function extractResponsiveAction(projectId: string): Promise<ResponsiveResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const overBudget = spend(FIGMA_BUDGET, auth.user.id);
+  if (overBudget) return { ok: false, error: overBudget };
   const project = await getProject(projectId);
   if (!project) return { ok: false, error: "This project no longer exists." };
   const refs = collectFrameRefs(project);

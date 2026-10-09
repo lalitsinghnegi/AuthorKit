@@ -7,6 +7,13 @@ afterEach(() => {
   cleanup();
   jar.cookies.clear();
   jar.headers = new Headers();
+  // Package build limits and cache live on globalThis (src/lib/generator/limit.ts).
+  const limits = (
+    globalThis as { __akBuildLimit?: { cache: Map<string, unknown>; perUser: Map<string, number> } }
+  ).__akBuildLimit;
+  limits?.cache.clear();
+  limits?.perUser.clear();
+  (globalThis as { __akBudgets?: Map<string, unknown> }).__akBudgets?.clear();
 });
 
 // `server-only` throws outside the React Server bundle; tests import server modules directly.

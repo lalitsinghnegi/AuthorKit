@@ -3,6 +3,8 @@ import { findDuplicate, Id } from "./common";
 
 const Px = z.int().min(0).max(10000);
 
+export const MAX_BREAKPOINTS = 12;
+
 export const Breakpoint = z.object({
   id: Id,
   name: z
@@ -15,7 +17,7 @@ export type Breakpoint = z.infer<typeof Breakpoint>;
 
 // Structural rules only. Overlap, gap and min > max checks live in the breakpoint module (Prompt 3).
 export const BreakpointSet = z
-  .object({ breakpoints: z.array(Breakpoint).min(1) })
+  .object({ breakpoints: z.array(Breakpoint).min(1).max(MAX_BREAKPOINTS) })
   .superRefine((set, ctx) => {
     const dupId = findDuplicate(set.breakpoints.map((b) => b.id));
     if (dupId) ctx.addIssue({ code: "custom", message: `Duplicate breakpoint id "${dupId}"` });
