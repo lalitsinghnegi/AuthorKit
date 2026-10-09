@@ -30,6 +30,29 @@ export const SemVer = z
     "Use a version such as 1.0.0",
   );
 
+/**
+ * The brand's published site (for example the AEM publish or live URL), used as the
+ * reference for the real DOM structure. http(s) only, no embedded credentials.
+ */
+export const SiteUrl = z
+  .string()
+  .trim()
+  .max(2048, "URLs are at most 2048 characters")
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return (
+        (url.protocol === "https:" || url.protocol === "http:") &&
+        url.hostname !== "" &&
+        url.username === "" &&
+        url.password === ""
+      );
+    } catch {
+      return false;
+    }
+  }, "Use a full http:// or https:// address, such as https://www.example.com")
+  .transform((value) => new URL(value).href);
+
 /** Optional npm-style packaging of the generated CSS. */
 export const NpmOptions = z.object({ enabled: z.boolean(), name: NpmName, version: SemVer });
 export type NpmOptions = z.infer<typeof NpmOptions>;
@@ -39,6 +62,7 @@ export const ProjectInput = z.object({
   name: z.string().trim().min(1, "Name is required").max(80),
   brandName: z.string().trim().min(1, "Brand name is required").max(80),
   prefix: Prefix,
+  siteUrl: SiteUrl.optional(),
   description: z.string().trim().max(500).optional(),
   approach: z.enum(["mobile-first", "desktop-first"]),
 });

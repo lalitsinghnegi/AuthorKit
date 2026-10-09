@@ -68,6 +68,27 @@ export function NewProjectForm() {
         />
       </Field>
 
+      <Field
+        name="siteUrl"
+        label="Site URL (optional)"
+        state={state}
+        hint="The published site (for example the AEM publish URL), used as the reference for the real page structure. You can add or change it later."
+      >
+        <input
+          id="siteUrl"
+          name="siteUrl"
+          type="url"
+          inputMode="url"
+          className={ui.input}
+          defaultValue={values.siteUrl}
+          maxLength={2048}
+          placeholder="https://www.example.com"
+          autoComplete="url"
+          spellCheck={false}
+          {...errorProps("siteUrl", state)}
+        />
+      </Field>
+
       <fieldset className={ui.field} style={{ border: 0, padding: 0, margin: 0 }}>
         <legend className={ui.label}>Responsive approach</legend>
         <div className={ui.radioRow}>

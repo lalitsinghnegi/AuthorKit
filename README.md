@@ -48,7 +48,7 @@ data/
   settings.json                  # encrypted Figma token, AI component patterns
   users.json                     # users and password hashes
   audit.log                      # who changed what (JSON lines)
-  projects/<id>/project.json     # brand, prefix, breakpoints, scaffold, Figma links
+  projects/<id>/project.json     # brand, prefix, site URL, breakpoints, scaffold, Figma links
   projects/<id>/tokens.json      # design tokens
   projects/<id>/responsive.json  # per-breakpoint values measured from Figma
   scaffold-templates/<id>.json   # scaffold presets

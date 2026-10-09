@@ -40,6 +40,16 @@ describe("createProjectAction", () => {
     expect(entry).toMatchObject({ action: "project.create", actor: { email: me().email } });
     expect((await listProjects()).projects[0]).toMatchObject({ name: "Launch", prefix: "acme" });
   });
+
+  it("validates and stores the optional site URL", async () => {
+    const bad = await createProjectAction({}, form({ ...valid, siteUrl: "javascript:alert(1)" }));
+    expect(Object.keys(bad.errors ?? {})).toEqual(["siteUrl"]);
+    await expect(
+      createProjectAction({}, form({ ...valid, siteUrl: " https://www.acme.com " })),
+    ).rejects.toThrow(Redirect);
+    const [created] = (await listProjects()).projects;
+    expect(created).toMatchObject({ siteUrl: "https://www.acme.com/" });
+  });
 });
 
 describe("importProjectAction", () => {

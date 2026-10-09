@@ -232,7 +232,7 @@ Rules:
 ## Storage (keep it simple)
 
 - **No database.** Project configuration is stored as JSON files on disk:
-  - `data/projects/<project-id>/project.json` holds the brand, prefix, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
+  - `data/projects/<project-id>/project.json` holds the brand, prefix, optional site URL (`SiteUrl`: http(s), no credentials; stored only, never fetched), approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
   - `data/users.json` holds users (scrypt hashes, never passwords), and `data/audit.log` holds the audit trail.
   - `data/scaffold-templates/*.json` holds the scaffold presets. Built-in presets (Basic, Component-based) live in code (`src/lib/scaffold/presets.ts`), can't be changed or deleted, and are merged into listings.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.

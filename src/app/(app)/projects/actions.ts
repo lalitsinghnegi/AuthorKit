@@ -22,11 +22,13 @@ export async function createProjectAction(
     name: String(formData.get("name") ?? ""),
     brandName: String(formData.get("brandName") ?? ""),
     prefix: String(formData.get("prefix") ?? "").trim(),
+    siteUrl: String(formData.get("siteUrl") ?? "").trim(),
     description: String(formData.get("description") ?? ""),
     approach: String(formData.get("approach") ?? ""),
   };
   const parsed = ProjectInput.safeParse({
     ...values,
+    siteUrl: values.siteUrl || undefined,
     description: values.description.trim() || undefined,
   });
   if (!parsed.success) {

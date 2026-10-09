@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
+import { EditGate } from "@/components/ReadOnly/EditGate";
 import ui from "@/components/ui/ui.module.css";
 import type { TreeNode } from "@/lib/model";
 import { getProject } from "@/lib/storage/projects";
+import { SiteUrlEditor } from "./SiteUrlEditor";
 
 export default function ProjectPage({ params }: PageProps<"/projects/[id]">) {
   return (
@@ -41,6 +43,14 @@ async function ProjectOverview({ params }: Pick<PageProps<"/projects/[id]">, "pa
             <dd style={{ margin: 0 }}>
               <code className={ui.code}>.{project.prefix}-btn</code>,{" "}
               <code className={ui.code}>--{project.prefix}-color-primary</code>
+            </dd>
+            <dt className={ui.muted}>
+              <label htmlFor="site-url">Site URL</label>
+            </dt>
+            <dd style={{ margin: 0 }}>
+              <EditGate>
+                <SiteUrlEditor projectId={project.id} initial={project.siteUrl} />
+              </EditGate>
             </dd>
             <dt className={ui.muted}>Approach</dt>
             <dd style={{ margin: 0 }}>{project.approach}</dd>

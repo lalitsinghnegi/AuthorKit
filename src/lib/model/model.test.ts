@@ -8,6 +8,7 @@ import {
   Project,
   ProjectInput,
   ScaffoldTemplate,
+  SiteUrl,
   Settings,
   TokenFile,
   walkTree,
@@ -215,5 +216,25 @@ describe("Settings", () => {
     const figmaToken = { iv: "AAAA", ciphertext: "AAAA", tag: "AAAA" };
     expect(Settings.safeParse({ schemaVersion: 1, figmaToken }).success).toBe(true);
     expect(Settings.safeParse({ schemaVersion: 1, figmaToken: "plain" }).success).toBe(false);
+  });
+});
+
+describe("SiteUrl", () => {
+  it.each([
+    "https://www.acme.com",
+    "http://localhost:4503/content/acme/en.html",
+    "https://acme.com/en?x=1",
+  ])("accepts %s", (url) => expect(SiteUrl.safeParse(url).success).toBe(true));
+  it.each([
+    "",
+    "www.acme.com",
+    "javascript:alert(1)",
+    "ftp://acme.com",
+    "file:///etc/passwd",
+    "https://user:pass@acme.com",
+    `https://acme.com/${"a".repeat(2050)}`,
+  ])("rejects %j", (url) => expect(SiteUrl.safeParse(url).success).toBe(false));
+  it("normalises the address", () => {
+    expect(SiteUrl.parse(" https://WWW.Acme.com ")).toBe("https://www.acme.com/");
   });
 });

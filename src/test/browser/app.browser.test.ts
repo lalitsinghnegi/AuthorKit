@@ -156,6 +156,20 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
     expect(errors).toEqual([]);
   }, 120_000);
 
+  it("admins can save the site URL on the project overview", async () => {
+    const { page, errors } = await signIn(ADMIN);
+    await page.goto(`${base}/projects/${projectId}`);
+    await page.getByLabel("Site URL").fill("https://www.acme.com");
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await page.waitForSelector("text=Site URL saved.");
+    await page.reload();
+    expect(await page.getByLabel("Site URL").inputValue()).toBe("https://www.acme.com/");
+    expect(await page.getByRole("link", { name: "Open site" }).getAttribute("href")).toBe(
+      "https://www.acme.com/",
+    );
+    expect(errors).toEqual([]);
+  }, 60_000);
+
   it("viewers get read-only screens but can download", async () => {
     const { page } = await signIn(VIEWER);
     await page.goto(`${base}/projects/${projectId}/breakpoints`);
