@@ -19,7 +19,7 @@ type Props = {
   figmaConnected: boolean;
   sourceLinks: number;
 };
-type Filter = "all" | "review" | "low" | "excluded";
+type Filter = "all" | "review" | "excluded";
 type Status = { kind: "idle" | "ok" | "error"; message?: string; notes?: string[] };
 
 const TYPE_LABELS: Record<TokenType, string> = {
@@ -76,17 +76,14 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
 
   const counts = {
     review: tokens.filter((t) => t.status === "auto").length,
-    low: active.filter((t) => t.meta?.confidence === "low").length,
     excluded: tokens.length - active.length,
   };
   const visible = tokens.filter((t) =>
     filter === "review"
       ? t.status === "auto"
-      : filter === "low"
-        ? t.status !== "excluded" && t.meta?.confidence === "low"
-        : filter === "excluded"
-          ? t.status === "excluded"
-          : true,
+      : filter === "excluded"
+        ? t.status === "excluded"
+        : true,
   );
   const covered = new Set(active.map((t) => t.name));
   const onDefaults = [...TEMPLATE_TOKENS.keys()].filter((n) => !covered.has(n));
@@ -134,13 +131,9 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
     });
   };
 
-  const acceptHighConfidence = () =>
+  const acceptAll = () =>
     setTokens((list) =>
-      list.map((t) =>
-        t.status === "auto" && t.meta?.confidence === "high" && !t.meta.missing
-          ? { ...t, status: "accepted" }
-          : t,
-      ),
+      list.map((t) => (t.status === "auto" && !t.meta?.missing ? { ...t, status: "accepted" } : t)),
     );
 
   const save = () =>
@@ -170,10 +163,10 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
           </PanelButton>
           <PanelButton
             variant="secondary"
-            onClick={acceptHighConfidence}
+            onClick={acceptAll}
             disabled={busy || counts.review === 0}
           >
-            Accept all high-confidence
+            Accept all
           </PanelButton>
           <PanelButton
             variant="secondary"
@@ -191,8 +184,6 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
           <dl className={styles.counts}>
             <dt>To review</dt>
             <dd>{counts.review}</dd>
-            <dt>Low confidence</dt>
-            <dd>{counts.low}</dd>
             <dt>Excluded</dt>
             <dd>{counts.excluded}</dd>
           </dl>
@@ -241,7 +232,6 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
               [
                 ["all", `All (${tokens.length})`],
                 ["review", `To review (${counts.review})`],
-                ["low", `Low confidence (${counts.low})`],
                 ["excluded", `Excluded (${counts.excluded})`],
               ] as const
             ).map(([key, label]) => (
@@ -275,7 +265,7 @@ export function TokenReview({ projectId, initialTokens, figmaConnected, sourceLi
                       <th scope="col">Name</th>
                       <th scope="col">Value</th>
                       <th scope="col">From Figma</th>
-                      <th scope="col">Confidence</th>
+                      <th scope="col">Notes</th>
                       <th scope="col">Status</th>
                     </tr>
                   </thead>
@@ -423,9 +413,6 @@ function TokenRow({
       <td>
         {meta && (
           <>
-            <span className={styles.badge} data-confidence={meta.confidence}>
-              {meta.confidence}
-            </span>
             {meta.reasons.length > 0 && (
               <ul className={styles.reasons}>
                 {meta.reasons.map((r) => (

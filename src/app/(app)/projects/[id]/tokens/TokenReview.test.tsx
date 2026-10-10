@@ -98,7 +98,7 @@ beforeEach(() => {
 });
 
 describe("TokenReview", () => {
-  it("groups tokens by type with previews, sources and confidence", () => {
+  it("groups tokens by type with previews, sources and notes", () => {
     setup();
     expect(screen.getByRole("heading", { name: "Colors" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Font sizes" })).toBeInTheDocument();
@@ -113,13 +113,13 @@ describe("TokenReview", () => {
     ).toHaveTextContent(/^\d+\.\d:1$/);
   });
 
-  it("filters by review state and confidence", () => {
+  it("filters by review state, with no confidence filter or badge", () => {
     setup();
-    fireEvent.click(screen.getByRole("button", { name: "Low confidence (1)" }));
-    expect(screen.queryByDisplayValue("color-primary")).not.toBeInTheDocument();
-    expect(screen.getByDisplayValue("color-teal")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Low confidence/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("high")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "To review (3)" }));
     expect(screen.queryByDisplayValue("font-size-h1")).not.toBeInTheDocument();
+    expect(screen.getByDisplayValue("color-primary")).toBeInTheDocument();
   });
 
   it("an edited value becomes an override and shows the Figma value", () => {
@@ -150,11 +150,11 @@ describe("TokenReview", () => {
     );
   });
 
-  it("accepts all high-confidence tokens but not low or missing ones", () => {
+  it("accepts all tokens to review except missing ones", () => {
     const { panel } = setup();
-    fireEvent.click(panel.getByRole("button", { name: "Accept all high-confidence" }));
+    fireEvent.click(panel.getByRole("button", { name: "Accept all" }));
     expect(within(row("color-primary")).getByText("Accepted")).toBeInTheDocument();
-    expect(within(row("color-teal")).getByText("To review")).toBeInTheDocument();
+    expect(within(row("color-teal")).getByText("Accepted")).toBeInTheDocument();
     expect(within(row("space-9")).getByText("To review")).toBeInTheDocument();
   });
 

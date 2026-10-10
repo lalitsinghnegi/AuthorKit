@@ -15,7 +15,8 @@ export const MISSING_NOTE = "No longer found in Figma";
  * - overridden → keeps the admin's value; the Figma value is updated
  * - excluded → stays excluded
  * - renamed → keeps the admin's name
- * - saved tokens Figma no longer has → kept and marked missing
+ * - saved tokens Figma no longer has → kept and marked missing, except undecided
+ *   low-confidence ones from earlier extractions, which are dropped
  * - tokens without meta (added by hand) → untouched
  */
 export function mergeTokens(
@@ -85,6 +86,8 @@ export function mergeTokens(
 
   for (const old of existing) {
     if (old.meta && !seen.has(old.meta.sourceKey)) {
+      // Uncertain values from earlier extractions that nobody decided on are dropped.
+      if (old.status === "auto" && old.meta.confidence === "low") continue;
       summary.missing++;
       result.push({ ...old, meta: { ...old.meta, missing: true, note: MISSING_NOTE } });
     } else if (!old.meta) {

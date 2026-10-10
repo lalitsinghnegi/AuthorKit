@@ -61,7 +61,12 @@ describe("extractTokensAction", () => {
       { nodeId: "3:1", scope: "component" },
     ]);
     const result = await extractTokensAction(id);
-    expect(result).toMatchObject({ ok: true, notes: [], summary: { changed: 0, missing: 0 } });
+    expect(result).toMatchObject({
+      ok: true,
+      notes: [expect.stringMatching(/left out/)],
+      summary: { changed: 0, missing: 0 },
+    });
+    expect(result.ok && result.tokens.every((t) => t.meta?.confidence === "high")).toBe(true);
     if (!result.ok) return;
     expect(lastClient!.calls.map((c) => c.method)).toEqual(["getNodes", "getLocalVariables"]);
     expect(lastClient!.calls[0].args).toEqual([FIXTURE_FILE_KEY, ["1:1", "1:2", "3:1"]]);
@@ -88,6 +93,7 @@ describe("extractTokensAction", () => {
       ok: true,
       notes: [
         "Figma variables are not available for this account, so styles and layers were used.",
+        expect.stringMatching(/left out/),
       ],
     });
   });
@@ -112,6 +118,7 @@ describe("extractTokensAction", () => {
     const result = await extractTokensAction(id);
     expect(result.ok && result.notes).toEqual([
       'The frame for "Link 1" was not found in Figma; check the link.',
+      expect.stringMatching(/left out/),
     ]);
   });
 
@@ -145,10 +152,10 @@ describe("saveTokensAction", () => {
     const edits = tokens.map((t) =>
       t.name === "color-primary"
         ? { ...t, value: "#000000", status: "accepted" as const }
-        : t.name === "color-one-off-accent"
+        : t.name === "color-surface"
           ? { ...t, status: "excluded" as const }
-          : t.name === "color-link"
-            ? { ...t, name: "color-link-hover", status: "accepted" as const }
+          : t.name === "color-text"
+            ? { ...t, name: "color-heading", status: "accepted" as const }
             : t,
     );
     const result = await saveTokensAction(id, edits);
@@ -159,8 +166,8 @@ describe("saveTokensAction", () => {
       value: "#000000",
       originalValue: "#8a0b4f",
     });
-    expect(saved.find((t) => t.meta?.figmaName === "One-off accent")?.status).toBe("excluded");
-    expect(saved.find((t) => t.name === "color-link-hover")?.meta).toMatchObject({ mapped: true });
+    expect(saved.find((t) => t.meta?.figmaName === "Neutral/Surface")?.status).toBe("excluded");
+    expect(saved.find((t) => t.name === "color-heading")?.meta).toMatchObject({ mapped: true });
   });
 
   it("deletes tokens left out of the edits", async () => {

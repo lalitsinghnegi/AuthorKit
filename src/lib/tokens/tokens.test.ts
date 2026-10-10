@@ -8,7 +8,9 @@ import {
   MISSING_NOTE,
   UNMAPPED_REASON,
   colorToCss,
+  extractAllTokens,
   extractTokens,
+  lowConfidenceNote,
   letterSpacingEm,
   lineHeightRatio,
   mergeTokens,
@@ -24,7 +26,7 @@ import {
 const fixture = file as FigmaFile;
 const vars = (variables as FigmaVariablesResponse).meta;
 const extract = (withVariables = false, roots: FigmaNode[] = [fixture.document]) =>
-  extractTokens([
+  extractAllTokens([
     { fileKey: "K", roots, styles: fixture.styles, variables: withVariables ? vars : undefined },
   ]);
 const byName = (tokens: ExtractedToken[], name: string) => tokens.find((t) => t.name === name);
@@ -214,7 +216,7 @@ describe("extractTokens edge cases", () => {
       rect("1:2", "Primary", [0, 0, 1]),
       rect("1:3", "Primary", [0, 0, 1]),
     ]);
-    const { tokens } = extractTokens([{ fileKey: "K", roots: [root], styles }]);
+    const { tokens } = extractAllTokens([{ fileKey: "K", roots: [root], styles }]);
     expect(byName(tokens, "color-primary")).toMatchObject({
       value: "#f00",
       meta: { origin: "style", confidence: "low" },
@@ -235,7 +237,7 @@ describe("extractTokens edge cases", () => {
       frame([], { id: "1:3", layoutMode: "VERTICAL", itemSpacing: 18 }),
       frame([], { id: "1:4", layoutMode: "VERTICAL", itemSpacing: 100 }),
     ]);
-    const tokens = extractTokens([{ fileKey: "K", roots: [root], styles: {} }]).tokens;
+    const tokens = extractAllTokens([{ fileKey: "K", roots: [root], styles: {} }]).tokens;
     // 20px is equally close to 16 and 24; ties go to the smaller step. 18px lands there too.
     expect(byName(tokens, "space-4")).toMatchObject({
       value: "1.25rem",
@@ -257,7 +259,7 @@ describe("extractTokens edge cases", () => {
       style: { fontFamily: "Lato", fontWeight: 400, fontSize: size, lineHeightPx: size * 1.5 },
     });
     const root = frame([text("1:1", 16), text("1:2", 16), text("1:3", 36), text("1:4", 24)]);
-    const result = extractTokens([{ fileKey: "K", roots: [root], styles: {} }]);
+    const result = extractAllTokens([{ fileKey: "K", roots: [root], styles: {} }]);
     expect(result.notes).toContain(
       "No Figma text styles were found, so typography was estimated from text layers.",
     );
@@ -278,7 +280,7 @@ describe("extractTokens edge cases", () => {
         fills: [{ type: "SOLID", color: { r: 0.1, g: 0.2, b: 0.3, a: 1 } }],
       },
     ]);
-    const { tokens } = extractTokens([{ fileKey: "K", roots: [root], styles: {} }]);
+    const { tokens } = extractAllTokens([{ fileKey: "K", roots: [root], styles: {} }]);
     expect(tokens.length).toBeGreaterThan(0);
     for (const t of tokens) {
       expect(t.meta.figmaName.length).toBeLessThanOrEqual(120);
@@ -304,7 +306,7 @@ describe("extractTokens edge cases", () => {
       rect("1:1", "a", [1, 0.85, 0.9], { styles: { fill: "S:p" } }),
       rect("1:2", "b", [1, 1, 1], { styles: { fill: "S:o" } }),
     ]);
-    const tokens = extractTokens([{ fileKey: "K", roots: [root], styles }]).tokens;
+    const tokens = extractAllTokens([{ fileKey: "K", roots: [root], styles }]).tokens;
     expect(byName(tokens, "color-on-primary")?.meta.reasons.join()).toMatch(
       /color-on-primary on color-primary has contrast 1\.\d+:1 \(needs 4\.5:1\)/,
     );
@@ -324,11 +326,31 @@ describe("extractTokens edge cases", () => {
         },
       },
     };
-    const result = extractTokens([
+    const result = extractAllTokens([
       { fileKey: "K", roots: [root], styles: {}, variables: aliasVars },
     ]);
     expect(result.tokens).toEqual([]);
     expect(result.notes).toEqual(['Variable "color/alias" is an alias and was skipped.']);
+  });
+});
+
+describe("extractTokens keeps only high-confidence values", () => {
+  it("leaves out every low-confidence token and says how many", () => {
+    const input = [{ fileKey: "K", roots: [fixture.document], styles: fixture.styles }];
+    const all = extractAllTokens(input);
+    const kept = extractTokens(input);
+    const low = all.tokens.filter((t) => t.meta.confidence === "low");
+    expect(low.length).toBeGreaterThan(0);
+    expect(kept.tokens).toEqual(all.tokens.filter((t) => t.meta.confidence === "high"));
+    expect(kept.notes).toEqual([...all.notes, lowConfidenceNote(low.length)]);
+  });
+
+  it("adds no note when nothing was left out", () => {
+    const styles = { "S:p": { key: "kp", name: "Primary", styleType: "FILL" } };
+    const root = frame([rect("1:1", "a", [0.5, 0, 0.3], { styles: { fill: "S:p" } })]);
+    const result = extractTokens([{ fileKey: "K", roots: [root], styles }]);
+    expect(result.tokens.map((t) => t.name)).toEqual(["color-primary"]);
+    expect(result.notes).toEqual([]);
   });
 });
 
@@ -404,6 +426,23 @@ describe("mergeTokens", () => {
       note: MISSING_NOTE,
     });
     expect(tokens).toContainEqual(manual);
+  });
+
+  it("drops undecided low-confidence tokens that are no longer extracted", () => {
+    const saved = first();
+    expect(saved.some((t) => t.meta?.confidence === "low")).toBe(true);
+    const decided = set(saved, "color-one-off-accent", { status: "excluded" });
+    const { tokens, summary } = mergeTokens(
+      decided,
+      extracted().filter((t) => t.meta.confidence === "high"),
+      id,
+    );
+    expect(tokens.some((t) => t.status === "auto" && t.meta?.confidence === "low")).toBe(false);
+    expect(tokens.find((t) => t.name === "color-one-off-accent")).toMatchObject({
+      status: "excluded",
+      meta: { missing: true },
+    });
+    expect(summary.missing).toBe(1);
   });
 
   it("renames a new token that collides with an accepted one", () => {

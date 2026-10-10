@@ -178,7 +178,22 @@ function nearest<T extends readonly number[]>(scale: T, v: number): number {
   return scale.reduce((best, s) => (Math.abs(s - v) < Math.abs(best - v) ? s : best), scale[0]);
 }
 
+/**
+ * Tokens to offer the admin: only high-confidence ones. Anything uncertain is left out,
+ * so the generated CSS keeps the template default for it.
+ */
 export function extractTokens(inputs: ExtractInput[]): ExtractResult {
+  const all = extractAllTokens(inputs);
+  const tokens = all.tokens.filter((t) => t.meta.confidence === "high");
+  const left = all.tokens.length - tokens.length;
+  return { tokens, notes: left ? [...all.notes, lowConfidenceNote(left)] : all.notes };
+}
+
+export const lowConfidenceNote = (n: number) =>
+  `${n} uncertain ${n === 1 ? "value was" : "values were"} left out (used once, off the scale, conflicting, unnamed or failing contrast).`;
+
+/** Every value found, each rated high or low confidence with its reasons. */
+export function extractAllTokens(inputs: ExtractInput[]): ExtractResult {
   const c = new Collector();
   const notes: string[] = [];
   const styles: Record<string, FigmaStyleMeta> = {};

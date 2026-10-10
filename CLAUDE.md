@@ -88,13 +88,14 @@ Rules:
 - **Names:** tokens are named after template tokens where possible (`naming.ts`), so they fill the CSS. Anything else gets a slug name and is `mapped: false`.
   - **Spacing** snaps to the 8-step scale (4–64px), radius to sm/md/lg/pill, and shadows to sm/md/lg by blur.
   - **Conflicting values** for one name: the most trusted, then most used, wins. The others become `-alt` tokens.
+- **Only high-confidence tokens are kept.** `extractTokens` drops every low-confidence token (the template default is used instead) and adds a note with the count; `extractAllTokens` returns everything, rated, for tests. Extra (non-template) values therefore only come from renames or hand-made tokens.
 - **Low confidence** = any reason in `meta.reasons`:
   - a value used once and not saved as a style
   - far (more than 25%) from its scale step
   - an unmapped name
   - one of several conflicting values
   - failing contrast
-- **Re-extraction:** `mergeTokens(existing, extracted)` keeps the admin's decisions, matched by `meta.sourceKey`, as in its doc comment. Hand-made tokens (no `meta`) are never touched.
+- **Re-extraction:** `mergeTokens(existing, extracted)` keeps the admin's decisions, matched by `meta.sourceKey`, as in its doc comment. Undecided low-confidence tokens from earlier extractions are dropped. Hand-made tokens (no `meta`) are never touched.
 - **Saving:** `saveTokensAction` only changes `name`, `value` and `status`. It re-validates every value with `validateTokenValue`, which refuses `; { } < > \` and comments, because values go into CSS. A value different from Figma's is always saved as `overridden`.
 
 ## Component mapping and AI

@@ -103,13 +103,13 @@ All design values are CSS custom properties. Override a token after loading the 
 
 ## Design sources
 
-- **From Figma:** 35 values (design tokens and per-breakpoint component values)
-- **AuthorKit defaults:** 64 values not yet defined in the design
-- **Extra values from Figma:** \`--acme-color-label\`, \`--acme-color-one-off-accent\` (in \`tokens.css\`, for your own CSS)
+- **From Figma:** 34 values (design tokens and per-breakpoint component values)
+- **AuthorKit defaults:** 65 values not yet defined in the design
+- **Extra values from Figma:** \`--acme-color-accent\` (in \`tokens.css\`, for your own CSS)
 
 Values still using defaults:
 
-- \`tokens.css\`: \`--acme-color-on-primary\`, \`--acme-color-heading\`, \`--acme-color-text-muted\`, \`--acme-color-background\`, \`--acme-color-surface\`, \`--acme-color-border\`, \`--acme-color-link-hover\`, \`--acme-color-focus\`, \`--acme-color-focus-inverse\`, \`--acme-color-disabled-background\`, \`--acme-color-disabled-text\`, \`--acme-color-overlay\`, \`--acme-color-header-background\`, \`--acme-color-footer-background\`, \`--acme-color-footer-text\`, \`--acme-color-footer-link\`, \`--acme-color-isi-background\`, \`--acme-color-isi-text\`, \`--acme-color-isi-heading\`, \`--acme-font-size-xs\`, \`--acme-font-size-sm\`, \`--acme-font-size-lg\`, \`--acme-font-size-h3\`, \`--acme-font-size-h4\`, \`--acme-font-size-h5\`, \`--acme-font-size-h6\`, \`--acme-font-size-sup\`, \`--acme-line-height-tight\`, \`--acme-space-1\`, \`--acme-space-4\`, \`--acme-space-6\`, \`--acme-space-7\`, \`--acme-space-8\`, \`--acme-radius-sm\`, \`--acme-radius-md\`, \`--acme-radius-lg\`, \`--acme-shadow-sm\`, \`--acme-shadow-md\`, \`--acme-shadow-lg\`, \`--acme-z-header\`, \`--acme-z-isi-bar\`, \`--acme-z-modal\`, \`--acme-duration-fast\`, \`--acme-duration-base\`, \`--acme-size-container-max\`, \`--acme-size-gutter\`, \`--acme-size-header-height\`, \`--acme-size-logo-height\`, \`--acme-size-icon\`, \`--acme-size-touch-target\`, \`--acme-size-focus-ring\`, \`--acme-size-focus-offset\`, \`--acme-size-modal-max\`, \`--acme-size-modal-narrow\`, \`--acme-size-isi-bar-collapsed\`, \`--acme-size-isi-bar-expanded\`, \`--acme-size-sup-offset\`, \`--acme-size-sub-offset\`
+- \`tokens.css\`: \`--acme-color-on-primary\`, \`--acme-color-heading\`, \`--acme-color-text-muted\`, \`--acme-color-background\`, \`--acme-color-surface\`, \`--acme-color-border\`, \`--acme-color-link\`, \`--acme-color-link-hover\`, \`--acme-color-focus\`, \`--acme-color-focus-inverse\`, \`--acme-color-disabled-background\`, \`--acme-color-disabled-text\`, \`--acme-color-overlay\`, \`--acme-color-header-background\`, \`--acme-color-footer-background\`, \`--acme-color-footer-text\`, \`--acme-color-footer-link\`, \`--acme-color-isi-background\`, \`--acme-color-isi-text\`, \`--acme-color-isi-heading\`, \`--acme-font-size-xs\`, \`--acme-font-size-sm\`, \`--acme-font-size-lg\`, \`--acme-font-size-h3\`, \`--acme-font-size-h4\`, \`--acme-font-size-h5\`, \`--acme-font-size-h6\`, \`--acme-font-size-sup\`, \`--acme-line-height-tight\`, \`--acme-space-1\`, \`--acme-space-4\`, \`--acme-space-6\`, \`--acme-space-7\`, \`--acme-space-8\`, \`--acme-radius-sm\`, \`--acme-radius-md\`, \`--acme-radius-lg\`, \`--acme-shadow-sm\`, \`--acme-shadow-md\`, \`--acme-shadow-lg\`, \`--acme-z-header\`, \`--acme-z-isi-bar\`, \`--acme-z-modal\`, \`--acme-duration-fast\`, \`--acme-duration-base\`, \`--acme-size-container-max\`, \`--acme-size-gutter\`, \`--acme-size-header-height\`, \`--acme-size-logo-height\`, \`--acme-size-icon\`, \`--acme-size-touch-target\`, \`--acme-size-focus-ring\`, \`--acme-size-focus-offset\`, \`--acme-size-modal-max\`, \`--acme-size-modal-narrow\`, \`--acme-size-isi-bar-collapsed\`, \`--acme-size-isi-bar-expanded\`, \`--acme-size-sup-offset\`, \`--acme-size-sub-offset\`
 - \`footer.css\`: \`--acme-footer-align\`
 - \`isi.css\`: \`--acme-isi-padding-y\`
 - \`modals.css\`: \`--acme-modal-width\`, \`--acme-modal-padding\`
@@ -1241,8 +1241,7 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
  *   --acme-size-isi-bar-expanded
  *   --acme-size-sup-offset
  *   --acme-size-sub-offset
- *   --acme-color-label
- *   --acme-color-one-off-accent
+ *   --acme-color-accent
  */
 
 :root {
@@ -1255,7 +1254,7 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-color-background: #fff;
   --acme-color-surface: #f4f6f8;
   --acme-color-border: #c9cfd6;
-  --acme-color-link: #8a0b4f;
+  --acme-color-link: #0b4f8a;
   --acme-color-link-hover: #083a66;
   --acme-color-focus: #b84a00;
   --acme-color-focus-inverse: #ffbf47;
@@ -1325,8 +1324,7 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-size-sub-offset: 0.25em;
 
   /* Extra values from Figma: not read by the templates, available for your own CSS */
-  --acme-color-label: #fff;
-  --acme-color-one-off-accent: #009980;
+  --acme-color-accent: #009980;
 }
 
 /* @authorkit-responsive tokens · tablet (768px – 1023px) */
@@ -1367,8 +1365,7 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
     },
   ],
   "extras": [
-    "color-label",
-    "color-one-off-accent",
+    "color-accent",
   ],
   "rows": [
     {
@@ -1438,8 +1435,8 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "file": "tokens.css",
       "kind": "token",
       "name": "color-link",
-      "source": "figma-token",
-      "value": "#8a0b4f",
+      "source": "default",
+      "value": "#0b4f8a",
     },
     {
       "file": "tokens.css",
@@ -2171,13 +2168,13 @@ All design values are CSS custom properties. Override a token after loading the 
 
 ## Design sources
 
-- **From Figma:** 35 values (design tokens and per-breakpoint component values)
-- **AuthorKit defaults:** 64 values not yet defined in the design
-- **Extra values from Figma:** \`--acme-color-label\`, \`--acme-color-one-off-accent\` (in \`tokens.css\`, for your own CSS)
+- **From Figma:** 34 values (design tokens and per-breakpoint component values)
+- **AuthorKit defaults:** 65 values not yet defined in the design
+- **Extra values from Figma:** \`--acme-color-accent\` (in \`tokens.css\`, for your own CSS)
 
 Values still using defaults:
 
-- \`tokens.css\`: \`--acme-color-on-primary\`, \`--acme-color-heading\`, \`--acme-color-text-muted\`, \`--acme-color-background\`, \`--acme-color-surface\`, \`--acme-color-border\`, \`--acme-color-link-hover\`, \`--acme-color-focus\`, \`--acme-color-focus-inverse\`, \`--acme-color-disabled-background\`, \`--acme-color-disabled-text\`, \`--acme-color-overlay\`, \`--acme-color-header-background\`, \`--acme-color-footer-background\`, \`--acme-color-footer-text\`, \`--acme-color-footer-link\`, \`--acme-color-isi-background\`, \`--acme-color-isi-text\`, \`--acme-color-isi-heading\`, \`--acme-font-size-xs\`, \`--acme-font-size-sm\`, \`--acme-font-size-lg\`, \`--acme-font-size-h3\`, \`--acme-font-size-h4\`, \`--acme-font-size-h5\`, \`--acme-font-size-h6\`, \`--acme-font-size-sup\`, \`--acme-line-height-tight\`, \`--acme-space-1\`, \`--acme-space-4\`, \`--acme-space-6\`, \`--acme-space-7\`, \`--acme-space-8\`, \`--acme-radius-sm\`, \`--acme-radius-md\`, \`--acme-radius-lg\`, \`--acme-shadow-sm\`, \`--acme-shadow-md\`, \`--acme-shadow-lg\`, \`--acme-z-header\`, \`--acme-z-isi-bar\`, \`--acme-z-modal\`, \`--acme-duration-fast\`, \`--acme-duration-base\`, \`--acme-size-container-max\`, \`--acme-size-gutter\`, \`--acme-size-header-height\`, \`--acme-size-logo-height\`, \`--acme-size-icon\`, \`--acme-size-touch-target\`, \`--acme-size-focus-ring\`, \`--acme-size-focus-offset\`, \`--acme-size-modal-max\`, \`--acme-size-modal-narrow\`, \`--acme-size-isi-bar-collapsed\`, \`--acme-size-isi-bar-expanded\`, \`--acme-size-sup-offset\`, \`--acme-size-sub-offset\`
+- \`tokens.css\`: \`--acme-color-on-primary\`, \`--acme-color-heading\`, \`--acme-color-text-muted\`, \`--acme-color-background\`, \`--acme-color-surface\`, \`--acme-color-border\`, \`--acme-color-link\`, \`--acme-color-link-hover\`, \`--acme-color-focus\`, \`--acme-color-focus-inverse\`, \`--acme-color-disabled-background\`, \`--acme-color-disabled-text\`, \`--acme-color-overlay\`, \`--acme-color-header-background\`, \`--acme-color-footer-background\`, \`--acme-color-footer-text\`, \`--acme-color-footer-link\`, \`--acme-color-isi-background\`, \`--acme-color-isi-text\`, \`--acme-color-isi-heading\`, \`--acme-font-size-xs\`, \`--acme-font-size-sm\`, \`--acme-font-size-lg\`, \`--acme-font-size-h3\`, \`--acme-font-size-h4\`, \`--acme-font-size-h5\`, \`--acme-font-size-h6\`, \`--acme-font-size-sup\`, \`--acme-line-height-tight\`, \`--acme-space-1\`, \`--acme-space-4\`, \`--acme-space-6\`, \`--acme-space-7\`, \`--acme-space-8\`, \`--acme-radius-sm\`, \`--acme-radius-md\`, \`--acme-radius-lg\`, \`--acme-shadow-sm\`, \`--acme-shadow-md\`, \`--acme-shadow-lg\`, \`--acme-z-header\`, \`--acme-z-isi-bar\`, \`--acme-z-modal\`, \`--acme-duration-fast\`, \`--acme-duration-base\`, \`--acme-size-container-max\`, \`--acme-size-gutter\`, \`--acme-size-header-height\`, \`--acme-size-logo-height\`, \`--acme-size-icon\`, \`--acme-size-touch-target\`, \`--acme-size-focus-ring\`, \`--acme-size-focus-offset\`, \`--acme-size-modal-max\`, \`--acme-size-modal-narrow\`, \`--acme-size-isi-bar-collapsed\`, \`--acme-size-isi-bar-expanded\`, \`--acme-size-sup-offset\`, \`--acme-size-sub-offset\`
 - \`footer.css\`: \`--acme-footer-align\`
 - \`isi.css\`: \`--acme-isi-padding-y\`
 - \`modals.css\`: \`--acme-modal-width\`, \`--acme-modal-padding\`
@@ -3309,8 +3306,7 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
  *   --acme-size-isi-bar-expanded
  *   --acme-size-sup-offset
  *   --acme-size-sub-offset
- *   --acme-color-label
- *   --acme-color-one-off-accent
+ *   --acme-color-accent
  */
 
 :root {
@@ -3323,7 +3319,7 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-color-background: #fff;
   --acme-color-surface: #f4f6f8;
   --acme-color-border: #c9cfd6;
-  --acme-color-link: #8a0b4f;
+  --acme-color-link: #0b4f8a;
   --acme-color-link-hover: #083a66;
   --acme-color-focus: #b84a00;
   --acme-color-focus-inverse: #ffbf47;
@@ -3393,8 +3389,7 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-size-sub-offset: 0.25em;
 
   /* Extra values from Figma: not read by the templates, available for your own CSS */
-  --acme-color-label: #fff;
-  --acme-color-one-off-accent: #009980;
+  --acme-color-accent: #009980;
 }
 
 /* @authorkit-responsive tokens · tablet (768px – 1023px): no overrides */
@@ -3435,8 +3430,7 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
     },
   ],
   "extras": [
-    "color-label",
-    "color-one-off-accent",
+    "color-accent",
   ],
   "rows": [
     {
@@ -3506,8 +3500,8 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "file": "tokens.css",
       "kind": "token",
       "name": "color-link",
-      "source": "figma-token",
-      "value": "#8a0b4f",
+      "source": "default",
+      "value": "#0b4f8a",
     },
     {
       "file": "tokens.css",
