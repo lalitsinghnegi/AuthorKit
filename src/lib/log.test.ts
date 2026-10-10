@@ -5,7 +5,7 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("log redaction", () => {
   it("hides tokens, cookies, passwords and configured secrets", () => {
-    const env = { SESSION_SECRET: "super-secret-session-value-123", ANTHROPIC_API_KEY: undefined };
+    const env = { SESSION_SECRET: "super-secret-session-value-123", ENCRYPTION_KEY: undefined };
     const text = [
       "token figd_AbC123-xyz in header",
       "key sk-ant-api03-ABCdef_123",

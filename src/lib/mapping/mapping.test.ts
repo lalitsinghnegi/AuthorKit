@@ -7,12 +7,11 @@ import {
   candidateFrames,
   classify,
   effectivePatterns,
+  confirmFromPatterns,
   isAllowedImageUrl,
-  isAmbiguous,
   mergeMappings,
   safeImages,
   scoreKeyword,
-  suggestFromPatterns,
 } from "./index";
 
 const patterns = effectivePatterns(undefined);
@@ -94,75 +93,71 @@ describe("candidate frames", () => {
       "Footer",
       "Header / Footer spacer",
     ]);
-    expect(frames[1]).toMatchObject({
+    expect(frames[1]).toEqual({
       nodeId: "4:10",
+      nodeName: "Header",
       path: "Home / Desktop › Header",
-      width: 1440,
-      height: 80,
-      childNames: ["Logo", "Nav"],
     });
   });
 
-  it("suggests from names with confidence and reasons", () => {
-    const byName = Object.fromEntries(
-      suggestFromPatterns(candidateFrames(homePage), patterns).map((m) => [m.nodeName, m]),
-    );
-    expect(byName["Header"]).toMatchObject({
+  it("confirms only frames whose name clearly names one component", () => {
+    const confirmed = confirmFromPatterns(candidateFrames(homePage), patterns);
+    const byName = Object.fromEntries(confirmed.map((m) => [m.nodeName, m]));
+    expect(byName["Header"]).toEqual({
+      nodeId: "4:10",
+      nodeName: "Header",
+      path: "Home / Desktop › Header",
       componentId: "header",
-      confidence: "high",
-      reason: "Name is “header”",
-      state: "suggested",
       source: "pattern",
+      reason: "Name is “header”",
     });
-    expect(byName["Button / Primary"]).toMatchObject({ componentId: "cta", confidence: "high" });
-    expect(byName["Important Safety Information"]).toMatchObject({
-      componentId: "isi",
-      confidence: "high",
+    expect(byName["Button / Primary"]).toMatchObject({ componentId: "cta" });
+    expect(byName["Important Safety Information"]).toMatchObject({ componentId: "isi" });
+    // A name that starts with a keyword counts as clear, even when it mentions another one.
+    expect(byName["Header / Footer spacer"]).toMatchObject({
+      componentId: "header",
+      reason: "Name starts with “header”",
     });
-    expect(byName["Frame 12"]).toMatchObject({
-      componentId: null,
-      confidence: "low",
-      reason: "No name pattern matches",
-    });
-    expect(isAmbiguous(byName["Frame 12"])).toBe(true);
-    expect(isAmbiguous(byName["Header"])).toBe(false);
+    expect(byName["Frame 12"]).toBeUndefined();
+  });
+
+  it("leaves out weak and ambiguous matches", () => {
+    const frame = (nodeName: string) => ({ nodeId: "1:1", nodeName, path: nodeName });
+    expect(classify("Promo header strip", patterns)).toMatchObject({ kind: "match", score: 1 });
+    expect(confirmFromPatterns([frame("Promo header strip")], patterns)).toEqual([]);
+    const tied = { ...patterns, cta: ["modal button"], modals: ["modal button"] };
+    expect(confirmFromPatterns([frame("Modal button")], tied)).toEqual([]);
   });
 });
 
 describe("mergeMappings", () => {
-  const m = (nodeId: string, patch: Partial<FrameMapping> = {}): FrameMapping => ({
+  const frame = (nodeId: string, nodeName = `Frame ${nodeId}`) => ({
     nodeId,
-    nodeName: `Frame ${nodeId}`,
-    path: `Page › Frame ${nodeId}`,
-    componentId: null,
-    state: "suggested",
+    nodeName,
+    path: `Page › ${nodeName}`,
+  });
+  const m = (nodeId: string, patch: Partial<FrameMapping> = {}): FrameMapping => ({
+    ...frame(nodeId),
+    componentId: "cta",
     source: "pattern",
     ...patch,
   });
 
-  it("keeps decisions, refreshes names, adds new frames and marks missing ones", () => {
+  it("keeps saved components, refreshes names, adds new frames and marks missing ones", () => {
     const saved = [
-      m("1:1", { state: "confirmed", componentId: "header", source: "manual" }),
-      m("1:2", { state: "ignored" }),
-      m("1:3", { componentId: "footer" }),
-      m("1:4", { state: "confirmed", componentId: "cta" }),
-      m("1:5", { source: "ai", componentId: "accordion", reason: "Looks like FAQ" }),
+      m("1:1", { componentId: "header", source: "manual" }),
+      m("1:2", { componentId: "footer", source: "manual" }),
+      m("1:4", { componentId: "cta" }),
     ];
-    const detected = [
-      m("1:1", { nodeName: "Renamed header", componentId: "footer" }),
-      m("1:2", { componentId: "cta" }),
-      m("1:3", { componentId: "cta" }),
-      m("1:5"),
-      m("1:6", { componentId: "isi" }),
-    ];
-    const merged = mergeMappings(saved, detected);
-    expect(merged.map((x) => [x.nodeId, x.state, x.componentId, x.missing ?? false])).toEqual([
-      ["1:1", "confirmed", "header", false],
-      ["1:2", "ignored", null, false],
-      ["1:3", "suggested", "cta", false],
-      ["1:5", "suggested", "accordion", false],
-      ["1:6", "suggested", "isi", false],
-      ["1:4", "confirmed", "cta", true],
+    // 1:2 no longer matches a name pattern but still exists, so it is kept as is.
+    const frames = [frame("1:1", "Renamed header"), frame("1:2"), frame("1:3"), frame("1:6")];
+    const detected = [m("1:1", { componentId: "footer" }), m("1:6", { componentId: "isi" })];
+    const merged = mergeMappings(saved, frames, detected);
+    expect(merged.map((x) => [x.nodeId, x.componentId, x.source, x.missing ?? false])).toEqual([
+      ["1:1", "header", "manual", false],
+      ["1:2", "footer", "manual", false],
+      ["1:6", "isi", "pattern", false],
+      ["1:4", "cta", "pattern", true],
     ]);
     expect(merged[0].nodeName).toBe("Renamed header");
   });

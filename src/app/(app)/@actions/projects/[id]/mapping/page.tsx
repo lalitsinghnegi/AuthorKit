@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { ProjectNav } from "@/components/AppShell/ProjectNav";
 import { getProject } from "@/lib/storage/projects";
 
-// Detect, previews, AI and Save are rendered by MappingView via <PanelActions>.
+// Detect, previews and Save are rendered by MappingView via <PanelActions>.
 export default function MappingActions({ params }: PageProps<"/projects/[id]/mapping">) {
   return (
     <Suspense fallback={null}>

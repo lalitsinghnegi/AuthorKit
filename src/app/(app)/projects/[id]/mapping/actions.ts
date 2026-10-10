@@ -6,30 +6,24 @@ import type { FigmaClient } from "@/lib/figma/client";
 import { FigmaError } from "@/lib/figma/errors";
 import { getFigmaClient } from "@/lib/figma/server";
 import type { FigmaNode } from "@/lib/figma/types";
-import { LLMError, MAX_FRAMES, type MappingRequest } from "@/lib/llm/provider";
-import { getLLMProvider } from "@/lib/llm/server";
 import {
   MAPPABLE_COMPONENTS,
   candidateFrames,
+  confirmFromPatterns,
   effectivePatterns,
-  isAmbiguous,
   mergeMappings,
   safeImages,
-  suggestFromPatterns,
-  type CandidateFrame,
   type MappableComponent,
 } from "@/lib/mapping";
-import { CSS_TEMPLATE_LABELS, type FigmaLink, type FrameMapping, type Project } from "@/lib/model";
-import { AI_BUDGET, FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
+import type { FigmaLink, FrameMapping } from "@/lib/model";
+import { FIGMA_BUDGET, spend } from "@/lib/security/rateLimit";
 import { getProject, updateProject } from "@/lib/storage/projects";
 import { getComponentPatterns } from "@/lib/storage/settings";
-import { getManifests } from "@/lib/templates/registry";
 
 export type MappingResult =
   { ok: true; links: FigmaLink[]; notes: string[] } | { ok: false; error: string };
 
-const friendly = (err: unknown): string | null =>
-  err instanceof FigmaError || err instanceof LLMError ? err.message : null;
+const friendly = (err: unknown): string | null => (err instanceof FigmaError ? err.message : null);
 
 /** Fetch each linked node once per file. Links without a frame are reported in `notes`. */
 async function fetchRoots(
@@ -59,7 +53,7 @@ async function fetchRoots(
   return roots;
 }
 
-/** Find candidate frames in every linked node and suggest components from their names. */
+/** Find the frames in every linked node and confirm those whose names clearly name a component. */
 export async function detectFramesAction(projectId: string): Promise<MappingResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
@@ -81,20 +75,20 @@ export async function detectFramesAction(projectId: string): Promise<MappingResu
       figmaLinks: p.figmaLinks.map((link) => {
         const root = roots.get(link.id);
         if (!root) return link;
-        const detected = suggestFromPatterns(candidateFrames(root), patterns).map((m) =>
-          // A component link already says what its frame is.
-          m.nodeId === link.nodeId && link.scope === "component" && link.componentId
-            ? {
-                ...m,
-                componentId: link.componentId,
-                state: "confirmed" as const,
-                source: "manual" as const,
-                confidence: "high" as const,
-                reason: "Set on the Figma link",
-              }
-            : m,
+        const frames = candidateFrames(root);
+        const detected = confirmFromPatterns(frames, patterns).filter(
+          (m) => m.nodeId !== link.nodeId,
         );
-        return { ...link, mappings: mergeMappings(link.mappings ?? [], detected) };
+        // A component link already says what its own frame is.
+        const own = frames.find((f) => f.nodeId === link.nodeId);
+        if (own && link.scope === "component" && link.componentId)
+          detected.push({
+            ...own,
+            componentId: link.componentId,
+            source: "manual",
+            reason: "Set on the Figma link",
+          });
+        return { ...link, mappings: mergeMappings(link.mappings ?? [], frames, detected) };
       }),
     }));
     await audit(actorOf(auth.user), {
@@ -130,7 +124,7 @@ export async function loadPreviewsAction(projectId: string): Promise<PreviewResu
     const byFile = new Map<string, Set<string>>();
     for (const link of project.figmaLinks) {
       for (const m of link.mappings ?? []) {
-        if (m.missing || m.state === "ignored") continue;
+        if (m.missing) continue;
         byFile.set(link.fileKey, (byFile.get(link.fileKey) ?? new Set()).add(m.nodeId));
       }
     }
@@ -152,124 +146,17 @@ export async function loadPreviewsAction(projectId: string): Promise<PreviewResu
   }
 }
 
-export type AiResult =
-  | { ok: true; links: FigmaLink[]; suggested: number; notes: string[] }
-  | { ok: false; error: string };
-
-/** Ask the AI provider about frames whose names did not settle the mapping. Results stay suggestions. */
-export async function suggestWithAIAction(projectId: string): Promise<AiResult> {
-  const auth = await checkAdmin();
-  if (!auth.user) return { ok: false, error: auth.denied };
-  const overBudget = spend(AI_BUDGET, auth.user.id);
-  if (overBudget) return { ok: false, error: overBudget };
-  const provider = getLLMProvider();
-  if (!provider)
-    return {
-      ok: false,
-      error: "AI suggestions are off. Set ANTHROPIC_API_KEY in .env to switch them on.",
-    };
-  const project = await getProject(projectId);
-  if (!project) return { ok: false, error: "This project no longer exists." };
-
-  const ambiguous = project.figmaLinks.filter((l) => (l.mappings ?? []).some(isAmbiguous));
-  if (ambiguous.length === 0)
-    return {
-      ok: true,
-      links: project.figmaLinks,
-      suggested: 0,
-      notes: ["No ambiguous frames to ask about."],
-    };
-
-  const notes: string[] = [];
-  try {
-    // Re-read the nodes for child names and sizes, which are not stored.
-    const roots = await fetchRoots(await getFigmaClient(), ambiguous, notes);
-    const frames: CandidateFrame[] = [];
-    for (const link of ambiguous) {
-      const wanted = new Set((link.mappings ?? []).filter(isAmbiguous).map((m) => m.nodeId));
-      const root = roots.get(link.id);
-      if (root) frames.push(...candidateFrames(root).filter((f) => wanted.has(f.nodeId)));
-    }
-    if (frames.length > MAX_FRAMES)
-      notes.push(`Only the first ${MAX_FRAMES} ambiguous frames were sent.`);
-    const request: MappingRequest = {
-      frames: frames
-        .slice(0, MAX_FRAMES)
-        .map(({ nodeId, nodeName, path, childNames, width, height }) => ({
-          nodeId,
-          nodeName,
-          path,
-          childNames,
-          width,
-          height,
-        })),
-      components: componentDescriptions(),
-    };
-    const suggestions = new Map(
-      (await provider.suggestMappings(request)).map((s) => [s.nodeId, s]),
-    );
-
-    const updated = await updateProject(projectId, (p) => applySuggestions(p, suggestions));
-    await audit(actorOf(auth.user), {
-      action: "mapping.ai_suggest",
-      target: { type: "project", id: project.id, name: project.name },
-      details: `${suggestions.size} frames sent to ${provider.name}`,
-    });
-    return { ok: true, links: updated.figmaLinks, suggested: suggestions.size, notes };
-  } catch (err) {
-    const message = friendly(err);
-    if (message) return { ok: false, error: message };
-    throw err;
-  }
-}
-
-function componentDescriptions(): MappingRequest["components"] {
-  const manifests = getManifests();
-  return MAPPABLE_COMPONENTS.map((id) => ({
-    id,
-    name: CSS_TEMPLATE_LABELS[id],
-    description: manifests[id].description,
-  }));
-}
-
-function applySuggestions(
-  project: Project,
-  suggestions: Map<
-    string,
-    { componentId: MappableComponent | null; confidence: "high" | "low"; reason: string }
-  >,
-): Project {
-  return {
-    ...project,
-    figmaLinks: project.figmaLinks.map((link) => ({
-      ...link,
-      mappings: link.mappings?.map((m) => {
-        const s = suggestions.get(m.nodeId);
-        if (!s || !isAmbiguous(m)) return m;
-        return {
-          ...m,
-          componentId: s.componentId,
-          confidence: s.confidence,
-          reason: s.reason,
-          source: "ai" as const,
-          state: "suggested" as const,
-        };
-      }),
-    })),
-  };
-}
-
 export type MappingEdit = {
   linkId: string;
   nodeId: string;
+  /** null removes the frame from the mapping. */
   componentId: MappableComponent | null;
-  state: FrameMapping["state"];
 };
 
 /**
- * Apply the admin's decisions. Only existing frames can change; a confirmed
- * frame must name a component. A component link's own frame keeps the link's
- * componentId in sync.
+ * Apply the admin's changes: a new component for a frame, or null to remove
+ * it. Only existing frames can change. A component link's own frame keeps the
+ * link's componentId in sync.
  */
 export async function saveMappingsAction(
   projectId: string,
@@ -284,10 +171,6 @@ export async function saveMappingsAction(
   for (const e of edits) {
     if (e.componentId !== null && !MAPPABLE_COMPONENTS.includes(e.componentId))
       return { ok: false, error: `Unknown component “${e.componentId}”.` };
-    if (!["suggested", "confirmed", "ignored"].includes(e.state))
-      return { ok: false, error: "Unknown state." };
-    if (e.state === "confirmed" && e.componentId === null)
-      return { ok: false, error: "Choose a component before confirming a frame, or ignore it." };
     const link = project.figmaLinks.find((l) => l.id === e.linkId);
     if (!link?.mappings?.some((m) => m.nodeId === e.nodeId))
       return { ok: false, error: "A frame was not found. Detect frames again." };
@@ -296,24 +179,14 @@ export async function saveMappingsAction(
   const updated = await updateProject(projectId, (p) => ({
     ...p,
     figmaLinks: p.figmaLinks.map((link) => {
-      const mappings = link.mappings?.map((m) => {
+      const mappings = link.mappings?.flatMap((m): FrameMapping[] => {
         const e = byKey.get(`${link.id} ${m.nodeId}`);
-        if (!e || (e.componentId === m.componentId && e.state === m.state)) return m;
-        const changedComponent = e.componentId !== m.componentId;
-        return {
-          ...m,
-          componentId: e.componentId,
-          state: e.state,
-          ...(changedComponent
-            ? { source: "manual" as const, confidence: undefined, reason: undefined }
-            : {}),
-        };
+        if (!e || e.componentId === m.componentId) return [m];
+        if (e.componentId === null) return [];
+        return [{ ...m, componentId: e.componentId, source: "manual", reason: undefined }];
       });
       const own = mappings?.find((m) => m.nodeId === link.nodeId);
-      const componentId =
-        link.scope === "component" && own?.state === "confirmed" && own.componentId
-          ? own.componentId
-          : link.componentId;
+      const componentId = link.scope === "component" && own ? own.componentId : link.componentId;
       return { ...link, mappings, componentId };
     }),
   }));

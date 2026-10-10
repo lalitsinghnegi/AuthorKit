@@ -16,7 +16,7 @@ export function redact(
   env: Record<string, string | undefined> = process.env,
 ): string {
   let out = text;
-  for (const name of ["ENCRYPTION_KEY", "SESSION_SECRET", "ANTHROPIC_API_KEY"]) {
+  for (const name of ["ENCRYPTION_KEY", "SESSION_SECRET"]) {
     const value = env[name];
     if (value && value.length >= 8) out = out.split(value).join("[redacted]");
   }

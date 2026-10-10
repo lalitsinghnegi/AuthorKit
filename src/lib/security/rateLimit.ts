@@ -1,6 +1,6 @@
 /**
  * Fixed-window request budgets per user for actions that call paid or
- * rate-limited services (Figma, the AI provider). In memory, per server.
+ * rate-limited services (Figma, the project's site). In memory, per server.
  */
 export type Budget = { name: string; max: number; windowMs: number; message: string };
 
@@ -9,13 +9,6 @@ export const FIGMA_BUDGET: Budget = {
   max: 30,
   windowMs: 60_000,
   message: "Too many Figma requests in the last minute. Wait a moment and try again.",
-};
-
-export const AI_BUDGET: Budget = {
-  name: "ai",
-  max: 10,
-  windowMs: 10 * 60_000,
-  message: "Too many AI suggestion requests. Wait a few minutes and try again.",
 };
 
 /** Reading the project's public site (up to 21 pages per use). */

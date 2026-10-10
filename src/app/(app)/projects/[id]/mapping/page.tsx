@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { EditGate } from "@/components/ReadOnly/EditGate";
 import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
-import { isLLMConfigured } from "@/lib/llm/server";
 import { getProject } from "@/lib/storage/projects";
 import { getFigmaStatus } from "@/lib/storage/settings";
 import { MappingView } from "./MappingView";
@@ -25,7 +24,7 @@ async function Loader({ params }: Pick<PageProps<"/projects/[id]/mapping">, "par
     <>
       <PageHeader
         title="Components"
-        description="Match the frames inside each Figma link to AuthorKit components. Suggestions come from frame names (and optionally AI); nothing is used until you confirm it."
+        description="The frames inside each Figma link that are confirmed as AuthorKit components. Detect frames confirms frames named after a component (for example “Header” or “Footer / Mobile”); change or remove any of them here."
       />
       <EditGate>
         <MappingView
@@ -35,7 +34,6 @@ async function Loader({ params }: Pick<PageProps<"/projects/[id]/mapping">, "par
             project.breakpoints.breakpoints.map((b) => [b.id, b.name]),
           )}
           figmaConnected={status.connected}
-          aiConfigured={isLLMConfigured()}
         />
       </EditGate>
     </>

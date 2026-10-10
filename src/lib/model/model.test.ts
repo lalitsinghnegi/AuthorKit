@@ -195,6 +195,38 @@ describe("FigmaLink", () => {
   ])("rejects non-Figma or insecure url %s", (url) => {
     expect(FigmaLink.safeParse(validLink({ url })).success).toBe(false);
   });
+
+  it("reads older files: keeps confirmed frames only and drops the old fields", () => {
+    const old = (
+      nodeId: string,
+      state: string,
+      componentId: string | null,
+      source = "pattern",
+    ) => ({
+      nodeId,
+      nodeName: nodeId,
+      path: nodeId,
+      componentId,
+      state,
+      source,
+      confidence: "high",
+    });
+    const link = FigmaLink.parse(
+      validLink({
+        scope: "global",
+        mappings: [
+          old("1:1", "confirmed", "header"),
+          old("1:2", "suggested", "footer"),
+          old("1:3", "ignored", null),
+          old("1:4", "confirmed", "accordion", "ai"),
+        ],
+      }),
+    );
+    expect(link.mappings).toEqual([
+      { nodeId: "1:1", nodeName: "1:1", path: "1:1", componentId: "header", source: "pattern" },
+      { nodeId: "1:4", nodeName: "1:4", path: "1:4", componentId: "accordion", source: "manual" },
+    ]);
+  });
 });
 
 describe("TokenFile", () => {

@@ -1,11 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { LLMProvider } from "@/lib/llm/provider";
 import { FigmaError } from "@/lib/figma/errors";
 import type { FigmaLink } from "@/lib/model";
 import { createProject, getProject, updateProject } from "@/lib/storage/projects";
 import { saveComponentPatterns } from "@/lib/storage/settings";
 import { FIXTURE_FILE_KEY, FIXTURE_URL, MockFigmaClient } from "@/test/figma/mockClient";
-import { MockLLMProvider } from "@/test/llm";
 import { withSignedIn } from "@/test/session";
 import { withTempDataDir } from "@/test/tempDataDir";
 
@@ -17,14 +15,7 @@ vi.mock("@/lib/figma/server", () => ({
     return figma;
   },
 }));
-let provider: LLMProvider | null = null;
-vi.mock("@/lib/llm/server", () => ({
-  getLLMProvider: () => provider,
-  isLLMConfigured: () => provider !== null,
-}));
-
-const { detectFramesAction, loadPreviewsAction, saveMappingsAction, suggestWithAIAction } =
-  await import("./actions");
+const { detectFramesAction, loadPreviewsAction, saveMappingsAction } = await import("./actions");
 
 withTempDataDir();
 withSignedIn("admin");
@@ -32,7 +23,6 @@ withSignedIn("admin");
 beforeEach(() => {
   connected = true;
   figma = new MockFigmaClient();
-  provider = null;
 });
 
 const link = (id: string, patch: Partial<FigmaLink>): FigmaLink => ({
@@ -60,7 +50,7 @@ const mapping = (links: FigmaLink[], nodeId: string) =>
   links.flatMap((l) => l.mappings ?? []).find((m) => m.nodeId === nodeId)!;
 
 describe("detectFramesAction", () => {
-  it("detects frames in linked nodes, suggests from names and notes whole-file links", async () => {
+  it("confirms clearly named frames, drops the rest and notes whole-file links", async () => {
     const id = await project([
       link("home", { nodeId: "4:1" }),
       link("btn", { scope: "component", pageName: undefined, nodeId: "3:1", componentId: "cta" }),
@@ -75,19 +65,19 @@ describe("detectFramesAction", () => {
 
     expect(mapping(result.links, "4:10")).toMatchObject({
       componentId: "header",
-      state: "suggested",
       source: "pattern",
+      reason: "Name is “header”",
     });
-    expect(mapping(result.links, "4:13")).toMatchObject({
-      componentId: null,
-      reason: "No name pattern matches",
-    });
+    // "Frame 12" matches no pattern, so it is not listed at all.
+    expect(mapping(result.links, "4:13")).toBeUndefined();
     // A component link's own frame is confirmed from the link.
     expect(mapping(result.links, "3:1")).toMatchObject({
       componentId: "cta",
-      state: "confirmed",
       source: "manual",
+      reason: "Set on the Figma link",
     });
+    const stored = result.links.flatMap((l) => l.mappings ?? []);
+    expect(stored.every((m) => !("state" in m) && !("confidence" in m))).toBe(true);
     expect((await getProject(id))!.figmaLinks).toEqual(result.links);
   });
 
@@ -97,25 +87,25 @@ describe("detectFramesAction", () => {
     const result = await detectFramesAction(id);
     expect(result.ok && mapping(result.links, "4:13")).toMatchObject({
       componentId: "accordion",
-      confidence: "high",
+      source: "pattern",
     });
   });
 
-  it("keeps decisions on re-detection", async () => {
+  it("keeps changed components on re-detection; removed frames come back if their name matches", async () => {
     const id = await project([link("home", { nodeId: "4:1" })]);
     await detectFramesAction(id);
-    await saveMappingsAction(id, [
-      { linkId: "home", nodeId: "4:13", componentId: "accordion", state: "confirmed" },
-      { linkId: "home", nodeId: "4:11", componentId: null, state: "ignored" },
+    const saved1 = await saveMappingsAction(id, [
+      { linkId: "home", nodeId: "4:10", componentId: "footer" },
+      { linkId: "home", nodeId: "4:15", componentId: null },
     ]);
+    expect(saved1.ok).toBe(true);
+    const saved = await getProject(id);
+    expect(mapping(saved!.figmaLinks, "4:15")).toBeUndefined();
+
     const again = await detectFramesAction(id);
     if (!again.ok) throw new Error(again.error);
-    expect(mapping(again.links, "4:13")).toMatchObject({
-      componentId: "accordion",
-      state: "confirmed",
-      source: "manual",
-    });
-    expect(mapping(again.links, "4:11").state).toBe("ignored");
+    expect(mapping(again.links, "4:10")).toMatchObject({ componentId: "footer", source: "manual" });
+    expect(mapping(again.links, "4:15")).toMatchObject({ source: "pattern" });
   });
 
   it("explains missing token and missing links", async () => {
@@ -132,18 +122,18 @@ describe("detectFramesAction", () => {
 });
 
 describe("loadPreviewsAction", () => {
-  it("renders previews for mapped frames, skipping ignored ones", async () => {
+  it("renders previews for mapped frames only", async () => {
     const id = await project([link("home", { nodeId: "4:1" })]);
     await detectFramesAction(id);
-    await saveMappingsAction(id, [
-      { linkId: "home", nodeId: "4:11", componentId: null, state: "ignored" },
-    ]);
+    expect(
+      (await saveMappingsAction(id, [{ linkId: "home", nodeId: "4:15", componentId: null }])).ok,
+    ).toBe(true);
     figma.calls.length = 0;
     const result = await loadPreviewsAction(id);
     if (!result.ok) throw new Error(result.error);
     const [call] = figma.calls;
     expect(call.method).toBe("getImages");
-    expect(call.args[1]).not.toContain("4:11");
+    expect(call.args[1]).not.toContain("4:15");
     expect(call.args[2]).toEqual({ format: "png", scale: 0.5 });
     expect(result.images["4:10"]).toBe(
       "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-10.png",
@@ -152,83 +142,14 @@ describe("loadPreviewsAction", () => {
   });
 });
 
-describe("suggestWithAIAction", () => {
-  it("is off without a provider", async () => {
-    expect(await suggestWithAIAction(await project([]))).toMatchObject({
-      ok: false,
-      error: expect.stringMatching(/ANTHROPIC_API_KEY/),
-    });
-  });
-
-  it("sends only ambiguous frames and stores answers as suggestions", async () => {
-    const mock = new MockLLMProvider((r) =>
-      r.frames.map((f) => ({
-        nodeId: f.nodeId,
-        componentId: f.nodeName === "Frame 12" ? ("accordion" as const) : null,
-        confidence: "high" as const,
-        reason: "From the AI",
-      })),
-    );
-    provider = mock;
-    const id = await project([link("home", { nodeId: "4:1" })]);
-    await detectFramesAction(id);
-    const result = await suggestWithAIAction(id);
-    if (!result.ok) throw new Error(result.error);
-
-    const sent = mock.requests[0].frames.map((f) => f.nodeName);
-    expect(sent).toContain("Frame 12");
-    expect(sent).not.toContain("Header");
-    expect(mock.requests[0].frames.find((f) => f.nodeName === "Frame 12")).toMatchObject({
-      childNames: ["Question 1", "Question 2"],
-      width: 1440,
-    });
-    expect(mock.requests[0].components.map((c) => c.id)).toEqual([
-      "global",
-      "header",
-      "footer",
-      "isi",
-      "modals",
-      "cta",
-      "accordion",
-    ]);
-    expect(mapping(result.links, "4:13")).toMatchObject({
-      componentId: "accordion",
-      source: "ai",
-      state: "suggested",
-      reason: "From the AI",
-    });
-    expect(mapping(result.links, "4:10")).toMatchObject({ source: "pattern" });
-  });
-
-  it("reports provider errors and does nothing when nothing is ambiguous", async () => {
-    provider = new MockLLMProvider({ fail: "rate_limited" });
-    const id = await project([link("home", { nodeId: "4:1" })]);
-    await detectFramesAction(id);
-    expect(await suggestWithAIAction(id)).toMatchObject({
-      ok: false,
-      error: expect.stringMatching(/rate-limiting/),
-    });
-
-    const quiet = await project([
-      link("btn", { scope: "component", pageName: undefined, nodeId: "3:10", componentId: "cta" }),
-    ]);
-    await detectFramesAction(quiet);
-    expect(await suggestWithAIAction(quiet)).toMatchObject({
-      ok: true,
-      suggested: 0,
-      notes: ["No ambiguous frames to ask about."],
-    });
-  });
-});
-
 describe("saveMappingsAction", () => {
-  it("applies decisions and keeps a component link in sync", async () => {
+  it("changes a component and keeps a component link in sync", async () => {
     const id = await project([
       link("btn", { scope: "component", pageName: undefined, nodeId: "3:1", componentId: "cta" }),
     ]);
     await detectFramesAction(id);
     const result = await saveMappingsAction(id, [
-      { linkId: "btn", nodeId: "3:1", componentId: "modals", state: "confirmed" },
+      { linkId: "btn", nodeId: "3:1", componentId: "modals" },
     ]);
     if (!result.ok) throw new Error(result.error);
     expect(result.links[0].componentId).toBe("modals");
@@ -240,40 +161,17 @@ describe("saveMappingsAction", () => {
   });
 
   it.each([
-    [
-      { linkId: "home", nodeId: "4:13", componentId: null, state: "confirmed" as const },
-      /Choose a component/,
-    ],
-    [
-      {
-        linkId: "home",
-        nodeId: "4:13",
-        componentId: "carousel" as never,
-        state: "suggested" as const,
-      },
-      /Unknown component/,
-    ],
-    [{ linkId: "home", nodeId: "9:9", componentId: null, state: "ignored" as const }, /not found/],
-    [{ linkId: "nope", nodeId: "4:13", componentId: null, state: "ignored" as const }, /not found/],
+    [{ linkId: "home", nodeId: "4:10", componentId: "carousel" as never }, /Unknown component/],
+    // Only listed (confirmed) frames can change; "Frame 12" (4:13) was never confirmed.
+    [{ linkId: "home", nodeId: "4:13", componentId: "accordion" as const }, /not found/],
+    [{ linkId: "home", nodeId: "9:9", componentId: null }, /not found/],
+    [{ linkId: "nope", nodeId: "4:10", componentId: null }, /not found/],
   ])("rejects %j", async (edit, error) => {
     const id = await project([link("home", { nodeId: "4:1" })]);
     await detectFramesAction(id);
     expect(await saveMappingsAction(id, [edit])).toMatchObject({
       ok: false,
       error: expect.stringMatching(error),
-    });
-  });
-});
-
-describe("AI request budget", () => {
-  it("refuses AI suggestions once the per-user budget is spent", async () => {
-    const { AI_BUDGET, spend } = await import("@/lib/security/rateLimit");
-    const { getCurrentUser } = await import("@/lib/auth/session");
-    const me = (await getCurrentUser())!;
-    for (let i = 0; i < AI_BUDGET.max; i++) spend(AI_BUDGET, me.id);
-    expect(await suggestWithAIAction("any-project")).toEqual({
-      ok: false,
-      error: AI_BUDGET.message,
     });
   });
 });

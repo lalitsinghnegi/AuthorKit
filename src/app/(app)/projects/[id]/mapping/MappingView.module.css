@@ -9,29 +9,6 @@
   font-size: 0.9rem;
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.filter {
-  font: inherit;
-  font-size: 0.85rem;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--ui-border);
-  background: var(--ui-surface);
-  color: var(--ui-fg);
-  cursor: pointer;
-}
-
-.filter[aria-pressed="true"] {
-  background: var(--ui-accent);
-  border-color: var(--ui-accent);
-  color: var(--ui-accent-fg);
-}
-
 .linkMeta {
   margin-left: 10px;
   font-size: 0.8rem;
@@ -55,13 +32,9 @@
   padding: 8px;
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius);
-}
-
-.frame[data-state="confirmed"] {
   border-left: 4px solid #2e7d32;
 }
 
-.frame[data-state="ignored"],
 .frame[data-missing] {
   opacity: 0.55;
 }
@@ -114,48 +87,9 @@
   color: var(--ui-muted);
 }
 
-.badge {
-  display: inline-block;
-  margin-right: 6px;
-  padding: 0 6px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  background: var(--ui-bg);
-  border: 1px solid var(--ui-border);
-}
-
-.badge[data-source="ai"] {
-  background: #ede7fb;
-  color: #4a2a9a;
-}
-
-.badge[data-confidence="high"] {
-  background: #e6f4ea;
-  color: #1e5e2a;
-}
-
-.badge[data-confidence="low"] {
-  background: #fff4d6;
-  color: #7a5200;
-}
-
 .controls {
   display: grid;
   gap: 6px;
-}
-
-.state {
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.state[data-state="confirmed"] {
-  color: #2e7d32;
-}
-
-.state[data-state="suggested"] {
-  color: #9a6700;
 }
 
 .buttons {

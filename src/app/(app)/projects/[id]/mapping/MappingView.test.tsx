@@ -7,25 +7,24 @@ import { MappingView } from "./MappingView";
 
 const detect = vi.fn();
 const previews = vi.fn();
-const ai = vi.fn();
 const save = vi.fn();
 vi.mock("./actions", () => ({
   detectFramesAction: (...a: unknown[]) => detect(...a),
   loadPreviewsAction: (...a: unknown[]) => previews(...a),
-  suggestWithAIAction: (...a: unknown[]) => ai(...a),
   saveMappingsAction: (...a: unknown[]) => save(...a),
 }));
 
-const m = (nodeId: string, nodeName: string, patch: Partial<FrameMapping> = {}): FrameMapping => ({
+const m = (
+  nodeId: string,
+  nodeName: string,
+  componentId: FrameMapping["componentId"],
+): FrameMapping => ({
   nodeId,
   nodeName,
   path: `Home › ${nodeName}`,
-  componentId: null,
-  state: "suggested",
+  componentId,
   source: "pattern",
-  confidence: "low",
-  reason: "No name pattern matches",
-  ...patch,
+  reason: `Name is “${nodeName.toLowerCase()}”`,
 });
 
 const links: FigmaLink[] = [
@@ -38,20 +37,16 @@ const links: FigmaLink[] = [
     fileKey: "AbCdEf1234567890XyZ012",
     nodeId: "4:1",
     breakpointId: "d",
-    mappings: [
-      m("4:10", "Header", {
-        componentId: "header",
-        confidence: "high",
-        reason: "Name is “header”",
-      }),
-      m("4:13", "Frame 12"),
-      m("4:15", "Footer", {
-        componentId: "footer",
-        state: "confirmed",
-        confidence: "high",
-        reason: "Name is “footer”",
-      }),
-    ],
+    mappings: [m("4:10", "Header", "header"), m("4:15", "Footer", "footer")],
+  },
+  {
+    id: "about",
+    label: "About",
+    scope: "page",
+    pageName: "About",
+    url: "https://www.figma.com/design/AbCdEf1234567890XyZ012/x?node-id=7-1",
+    fileKey: "AbCdEf1234567890XyZ012",
+    nodeId: "7:1",
   },
 ];
 
@@ -65,7 +60,6 @@ function setup(props: Partial<React.ComponentProps<typeof MappingView>> = {}) {
       initialLinks={links}
       breakpoints={{ d: "desktop" }}
       figmaConnected
-      aiConfigured
       {...props}
     />,
   );
@@ -75,64 +69,51 @@ const row = (name: string) => screen.getByText(name, { selector: "div" }).closes
 
 beforeEach(() => {
   document.body.innerHTML = "";
-  [detect, previews, ai, save].forEach((f) => f.mockReset());
+  [detect, previews, save].forEach((f) => f.mockReset());
   vi.spyOn(window, "confirm").mockReturnValue(true);
 });
 
 describe("MappingView", () => {
-  it("shows each link's frames with suggestions, badges and states", () => {
+  it("lists only confirmed frames, with no suggestion states, filters or AI", () => {
     const { panel } = setup();
     expect(screen.getByRole("heading", { name: /Home desktop/ })).toHaveTextContent(
       "Page: Home · desktop",
     );
     expect(within(row("Header")).getByText("Name is “header”")).toBeInTheDocument();
     expect(within(row("Header")).getByLabelText("Component for Header")).toHaveValue("header");
-    expect(within(row("Footer")).getByText("Confirmed")).toBeInTheDocument();
-    expect(panel.getByRole("button", { name: "Ask AI about ambiguous (1)" })).toBeEnabled();
+    expect(screen.getByText(/No confirmed frames/)).toBeInTheDocument();
+    for (const gone of [/Suggested/, /Confirm/, /Ignore/, /AI/, /Needs a decision/])
+      expect(screen.queryByText(gone)).not.toBeInTheDocument();
+    expect(panel.queryByRole("button", { name: /AI/ })).not.toBeInTheDocument();
+    expect(panel.getByRole("button", { name: "Save" })).toBeDisabled();
   });
 
-  it("filters frames", () => {
-    setup();
-    fireEvent.click(screen.getByRole("button", { name: "Confirmed (1)" }));
-    expect(screen.queryByText("Header", { selector: "div" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Ambiguous (1)" }));
-    expect(screen.getByText("Frame 12", { selector: "div" })).toBeInTheDocument();
-    expect(screen.queryByText("Footer", { selector: "div" })).not.toBeInTheDocument();
-  });
-
-  it("confirms, ignores, changes and undoes", () => {
-    const { panel } = setup();
-    expect(
-      within(row("Frame 12")).getByRole("button", { name: "Confirm Frame 12" }),
-    ).toBeDisabled();
-    fireEvent.change(within(row("Frame 12")).getByLabelText("Component for Frame 12"), {
-      target: { value: "accordion" },
-    });
-    expect(within(row("Frame 12")).getByText("Confirmed")).toBeInTheDocument();
-    expect(within(row("Frame 12")).getByText("You")).toBeInTheDocument();
-    fireEvent.click(within(row("Header")).getByRole("button", { name: "Ignore Header" }));
-    expect(within(row("Header")).getByText("Ignored")).toBeInTheDocument();
-    fireEvent.click(within(row("Header")).getByRole("button", { name: "Undo Header" }));
-    expect(within(row("Header")).getByText("Suggested")).toBeInTheDocument();
-    expect(panel.getByText("Unsaved changes")).toBeInTheDocument();
-  });
-
-  it("confirms all high-confidence suggestions and saves", async () => {
+  it("changes a component and removes a frame, then saves only the changes", async () => {
     save.mockImplementation(async () => ({ ok: true, links, notes: [] }));
     const { panel } = setup();
-    fireEvent.click(panel.getByRole("button", { name: "Confirm all high-confidence" }));
-    expect(within(row("Header")).getByText("Confirmed")).toBeInTheDocument();
-    expect(within(row("Frame 12")).getByText("Suggested")).toBeInTheDocument();
+    fireEvent.change(within(row("Header")).getByLabelText("Component for Header"), {
+      target: { value: "isi" },
+    });
+    expect(within(row("Header")).getByText("Set by you")).toBeInTheDocument();
+    fireEvent.click(within(row("Footer")).getByRole("button", { name: "Remove Footer" }));
+    expect(screen.queryByText("Footer", { selector: "div" })).not.toBeInTheDocument();
+    expect(panel.getByText("Unsaved changes")).toBeInTheDocument();
     await act(async () => {
       fireEvent.click(panel.getByRole("button", { name: "Save" }));
     });
-    expect(save.mock.calls[0][1]).toContainEqual({
-      linkId: "home",
-      nodeId: "4:10",
-      componentId: "header",
-      state: "confirmed",
-    });
+    expect(save.mock.calls[0][1]).toEqual([
+      { linkId: "home", nodeId: "4:10", componentId: "isi" },
+      { linkId: "home", nodeId: "4:15", componentId: null },
+    ]);
     expect(screen.getByText("Mappings saved.")).toBeInTheDocument();
+  });
+
+  it("discards changes", () => {
+    const { panel } = setup();
+    fireEvent.click(within(row("Footer")).getByRole("button", { name: "Remove Footer" }));
+    fireEvent.click(panel.getByRole("button", { name: "Discard changes" }));
+    expect(row("Footer")).toBeInTheDocument();
+    expect(panel.queryByText("Unsaved changes")).not.toBeInTheDocument();
   });
 
   it("loads previews from allowed hosts only", async () => {
@@ -140,7 +121,7 @@ describe("MappingView", () => {
       ok: true,
       images: {
         "4:10": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-10.png",
-        "4:13": "https://evil.com/x.png",
+        "4:15": "https://evil.com/x.png",
       },
     });
     const { panel } = setup();
@@ -151,30 +132,21 @@ describe("MappingView", () => {
       "src",
       "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4-10.png",
     );
-    expect(row("Frame 12").querySelector("img")).toBeNull();
+    expect(row("Footer").querySelector("img")).toBeNull();
   });
 
-  it("detects frames and asks AI, showing results and notes", async () => {
+  it("detects frames and shows the count and notes", async () => {
     detect.mockResolvedValue({ ok: true, links, notes: ["“file” links to a whole file."] });
-    ai.mockResolvedValue({ ok: true, links, suggested: 2, notes: [] });
     const { panel } = setup();
     await act(async () => {
       fireEvent.click(panel.getByRole("button", { name: "Detect frames" }));
     });
-    expect(screen.getByText("Frames detected.")).toBeInTheDocument();
+    expect(screen.getByText("Frames detected: 2 confirmed.")).toBeInTheDocument();
     expect(screen.getByText("“file” links to a whole file.")).toBeInTheDocument();
-    await act(async () => {
-      fireEvent.click(panel.getByRole("button", { name: "Ask AI about ambiguous (1)" }));
-    });
-    expect(
-      screen.getByText("AI suggested components for 2 frames. Review and confirm them."),
-    ).toBeInTheDocument();
   });
 
-  it("disables AI and detection when they are not configured", () => {
-    const { panel } = setup({ aiConfigured: false, figmaConnected: false });
-    expect(panel.getByRole("button", { name: "Ask AI about ambiguous (1)" })).toBeDisabled();
+  it("disables detection without a Figma connection", () => {
+    const { panel } = setup({ figmaConnected: false });
     expect(panel.getByRole("button", { name: "Detect frames" })).toBeDisabled();
-    expect(panel.getByText("AI suggestions are off.")).toBeInTheDocument();
   });
 });

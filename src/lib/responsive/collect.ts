@@ -17,12 +17,10 @@ export type FrameRef = {
 export function collectFrameRefs(project: Project): FrameRef[] {
   const refs: FrameRef[] = [];
   for (const link of project.figmaLinks) {
-    const confirmed = (link.mappings ?? []).filter(
-      (m) => m.state === "confirmed" && m.componentId && !m.missing,
-    );
+    const confirmed = (link.mappings ?? []).filter((m) => !m.missing);
     for (const m of confirmed) {
       refs.push({
-        target: m.componentId === "global" ? "typography" : m.componentId!,
+        target: m.componentId === "global" ? "typography" : m.componentId,
         linkId: link.id,
         fileKey: link.fileKey,
         nodeId: m.nodeId,

@@ -30,7 +30,6 @@ const confirmed = (nodeId: string, componentId: FrameMapping["componentId"]): Fr
   nodeName: nodeId,
   path: nodeId,
   componentId,
-  state: "confirmed",
   source: "manual",
 });
 
