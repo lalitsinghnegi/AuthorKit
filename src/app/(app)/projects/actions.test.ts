@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 import { readAudit } from "@/lib/audit/log";
 import { withSignedIn } from "@/test/session";
 import { withTempDataDir } from "@/test/tempDataDir";
-import { exportProject, listProjects } from "@/lib/storage/projects";
+import { exportProject, getProject, listProjects } from "@/lib/storage/projects";
+import { saveScaffoldTemplate } from "@/lib/storage/scaffoldTemplates";
+import { BASIC_PRESET } from "@/lib/scaffold";
+import { withoutIds } from "@/lib/breakpoints/presets";
 
 class Redirect extends Error {}
 vi.mock("next/navigation", () => ({
@@ -39,6 +42,45 @@ describe("createProjectAction", () => {
     const [entry] = (await readAudit()).entries;
     expect(entry).toMatchObject({ action: "project.create", actor: { email: me().email } });
     expect((await listProjects()).projects[0]).toMatchObject({ name: "Launch", prefix: "acme" });
+  });
+
+  it("starts the project with the chosen template's folders and breakpoints", async () => {
+    await saveScaffoldTemplate({
+      ...BASIC_PRESET,
+      id: "wide",
+      name: "Wide",
+      builtIn: false,
+      breakpoints: {
+        breakpoints: [
+          { id: "s", name: "small", maxWidth: 599 },
+          { id: "l", name: "large", minWidth: 600 },
+        ],
+      },
+    });
+    await expect(createProjectAction({}, form({ ...valid, templateId: "wide" }))).rejects.toThrow(
+      Redirect,
+    );
+    const project = (await getProject((await listProjects()).projects[0].id))!;
+    expect(withoutIds(project.breakpoints.breakpoints)).toEqual([
+      { name: "small", maxWidth: 599 },
+      { name: "large", minWidth: 600 },
+    ]);
+    // Fresh ids, not the template's.
+    expect(project.breakpoints.breakpoints.map((b) => b.id)).not.toContain("s");
+    expect(project.scaffold.children.map((c) => c.name)).toEqual(["css"]);
+    expect(project.scaffold.name).toBe("acme");
+  });
+
+  it("uses the Component-based template by default and rejects unknown templates", async () => {
+    const bad = await createProjectAction({}, form({ ...valid, templateId: "nope" }));
+    expect(bad.errors?.templateId).toEqual(["This template no longer exists."]);
+    await expect(createProjectAction({}, form(valid))).rejects.toThrow(Redirect);
+    const project = (await getProject((await listProjects()).projects[0].id))!;
+    expect(project.breakpoints.breakpoints.map((b) => b.name)).toEqual([
+      "mobile",
+      "tablet",
+      "desktop",
+    ]);
   });
 
   it("validates and stores the optional site URL", async () => {

@@ -1,7 +1,7 @@
 import stylelint from "stylelint";
 import { describe, expect, it } from "vitest";
 import { CSS_TEMPLATE_IDS, type Breakpoint, type CssTemplateId } from "@/lib/model";
-import { BREAKPOINT_PRESETS } from "@/lib/breakpoints";
+import { STANDARD_BREAKPOINTS } from "@/lib/breakpoints";
 import { analyzeCss, literalDesignValues } from "./analyze";
 import { cascade } from "./cascade";
 import { contrastRatio } from "./contrast";
@@ -12,9 +12,15 @@ import { getManifests, rawManifests } from "./registry";
 import { renderTemplate } from "./render";
 import { outputStylelintConfig } from "./stylelintConfig";
 
-const preset = (id: string): Breakpoint[] =>
-  BREAKPOINT_PRESETS.find((p) => p.id === id)!.breakpoints.map((b) => ({ ...b, id: b.name }));
-const threeStep = preset("three-step");
+const withNames = (list: readonly Omit<Breakpoint, "id">[]): Breakpoint[] =>
+  list.map((b) => ({ ...b, id: b.name }));
+const threeStep = withNames(STANDARD_BREAKPOINTS);
+const fourStep = withNames([
+  { name: "mobile", maxWidth: 767 },
+  { name: "tablet", minWidth: 768, maxWidth: 1023 },
+  { name: "desktop", minWidth: 1024, maxWidth: 1439 },
+  { name: "large", minWidth: 1440 },
+]);
 
 const ctxFor = (
   approach: "mobile-first" | "desktop-first",
@@ -42,7 +48,7 @@ describe("cascade", () => {
     expect(steps.map((s) => [s.name, s.condition, s.changed])).toEqual([
       ["mobile", null, { a: "1", b: "x" }],
       ["tablet", "(min-width: 768px)", { a: "2" }],
-      ["desktop", "(min-width: 1024px)", { b: "y" }],
+      ["desktop", "(min-width: 986px)", { b: "y" }],
     ]);
   });
 
@@ -51,7 +57,7 @@ describe("cascade", () => {
     expect(base).toEqual({ a: "2", b: "y" });
     expect(steps.map((s) => [s.name, s.condition, s.changed])).toEqual([
       ["desktop", null, { a: "2", b: "y" }],
-      ["tablet", "(max-width: 1023px)", { b: "x" }],
+      ["tablet", "(max-width: 985px)", { b: "x" }],
       ["mobile", "(max-width: 767px)", { a: "1" }],
     ]);
   });
@@ -150,10 +156,10 @@ describe("responsive hooks", () => {
     const css = renderTemplate("tokens", ctxFor("mobile-first"));
     expect(css).toContain("--ak-font-size-h1: 32px;");
     expect(css).toContain(
-      "/* @authorkit-responsive tokens · tablet (768px – 1023px): no overrides */",
+      "/* @authorkit-responsive tokens · tablet (768px – 985px): no overrides */",
     );
     expect(css).toMatch(
-      /\/\* @authorkit-responsive tokens · desktop \(≥ 1024px\) \*\/\n@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 44px;/,
+      /\/\* @authorkit-responsive tokens · desktop \(≥ 986px\) \*\/\n@media \(min-width: 986px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 44px;/,
     );
   });
 
@@ -161,7 +167,7 @@ describe("responsive hooks", () => {
     const css = renderTemplate("tokens", ctxFor("desktop-first"));
     expect(css).toContain("--ak-font-size-h1: 44px;");
     expect(css).toMatch(
-      /@media \(max-width: 1023px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 32px;/,
+      /@media \(max-width: 985px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 32px;/,
     );
     // Mobile inherits the tablet override through the cascade, so it adds nothing.
     expect(css).toContain("/* @authorkit-responsive tokens · mobile (≤ 767px): no overrides */");
@@ -171,18 +177,18 @@ describe("responsive hooks", () => {
     const mobile = renderTemplate("header", ctxFor("mobile-first"));
     expect(mobile).toContain("--ak-header-toggle-display: inline-flex;");
     expect(mobile).toMatch(
-      /@media \(min-width: 1024px\) \{\n {2}\.ak-header \{\n {4}--ak-header-toggle-display: none;/,
+      /@media \(min-width: 986px\) \{\n {2}\.ak-header \{\n {4}--ak-header-toggle-display: none;/,
     );
 
     const desktop = renderTemplate("header", ctxFor("desktop-first"));
     expect(desktop).toContain("--ak-header-toggle-display: none;");
     expect(desktop).toMatch(
-      /@media \(max-width: 1023px\) \{\n {2}\.ak-header \{\n {4}--ak-header-toggle-display: inline-flex;/,
+      /@media \(max-width: 985px\) \{\n {2}\.ak-header \{\n {4}--ak-header-toggle-display: inline-flex;/,
     );
   });
 
   it("the four-step preset treats desktop and large as large screens", () => {
-    const css = renderTemplate("tokens", ctxFor("mobile-first", "ak", preset("four-step")));
+    const css = renderTemplate("tokens", ctxFor("mobile-first", "ak", fourStep));
     expect(css).toContain("@media (min-width: 1024px)");
     expect(css).toContain("/* @authorkit-responsive tokens · large (≥ 1440px): no overrides */");
   });

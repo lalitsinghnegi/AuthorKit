@@ -159,6 +159,7 @@ describe.skipIf(!ENABLED)("AuthorKit in a real browser", () => {
       `${p}/styleguide`,
       "/templates",
       "/templates/scaffolds/basic",
+      "/templates/scaffolds/basic/breakpoints",
       "/settings",
       "/settings/users",
       "/settings/audit",

@@ -143,7 +143,7 @@ describe("Figma link actions", () => {
 
     const result = await saveBreakpointsAction(project.id, {
       approach: "mobile-first",
-      breakpoints: { breakpoints: [{ ...mobile, maxWidth: 1023 }, desktop] },
+      breakpoints: { breakpoints: [{ ...mobile, maxWidth: 985 }, desktop] },
     });
     expect(result).toEqual({
       ok: false,

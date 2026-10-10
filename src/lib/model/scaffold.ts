@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CssTemplateId } from "./cssTemplate";
+import { BreakpointSet } from "./breakpoints";
 import { Id, SchemaVersion } from "./common";
 
 // Basic safe-name rule; the scaffold designer (Prompt 4) adds friendlier validation.
@@ -93,6 +94,15 @@ export function treeIdsAreUnique(tree: ScaffoldTree): boolean {
   return new Set(ids).size === ids.length;
 }
 
+/** The standard set, with stable ids; templates saved before breakpoints existed get it. */
+export const STANDARD_TEMPLATE_BREAKPOINTS: BreakpointSet = {
+  breakpoints: [
+    { id: "mobile", name: "mobile", maxWidth: 767 },
+    { id: "tablet", name: "tablet", minWidth: 768, maxWidth: 985 },
+    { id: "desktop", name: "desktop", minWidth: 986 },
+  ],
+};
+
 export const ScaffoldTemplate = z.object({
   schemaVersion: SchemaVersion,
   id: z.string().regex(/^[a-z0-9-]{1,64}$/),
@@ -100,6 +110,11 @@ export const ScaffoldTemplate = z.object({
   description: z.string().max(500).optional(),
   builtIn: z.boolean(),
   tree: ScaffoldTree.refine(treeIdsAreUnique, "Node ids must be unique"),
+  /** Breakpoints a project can take from this template (new projects start with them). */
+  breakpoints: z.preprocess(
+    (value) => value ?? structuredClone(STANDARD_TEMPLATE_BREAKPOINTS),
+    BreakpointSet,
+  ),
 });
 export type ScaffoldTemplate = z.infer<typeof ScaffoldTemplate>;
 

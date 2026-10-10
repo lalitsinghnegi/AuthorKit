@@ -15,7 +15,7 @@ The build is driven step by step from `docs/BUILD_PROMPTS.md`. Work on one numbe
    - `modals.css`
    - `cta.css`: primary, secondary and tertiary buttons
    - `accordion.css`
-4. **Responsive output.** Generated CSS includes media queries built from the admin-defined breakpoints (for example mobile `max-width: 767px`, tablet `768px`–`1023px`, desktop `min-width: 1024px`).
+4. **Responsive output.** Generated CSS includes media queries built from the admin-defined breakpoints (for example mobile `max-width: 767px`, tablet `768px`–`985px`, desktop `min-width: 986px`).
 5. **Living style guide.** The preview of the generated CSS doubles as a developer style guide. For every component it shows the rendered HTML with the correct classes, a table of selectors, modifiers and states, and copyable code, so developers can apply the same classes to their AEM components. The style guide is generated from the **same component manifest** as the CSS, so the two never drift apart.
 
 ## Admin UI layout
@@ -54,7 +54,7 @@ Rules:
 
 - **Templates:** `src/templates/css/<id>.css.hbs`, Handlebars with `strict` and `noEscape`. Shared partials (`fileHeader`, `responsive`) live in `src/templates/partials/`.
 - **Manifests:** `src/templates/manifests/<id>.json`, validated by `ComponentManifest`.
-- **Default values:** `src/templates/defaults/tokens.json`, including large-screen (≥ 1024px) overrides for tokens and component layout variables.
+- **Default values:** `src/templates/defaults/tokens.json`, including large-screen (≥ 986px, `largeScreen.minWidth`) overrides for tokens and component layout variables.
 - **Rendering:** `renderTemplate(id, buildTemplateContext(...))` in `src/lib/templates/render.ts`. It reads files with `fs`, so import it only on the server. `@/lib/templates` (the index) is safe anywhere.
 - **Responsive values:** per-breakpoint values go through `cascade()`. Base styles use the base breakpoint's values (smallest for mobile-first, largest for desktop-first). Each media query only holds what changed since the previous step, and every non-base breakpoint gets an `@authorkit-responsive` marker comment.
 - **Rules the tests enforce:**
@@ -255,6 +255,8 @@ Rules:
   - `data/projects/<project-id>/project.json` holds the brand, prefix, optional site URL (`SiteUrl`: http(s), no credentials) and extra site pages, approach, breakpoints, scaffold tree, CSS file selection, Figma links, mappings and accepted tokens.
   - `data/users.json` holds users (scrypt hashes, never passwords), and `data/audit.log` holds the audit trail.
   - `data/scaffold-templates/*.json` holds the scaffold presets. Built-in presets (Basic, Component-based) live in code (`src/lib/scaffold/presets.ts`), can't be changed or deleted, and are merged into listings.
+  - **Templates carry breakpoints** (`ScaffoldTemplate.breakpoints`). Built-ins have the standard set (`STANDARD_TEMPLATE_BREAKPOINTS`: mobile ≤767, tablet 768–985, desktop ≥986); files saved without breakpoints read as the standard set. Custom templates edit theirs at `/templates/scaffolds/[id]/breakpoints` (the shared `BreakpointEditor` without the approach section). "Save as preset" from a project takes the project's breakpoints.
+  - **Projects take them:** the New project form picks a template (default Component-based) for both folders and breakpoints, and the project Breakpoints screen has "Apply from template". `takeBreakpoints` reuses ids by name so Figma links tagged with a breakpoint keep working.
 - **Generated output is never stored.** CSS, the style guide and the zip are rendered on demand in memory and streamed to the browser. There is no generation history, no stored zips and no run diffs.
 - **Schemas** live in `src/lib/model/` (zod, one file per entity). Repositories in `src/lib/storage/` are the only code that reads or writes `data/`.
 - **Atomic writes.** Write to a temp file, then rename. A single repository module (`src/lib/storage/`) owns all file access. Validate with zod on every read and write.

@@ -113,7 +113,7 @@ describe("GET /api/projects/[id]/package", () => {
     expect(tokens).toContain("--acme-color-text: #1f2329;"); // still to review → default
     const footer = await zip.file("acme-health/css/components/footer.css")!.async("string");
     expect(footer).toMatch(
-      /@media \(min-width: 1024px\) \{\n {2}\.acme-footer \{[\s\S]*--acme-footer-gap: 32px;/,
+      /@media \(min-width: 986px\) \{\n {2}\.acme-footer \{[\s\S]*--acme-footer-gap: 32px;/,
     );
   });
 

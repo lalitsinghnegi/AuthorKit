@@ -24,6 +24,9 @@ async function Actions({ params }: Pick<PageProps<"/templates/scaffolds/[id]">, 
 
   return (
     <PanelSection title="Preset">
+      <PanelLink href={`/templates/scaffolds/${preset.id}/breakpoints`} variant="secondary">
+        Breakpoints
+      </PanelLink>
       {admin && (
         <ConfirmSubmit
           action={duplicateScaffoldTemplateAction.bind(null, preset.id)}

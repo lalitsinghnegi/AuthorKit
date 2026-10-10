@@ -113,3 +113,68 @@ describe("scaffold preset actions", () => {
     );
   });
 });
+
+describe("template breakpoints", () => {
+  const wide = {
+    breakpoints: [
+      { id: "s", name: "small", maxWidth: 599 },
+      { id: "m", name: "medium", minWidth: 600, maxWidth: 1199 },
+      { id: "l", name: "large", minWidth: 1200 },
+    ],
+  };
+
+  it("built-ins carry the standard set; duplicates copy the source's breakpoints", async () => {
+    expect(BASIC_PRESET.breakpoints.breakpoints.map((b) => b.name)).toEqual([
+      "mobile",
+      "tablet",
+      "desktop",
+    ]);
+    await redirectTarget(actions.duplicateScaffoldTemplateAction("basic"));
+    expect((await getScaffoldTemplate("basic-copy"))?.breakpoints).toEqual(
+      BASIC_PRESET.breakpoints,
+    );
+  });
+
+  it("saves a custom template's breakpoints, refusing built-ins and overlaps", async () => {
+    await redirectTarget(actions.createScaffoldTemplateAction());
+    expect(
+      await actions.saveTemplateBreakpointsAction("new-preset", { breakpoints: wide }),
+    ).toEqual({
+      ok: true,
+      savedAt: expect.any(String),
+    });
+    expect((await getScaffoldTemplate("new-preset"))?.breakpoints).toEqual(wide);
+
+    expect(
+      await actions.saveTemplateBreakpointsAction("basic", { breakpoints: wide }),
+    ).toMatchObject({
+      ok: false,
+      error: expect.stringMatching(/read-only/),
+    });
+    const overlap = structuredClone(wide);
+    overlap.breakpoints[1].maxWidth = 1200;
+    expect(
+      await actions.saveTemplateBreakpointsAction("new-preset", { breakpoints: overlap }),
+    ).toMatchObject({
+      ok: false,
+      error: expect.stringMatching(/both match 1200px/),
+    });
+  });
+
+  it("imports older files without breakpoints with the standard set, and rejects bad ones", async () => {
+    // JSON leaves out undefined fields, so this is a file saved before breakpoints existed.
+    const old = { ...BASIC_PRESET, builtIn: false, breakpoints: undefined };
+    const file = (template: object) =>
+      fileForm(JSON.stringify({ schemaVersion: 1, kind: "authorkit-scaffold", template }));
+    await redirectTarget(actions.importScaffoldTemplateAction({}, file(old)));
+    expect((await getScaffoldTemplate("basic-2"))?.breakpoints).toEqual(BASIC_PRESET.breakpoints);
+
+    const gap = structuredClone(wide);
+    gap.breakpoints[1].minWidth = 700;
+    const result = await actions.importScaffoldTemplateAction(
+      {},
+      file({ ...old, breakpoints: gap }),
+    );
+    expect(result.error).toMatch(/Preset file is invalid\. .*600/);
+  });
+});

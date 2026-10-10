@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultScaffold } from "@/lib/model/defaults";
-import type { ScaffoldTemplate } from "@/lib/model";
+import { STANDARD_TEMPLATE_BREAKPOINTS, type ScaffoldTemplate } from "@/lib/model";
 import { withTempDataDir } from "@/test/tempDataDir";
 import {
   availableTemplateId,
@@ -18,6 +18,7 @@ const template = (id: string, name: string): ScaffoldTemplate => ({
   name,
   builtIn: false,
   tree: defaultScaffold("root"),
+  breakpoints: STANDARD_TEMPLATE_BREAKPOINTS,
 });
 
 describe("scaffold templates repository", () => {

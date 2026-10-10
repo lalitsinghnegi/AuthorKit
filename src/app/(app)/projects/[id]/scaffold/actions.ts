@@ -31,12 +31,16 @@ export async function saveProjectScaffoldAction(
   return { ok: true };
 }
 
+/** Save the project's folders as a new preset; the project's breakpoints come along. */
 export async function saveScaffoldAsPresetAction(
+  projectId: string,
   name: string,
   tree: unknown,
 ): Promise<SaveAsPresetResult> {
   const auth = await checkAdmin();
   if (!auth.user) return { ok: false, error: auth.denied };
+  const project = await getProject(projectId);
+  if (!project) return { ok: false, error: "This project no longer exists." };
   const trimmed = String(name ?? "").trim();
   if (!trimmed || trimmed.length > 80)
     return { ok: false, error: "Preset name must be 1–80 characters." };
@@ -49,6 +53,7 @@ export async function saveScaffoldAsPresetAction(
     name: trimmed,
     builtIn: false,
     tree: cloneWithNewIds(checked.tree),
+    breakpoints: project.breakpoints,
   });
   await audit(actorOf(auth.user), {
     action: "preset.create",

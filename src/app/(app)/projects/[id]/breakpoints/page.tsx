@@ -3,8 +3,11 @@ import { Suspense } from "react";
 import { EditGate } from "@/components/ReadOnly/EditGate";
 import { PageHeader } from "@/components/PageHeader";
 import ui from "@/components/ui/ui.module.css";
+import { BreakpointEditor } from "@/components/BreakpointEditor/BreakpointEditor";
+import { withoutIds } from "@/lib/breakpoints/presets";
 import { getProject } from "@/lib/storage/projects";
-import { BreakpointEditor } from "./BreakpointEditor";
+import { listScaffoldTemplates } from "@/lib/storage/scaffoldTemplates";
+import { saveBreakpointsAction } from "./actions";
 
 export default function BreakpointsPage({ params }: PageProps<"/projects/[id]/breakpoints">) {
   return (
@@ -16,21 +19,26 @@ export default function BreakpointsPage({ params }: PageProps<"/projects/[id]/br
 
 async function Loader({ params }: Pick<PageProps<"/projects/[id]/breakpoints">, "params">) {
   const { id } = await params;
-  const project = await getProject(id);
+  const [project, templates] = await Promise.all([getProject(id), listScaffoldTemplates()]);
   if (!project) notFound();
 
   return (
     <>
       <PageHeader
         title="Breakpoints"
-        description={`Screen-size ranges for ${project.name}. Generated CSS uses these for its media queries.`}
+        description={`Screen-size ranges for ${project.name}. Generated CSS uses these for its media queries. Use "Apply from template" to take a template's breakpoints.`}
       />
       <EditGate>
         <BreakpointEditor
-          projectId={project.id}
           initialApproach={project.approach}
           initialBreakpoints={project.breakpoints.breakpoints}
           prefix={project.prefix}
+          templates={templates.map((t) => ({
+            id: t.id,
+            name: t.name,
+            breakpoints: withoutIds(t.breakpoints.breakpoints),
+          }))}
+          onSave={saveBreakpointsAction.bind(null, project.id)}
         />
       </EditGate>
     </>

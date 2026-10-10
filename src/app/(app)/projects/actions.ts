@@ -6,9 +6,10 @@ import { audit } from "@/lib/audit/log";
 import { actorOf, checkAdmin, requireAdmin } from "@/lib/auth/session";
 import { ProjectInput } from "@/lib/model";
 import { createProject, deleteProject, importProject } from "@/lib/storage/projects";
+import { getScaffoldTemplate } from "@/lib/storage/scaffoldTemplates";
 
 export type FormState = {
-  errors?: Partial<Record<keyof ProjectInput | "form", string[]>>;
+  errors?: Partial<Record<keyof ProjectInput | "templateId" | "form", string[]>>;
   values?: Record<string, string>;
 };
 
@@ -25,6 +26,7 @@ export async function createProjectAction(
     siteUrl: String(formData.get("siteUrl") ?? "").trim(),
     description: String(formData.get("description") ?? ""),
     approach: String(formData.get("approach") ?? ""),
+    templateId: String(formData.get("templateId") ?? ""),
   };
   const parsed = ProjectInput.safeParse({
     ...values,
@@ -34,10 +36,14 @@ export async function createProjectAction(
   if (!parsed.success) {
     return { errors: z.flattenError(parsed.error).fieldErrors, values };
   }
-  const project = await createProject(parsed.data);
+  const template = values.templateId ? await getScaffoldTemplate(values.templateId) : null;
+  if (values.templateId && !template)
+    return { errors: { templateId: ["This template no longer exists."] }, values };
+  const project = await createProject(parsed.data, template ?? undefined);
   await audit(actorOf(auth.user), {
     action: "project.create",
     target: { type: "project", id: project.id, name: project.name },
+    details: `from template ${template?.id ?? "component-based"}`,
   });
   redirect(`/projects/${project.id}`);
 }

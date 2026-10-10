@@ -5,7 +5,6 @@ import { PANEL_PORTAL_ID } from "@/components/AppShell/PanelActions";
 import { BreakpointEditor } from "./BreakpointEditor";
 
 const save = vi.fn();
-vi.mock("./actions", () => ({ saveBreakpointsAction: (...args: unknown[]) => save(...args) }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const initial = [
@@ -14,16 +13,31 @@ const initial = [
   { id: "d", name: "desktop", minWidth: 1024 },
 ];
 
-function renderEditor() {
+const templates = [
+  {
+    id: "wide",
+    name: "Wide",
+    breakpoints: [
+      { name: "mobile", maxWidth: 767 },
+      { name: "tablet", minWidth: 768, maxWidth: 1023 },
+      { name: "desktop", minWidth: 1024, maxWidth: 1439 },
+      { name: "large", minWidth: 1440 },
+    ],
+  },
+];
+
+function renderEditor(props: Partial<React.ComponentProps<typeof BreakpointEditor>> = {}) {
   const portal = document.createElement("div");
   portal.id = PANEL_PORTAL_ID;
   document.body.appendChild(portal);
   const utils = render(
     <BreakpointEditor
-      projectId="p1"
       prefix="acme"
       initialApproach="mobile-first"
       initialBreakpoints={initial}
+      templates={templates}
+      onSave={save}
+      {...props}
     />,
   );
   return { ...utils, panel: within(portal) };
@@ -90,23 +104,29 @@ describe("BreakpointEditor", () => {
     expect(preview()).not.toHaveTextContent("min-width");
   });
 
-  it("loads a preset and saves it", async () => {
+  it("applies a template's breakpoints, keeping ids by name, and saves them", async () => {
     save.mockResolvedValue({ ok: true, savedAt: "now" });
     const { panel } = renderEditor();
-    fireEvent.change(panel.getByLabelText("Load a preset"), { target: { value: "four-step" } });
+    expect(
+      panel.getByRole("option", { name: "Wide (mobile, tablet, desktop, large)" }),
+    ).toBeTruthy();
+    fireEvent.change(panel.getByLabelText("Apply breakpoints from a template"), {
+      target: { value: "wide" },
+    });
     expect(screen.getByLabelText("Name of large")).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(panel.getByRole("button", { name: "Save breakpoints" }));
     });
-    expect(save).toHaveBeenCalledWith("p1", {
-      approach: "mobile-first",
-      breakpoints: {
-        breakpoints: expect.arrayContaining([
-          expect.objectContaining({ name: "large", minWidth: 1440 }),
-        ]),
-      },
-    });
+    const payload = save.mock.calls[0][0];
+    expect(payload.approach).toBe("mobile-first");
+    // Same-named breakpoints keep their ids, so Figma links tagged with them still work.
+    expect(payload.breakpoints.breakpoints).toEqual([
+      { id: "m", name: "mobile", maxWidth: 767 },
+      { id: "t", name: "tablet", minWidth: 768, maxWidth: 1023 },
+      { id: "d", name: "desktop", minWidth: 1024, maxWidth: 1439 },
+      { id: expect.any(String), name: "large", minWidth: 1440 },
+    ]);
     expect(screen.getByText("Breakpoints saved.")).toBeInTheDocument();
     expect(panel.queryByText("Unsaved changes")).not.toBeInTheDocument();
   });
@@ -129,5 +149,31 @@ describe("BreakpointEditor", () => {
     expect(screen.getByLabelText("Name of breakpoint")).toHaveFocus();
     fireEvent.click(panel.getByRole("button", { name: "Discard changes" }));
     expect(screen.queryByLabelText("Name of breakpoint")).not.toBeInTheDocument();
+  });
+
+  it("for templates: no approach section and no template picker", async () => {
+    save.mockResolvedValue({ ok: true, savedAt: "now" });
+    const { panel } = renderEditor({ initialApproach: undefined, templates: undefined });
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
+    expect(panel.queryByLabelText("Apply breakpoints from a template")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Max width of tablet in pixels"), {
+      target: { value: "1099" },
+    });
+    fireEvent.change(screen.getByLabelText("Min width of desktop in pixels"), {
+      target: { value: "1100" },
+    });
+    await act(async () => {
+      fireEvent.click(panel.getByRole("button", { name: "Save breakpoints" }));
+    });
+    expect(save.mock.calls[0][0]).toEqual({
+      approach: undefined,
+      breakpoints: {
+        breakpoints: [
+          { id: "m", name: "mobile", maxWidth: 767 },
+          { id: "t", name: "tablet", minWidth: 768, maxWidth: 1099 },
+          { id: "d", name: "desktop", minWidth: 1100 },
+        ],
+      },
+    });
   });
 });

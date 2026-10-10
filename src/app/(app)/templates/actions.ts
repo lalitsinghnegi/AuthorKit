@@ -6,7 +6,8 @@ import type { ScaffoldSavePayload } from "@/components/ScaffoldEditor/ScaffoldEd
 import type { SaveResult } from "@/lib/actions/result";
 import { audit } from "@/lib/audit/log";
 import { actorOf, checkAdmin, requireAdmin } from "@/lib/auth/session";
-import { ScaffoldExport } from "@/lib/model";
+import { hasErrors, validateBreakpoints } from "@/lib/breakpoints";
+import { BreakpointSet, STANDARD_TEMPLATE_BREAKPOINTS, ScaffoldExport } from "@/lib/model";
 import { cloneWithNewIds, createFolder } from "@/lib/scaffold";
 import { checkTree, firstMessage } from "@/lib/scaffold/server";
 import {
@@ -25,6 +26,7 @@ export async function createScaffoldTemplateAction(): Promise<void> {
     name: "New preset",
     builtIn: false,
     tree: createFolder("package", [createFolder("css")]),
+    breakpoints: structuredClone(STANDARD_TEMPLATE_BREAKPOINTS),
   });
   await audit(actorOf(auth), { action: "preset.create", target: { type: "preset", id } });
   redirect(`/templates/scaffolds/${id}`);
@@ -43,6 +45,7 @@ export async function duplicateScaffoldTemplateAction(sourceId: string): Promise
     description: source.description,
     builtIn: false,
     tree: cloneWithNewIds(source.tree),
+    breakpoints: structuredClone(source.breakpoints),
   });
   await audit(actorOf(auth), {
     action: "preset.duplicate",
@@ -86,6 +89,32 @@ export async function saveScaffoldTemplateAction(
   return { ok: true };
 }
 
+/** Save a custom template's breakpoints. Re-validated here; the editor's checks are a convenience. */
+export async function saveTemplateBreakpointsAction(
+  id: string,
+  payload: unknown,
+): Promise<{ ok: true; savedAt: string } | { ok: false; error: string }> {
+  const auth = await checkAdmin();
+  if (!auth.user) return { ok: false, error: auth.denied };
+  const parsed = z.object({ breakpoints: BreakpointSet }).safeParse(payload);
+  if (!parsed.success)
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid breakpoints" };
+  const issues = validateBreakpoints(parsed.data.breakpoints.breakpoints);
+  if (hasErrors(issues))
+    return { ok: false, error: issues.find((i) => i.severity === "error")!.message };
+  const existing = await getScaffoldTemplate(id);
+  if (!existing) return { ok: false, error: "This preset no longer exists." };
+  if (existing.builtIn)
+    return { ok: false, error: "Built-in presets are read-only. Duplicate it to edit." };
+  await saveScaffoldTemplate({ ...existing, breakpoints: parsed.data.breakpoints });
+  await audit(actorOf(auth.user), {
+    action: "preset.breakpoints",
+    target: { type: "preset", id, name: existing.name },
+    details: `${parsed.data.breakpoints.breakpoints.length} breakpoints`,
+  });
+  return { ok: true, savedAt: new Date().toISOString() };
+}
+
 export type ImportState = { error?: string };
 const MAX_IMPORT_BYTES = 1024 * 1024;
 
@@ -112,6 +141,11 @@ export async function importScaffoldTemplateAction(
   if (!parsed.success) return { error: `Preset file is invalid. ${firstMessage(parsed.error)}` };
   const checked = checkTree(parsed.data.template.tree);
   if ("error" in checked) return { error: `Preset file is invalid. ${checked.error}` };
+  const issues = validateBreakpoints(parsed.data.template.breakpoints.breakpoints);
+  if (hasErrors(issues))
+    return {
+      error: `Preset file is invalid. ${issues.find((i) => i.severity === "error")!.message}`,
+    };
 
   const id = await availableTemplateId(parsed.data.template.name);
   try {

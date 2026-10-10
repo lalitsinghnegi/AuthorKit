@@ -8,12 +8,23 @@ import styles from "./ReadOnly.module.css";
  * and a "View only" note. The server actions refuse viewers regardless.
  * Renders inside a Suspense boundary because it reads the session.
  */
-export async function EditGate({ children }: { children: React.ReactNode }) {
-  if (isAdmin(await getCurrentUser())) return children;
+export async function EditGate({
+  children,
+  readOnly,
+}: {
+  children: React.ReactNode;
+  /** Read-only for everyone (e.g. a built-in preset), with this note instead of "View only". */
+  readOnly?: React.ReactNode;
+}) {
+  if (!readOnly && isAdmin(await getCurrentUser())) return children;
   return (
     <ReadOnlyProvider>
       <p className={styles.note} role="note">
-        <strong>View only.</strong> Ask an admin to make changes.
+        {readOnly ?? (
+          <>
+            <strong>View only.</strong> Ask an admin to make changes.
+          </>
+        )}
       </p>
       <fieldset disabled className={styles.fieldset}>
         {children}

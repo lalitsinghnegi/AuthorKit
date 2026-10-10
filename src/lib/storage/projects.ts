@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { defaultBreakpoints, defaultScaffold } from "@/lib/model/defaults";
+import { templateBreakpoints, templateScaffold } from "@/lib/model/defaults";
 import {
   type DesignToken,
   type Project,
@@ -9,6 +9,7 @@ import {
   ProjectInput,
   SCHEMA_VERSION,
   ResponsiveFile,
+  type ScaffoldTemplate,
   SiteFile,
   TokenFile,
 } from "@/lib/model";
@@ -53,15 +54,19 @@ export async function getProject(id: string): Promise<Project | null> {
   return readJson(projectFile(id), ProjectSchema);
 }
 
-export async function createProject(input: ProjectInput): Promise<Project> {
+/** A new project whose folders and breakpoints are copied from `template` (Component-based by default). */
+export async function createProject(
+  input: ProjectInput,
+  template?: ScaffoldTemplate,
+): Promise<Project> {
   const fields = ProjectInput.parse(input);
   const now = new Date().toISOString();
   const project = ProjectSchema.parse({
     ...fields,
     schemaVersion: SCHEMA_VERSION,
     id: randomUUID(),
-    breakpoints: defaultBreakpoints(),
-    scaffold: defaultScaffold(slugify(fields.brandName) || fields.prefix),
+    breakpoints: templateBreakpoints(template),
+    scaffold: templateScaffold(slugify(fields.brandName) || fields.prefix, template),
     figmaLinks: [],
     createdAt: now,
     updatedAt: now,

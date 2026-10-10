@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Breakpoint } from "@/lib/model";
 import {
-  BREAKPOINT_PRESETS,
+  STANDARD_BREAKPOINTS,
   applyFix,
   describeRange,
   fixAll,
@@ -22,12 +22,10 @@ const bp = (name: string, minWidth?: number, maxWidth?: number): Breakpoint => (
 const standard = () => [bp("mobile", undefined, 767), bp("tablet", 768, 1023), bp("desktop", 1024)];
 
 describe("validateBreakpoints", () => {
-  it("accepts the standard set and every preset", () => {
+  it("accepts the standard set", () => {
     expect(validateBreakpoints(standard())).toEqual([]);
-    for (const preset of BREAKPOINT_PRESETS) {
-      const list = preset.breakpoints.map((b, i) => ({ ...b, id: String(i) }));
-      expect(validateBreakpoints(list)).toEqual([]);
-    }
+    const list = STANDARD_BREAKPOINTS.map((b, i) => ({ ...b, id: String(i) }));
+    expect(validateBreakpoints(list)).toEqual([]);
   });
 
   it("accepts a single unbounded breakpoint", () => {

@@ -55,12 +55,15 @@ describe("project scaffold actions", () => {
     ).toEqual({ ok: false, error: "This project no longer exists." });
   });
 
-  it("saves the tree as a new preset with fresh ids", async () => {
+  it("saves the tree and the project's breakpoints as a new preset with fresh ids", async () => {
     const project = await newProject();
-    const result = await saveScaffoldAsPresetAction("Acme layout", project.scaffold);
+    const result = await saveScaffoldAsPresetAction(project.id, "Acme layout", project.scaffold);
     expect(result).toEqual({ ok: true, id: "acme-layout", name: "Acme layout" });
     const preset = (await getScaffoldTemplate("acme-layout"))!;
     expect(preset.tree.id).not.toBe(project.scaffold.id);
-    expect(await saveScaffoldAsPresetAction("  ", project.scaffold)).toMatchObject({ ok: false });
+    expect(preset.breakpoints).toEqual(project.breakpoints);
+    expect(await saveScaffoldAsPresetAction(project.id, "  ", project.scaffold)).toMatchObject({
+      ok: false,
+    });
   });
 });

@@ -7,7 +7,6 @@ import { PanelButton, PanelSection } from "@/components/AppShell/PanelSection";
 import panel from "@/components/AppShell/AppShell.module.css";
 import ui from "@/components/ui/ui.module.css";
 import {
-  BREAKPOINT_PRESETS,
   describeRange,
   fixAll,
   hasErrors,
@@ -16,34 +15,44 @@ import {
   type Issue,
   type QueryMode,
 } from "@/lib/breakpoints";
-import { MAX_BREAKPOINTS, type Breakpoint, type Project } from "@/lib/model";
-import { saveBreakpointsAction } from "./actions";
+import { takeBreakpoints, type BreakpointValues } from "@/lib/breakpoints/presets";
+import { MAX_BREAKPOINTS, type Breakpoint, type BreakpointSet, type Project } from "@/lib/model";
 import { applyChanges, parseRows, sortRows, toRow, uniqueName, type Row } from "./rows";
 import styles from "./BreakpointEditor.module.css";
 
 type Approach = Project["approach"];
+export type BreakpointSavePayload = { approach?: Approach; breakpoints: BreakpointSet };
+export type BreakpointSaveResult = { ok: true; savedAt: string } | { ok: false; error: string };
+export type TemplateBreakpoints = { id: string; name: string; breakpoints: BreakpointValues[] };
+
 type Props = {
-  projectId: string;
+  /** Class prefix used in the media query preview. */
   prefix: string;
-  initialApproach: Approach;
   initialBreakpoints: Breakpoint[];
+  /** Projects only: shows the responsive approach section. */
+  initialApproach?: Approach;
+  /** Templates offered by "Apply from template". */
+  templates?: TemplateBreakpoints[];
+  onSave: (payload: BreakpointSavePayload) => Promise<BreakpointSaveResult>;
 };
 type Status = { kind: "idle" | "saved" | "error"; message?: string };
 
-const snapshot = (approach: Approach, rows: Row[]) => JSON.stringify({ approach, rows });
+const snapshot = (approach: Approach | undefined, rows: Row[]) =>
+  JSON.stringify({ approach, rows });
 
 export function BreakpointEditor({
-  projectId,
   prefix,
-  initialApproach,
   initialBreakpoints,
+  initialApproach,
+  templates,
+  onSave,
 }: Props) {
   const router = useRouter();
   const [rows, setRows] = useState<Row[]>(() => sortRows(initialBreakpoints.map(toRow)));
-  const [approach, setApproach] = useState<Approach>(initialApproach);
+  const [approach, setApproach] = useState<Approach | undefined>(initialApproach);
   const [saved, setSaved] = useState(() => snapshot(initialApproach, rows));
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const [previewMode, setPreviewMode] = useState<QueryMode>(initialApproach);
+  const [previewMode, setPreviewMode] = useState<QueryMode>(initialApproach ?? "mobile-first");
   const [saving, startSaving] = useTransition();
   const focusRowId = useRef<string | null>(null);
 
@@ -86,26 +95,30 @@ export function BreakpointEditor({
     edit(sortRows(applyChanges(rows, issue.fixes[fixIndex].changes)));
   const runFixAll = () => edit(sortRows(fixAll(breakpoints).map(toRow)));
 
-  const loadPreset = (presetId: string) => {
-    const preset = BREAKPOINT_PRESETS.find((p) => p.id === presetId);
-    if (!preset || !confirm(`Replace the current breakpoints with "${preset.label}"?`)) return;
-    edit(preset.breakpoints.map((b) => toRow({ ...b, id: crypto.randomUUID() })));
+  /** Replace the rows with a template's breakpoints, keeping ids of same-named rows. */
+  const applyTemplate = (templateId: string) => {
+    const template = templates?.find((t) => t.id === templateId);
+    if (!template || !confirm(`Replace the current breakpoints with those of "${template.name}"?`))
+      return;
+    const current = rows.map((r) => ({ id: r.id, name: r.name }));
+    edit(
+      sortRows(
+        takeBreakpoints(template.breakpoints, () => crypto.randomUUID(), current).map(toRow),
+      ),
+    );
   };
 
   const discard = () => {
     if (!confirm("Discard unsaved changes?")) return;
-    const restored = JSON.parse(saved) as { approach: Approach; rows: Row[] };
+    const restored = JSON.parse(saved) as { approach?: Approach; rows: Row[] };
     setApproach(restored.approach);
-    setPreviewMode(restored.approach);
+    setPreviewMode(restored.approach ?? "mobile-first");
     edit(restored.rows);
   };
 
   const save = () =>
     startSaving(async () => {
-      const result = await saveBreakpointsAction(projectId, {
-        approach,
-        breakpoints: { breakpoints },
-      });
+      const result = await onSave({ approach, breakpoints: { breakpoints } });
       if (result.ok) {
         setSaved(snapshot(approach, rows));
         setStatus({ kind: "saved", message: "Breakpoints saved." });
@@ -143,24 +156,28 @@ export function BreakpointEditor({
           <PanelButton variant="secondary" onClick={runFixAll} disabled={!fixable}>
             Fix all
           </PanelButton>
-          <label className={panel.visuallyHidden} htmlFor="bp-preset">
-            Load a preset
-          </label>
-          <select
-            id="bp-preset"
-            className={panel.panelSelect}
-            value=""
-            onChange={(e) => loadPreset(e.target.value)}
-          >
-            <option value="" disabled>
-              Load preset…
-            </option>
-            {BREAKPOINT_PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.label}
-              </option>
-            ))}
-          </select>
+          {templates && templates.length > 0 && (
+            <>
+              <label className={panel.visuallyHidden} htmlFor="bp-template">
+                Apply breakpoints from a template
+              </label>
+              <select
+                id="bp-template"
+                className={panel.panelSelect}
+                value=""
+                onChange={(e) => applyTemplate(e.target.value)}
+              >
+                <option value="" disabled>
+                  Apply from template…
+                </option>
+                {templates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name} ({t.breakpoints.map((b) => b.name).join(", ")})
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
           <PanelButton variant="secondary" onClick={discard} disabled={!dirty}>
             Discard changes
           </PanelButton>
@@ -171,31 +188,33 @@ export function BreakpointEditor({
         {status.message}
       </p>
 
-      <section className={ui.card} aria-labelledby="bp-approach">
-        <h2 id="bp-approach" className={ui.sectionHeading}>
-          Approach
-        </h2>
-        <div className={ui.radioRow} role="radiogroup" aria-labelledby="bp-approach">
-          {(["mobile-first", "desktop-first"] as const).map((value) => (
-            <label key={value}>
-              <input
-                type="radio"
-                name="approach"
-                value={value}
-                checked={approach === value}
-                onChange={() => {
-                  setApproach(value);
-                  setPreviewMode(value);
-                  setStatus({ kind: "idle" });
-                }}
-              />{" "}
-              {value === "mobile-first"
-                ? "Mobile-first: base styles for the smallest screen, min-width queries"
-                : "Desktop-first: base styles for the largest screen, max-width queries"}
-            </label>
-          ))}
-        </div>
-      </section>
+      {approach && (
+        <section className={ui.card} aria-labelledby="bp-approach">
+          <h2 id="bp-approach" className={ui.sectionHeading}>
+            Approach
+          </h2>
+          <div className={ui.radioRow} role="radiogroup" aria-labelledby="bp-approach">
+            {(["mobile-first", "desktop-first"] as const).map((value) => (
+              <label key={value}>
+                <input
+                  type="radio"
+                  name="approach"
+                  value={value}
+                  checked={approach === value}
+                  onChange={() => {
+                    setApproach(value);
+                    setPreviewMode(value);
+                    setStatus({ kind: "idle" });
+                  }}
+                />{" "}
+                {value === "mobile-first"
+                  ? "Mobile-first: base styles for the smallest screen, min-width queries"
+                  : "Desktop-first: base styles for the largest screen, max-width queries"}
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className={ui.card} aria-labelledby="bp-table">
         <h2 id="bp-table" className={ui.sectionHeading}>

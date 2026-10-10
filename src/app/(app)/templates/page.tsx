@@ -11,7 +11,7 @@ export default function TemplatesPage() {
     <>
       <PageHeader
         title="Templates"
-        description="Scaffold presets give new projects a starting folder structure. CSS templates are the stylesheets the generator fills with each project's values."
+        description="Scaffold presets give new projects a starting folder structure and breakpoints. CSS templates are the stylesheets the generator fills with each project's values."
       />
       <Suspense fallback={<p className={ui.muted}>Loading presets…</p>}>
         <PresetList />
@@ -61,6 +61,9 @@ function Group({
                 {p.description && <div className={ui.muted}>{p.description}</div>}
                 <div className={ui.meta}>
                   <span className={ui.badge}>{countFiles(p.tree)} files</span>
+                  <span className={ui.badge}>
+                    {p.breakpoints.breakpoints.map((b) => b.name).join(" · ")}
+                  </span>
                   {p.builtIn && <span className={ui.badge}>read-only</span>}
                 </div>
               </Link>

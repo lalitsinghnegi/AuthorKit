@@ -37,7 +37,7 @@ async function Loader({ params }: Pick<PageProps<"/projects/[id]/scaffold">, "pa
         readOnly={!isAdmin(user)}
         onSave={saveProjectScaffoldAction.bind(null, project.id)}
         presets={presets.map((p) => ({ id: p.id, name: p.name, tree: p.tree }))}
-        onSaveAsPreset={saveScaffoldAsPresetAction}
+        onSaveAsPreset={saveScaffoldAsPresetAction.bind(null, project.id)}
         autoRootFiles={generatedRootEntries(project)}
       />
     </>

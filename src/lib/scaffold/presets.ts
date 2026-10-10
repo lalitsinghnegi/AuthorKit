@@ -1,4 +1,11 @@
-import type { CssTemplateId, FileNode, FolderNode, ScaffoldTemplate, TreeNode } from "@/lib/model";
+import {
+  STANDARD_TEMPLATE_BREAKPOINTS,
+  type CssTemplateId,
+  type FileNode,
+  type FolderNode,
+  type ScaffoldTemplate,
+  type TreeNode,
+} from "@/lib/model";
 
 // Built-in presets use stable ids so they validate as stored templates.
 // Projects receive a copy with fresh ids (see cloneWithNewIds).
@@ -21,6 +28,7 @@ export const BASIC_PRESET: ScaffoldTemplate = {
   name: "Basic",
   description: "One flat css/ folder with every stylesheet.",
   builtIn: true,
+  breakpoints: STANDARD_TEMPLATE_BREAKPOINTS,
   tree: folder("basic-root", "package", [
     folder("basic-css", "css", [
       file("basic-tokens", "tokens.css", "tokens"),
@@ -41,6 +49,7 @@ export const COMPONENT_PRESET: ScaffoldTemplate = {
   name: "Component-based",
   description: "Tokens and global styles at the top, one file per component in css/components/.",
   builtIn: true,
+  breakpoints: STANDARD_TEMPLATE_BREAKPOINTS,
   tree: folder("cb-root", "package", [
     folder("cb-css", "css", [
       file("cb-tokens", "tokens.css", "tokens"),

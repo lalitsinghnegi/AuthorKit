@@ -4,7 +4,15 @@ import { useActionState, useState } from "react";
 import ui from "@/components/ui/ui.module.css";
 import { createProjectAction, type FormState } from "../actions";
 
-export function NewProjectForm() {
+export type TemplateOption = { id: string; name: string; breakpoints: string };
+
+export function NewProjectForm({
+  templates,
+  defaultTemplateId,
+}: {
+  templates: TemplateOption[];
+  defaultTemplateId: string;
+}) {
   const [state, formAction, pending] = useActionState(createProjectAction, {} as FormState);
   const values = state.values ?? {};
   const [prefix, setPrefix] = useState(values.prefix ?? "");
@@ -87,6 +95,27 @@ export function NewProjectForm() {
           spellCheck={false}
           {...errorProps("siteUrl", state)}
         />
+      </Field>
+
+      <Field
+        name="templateId"
+        label="Template"
+        hint="The project starts with this template's folders and breakpoints. You can change both later."
+        state={state}
+      >
+        <select
+          id="templateId"
+          name="templateId"
+          className={ui.input}
+          defaultValue={values.templateId ?? defaultTemplateId}
+          {...errorProps("templateId", state)}
+        >
+          {templates.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name} ({t.breakpoints})
+            </option>
+          ))}
+        </select>
       </Field>
 
       <fieldset className={ui.field} style={{ border: 0, padding: 0, margin: 0 }}>
