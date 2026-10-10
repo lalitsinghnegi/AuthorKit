@@ -134,9 +134,7 @@ describe("VARIABLES.md", async () => {
 
   it("lists what each file defines and uses", () => {
     expect(doc).toContain("## `css/tokens.css`");
-    expect(doc).toContain(
-      "| `--acme-font-size-h1` | `1.75rem` | `(min-width: 1024px)`: `2.5rem` |",
-    );
+    expect(doc).toContain("| `--acme-font-size-h1` | `28px` | `(min-width: 1024px)`: `40px` |");
     expect(doc).toContain("## `css/components/footer.css`");
     expect(doc).toContain("- `--acme-color-footer-background` (from `css/tokens.css`)");
   });

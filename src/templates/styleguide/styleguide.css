@@ -89,7 +89,7 @@ pre {
 
 .sg-topbar button {
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   padding: 4px 10px;
   border-radius: 6px;
   border: 1px solid rgb(255 255 255 / 25%);
@@ -131,7 +131,7 @@ pre {
 
 .sg-sidebar label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 12.8px;
   font-weight: 600;
   color: var(--sg-muted);
 }
@@ -182,12 +182,12 @@ pre {
 
 .sg-section h3 {
   margin: 28px 0 10px;
-  font-size: 1rem;
+  font-size: 16px;
 }
 
 .sg-section h4 {
   margin: 16px 0 8px;
-  font-size: 0.9rem;
+  font-size: 14.4px;
   color: var(--sg-muted);
 }
 
@@ -232,7 +232,7 @@ pre {
 
 .sg-state figcaption {
   margin-bottom: 4px;
-  font-size: 0.8rem;
+  font-size: 12.8px;
   font-weight: 600;
   color: var(--sg-muted);
 }
@@ -264,7 +264,7 @@ pre {
 
 .sg-copy {
   font: inherit;
-  font-size: 0.75rem;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
   border: 1px solid var(--sg-border);
@@ -280,7 +280,7 @@ pre {
 
 .sg-tabs [role="tab"] {
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   padding: 4px 12px;
   border: 1px solid var(--sg-border);
   border-bottom: 0;
@@ -305,7 +305,7 @@ pre {
 .sg-section table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 14.4px;
 }
 
 .sg-section th,
@@ -317,7 +317,7 @@ pre {
 }
 
 .sg-override {
-  font-size: 0.8rem;
+  font-size: 12.8px;
 }
 
 .sg-override span {
@@ -339,7 +339,7 @@ pre {
 }
 
 .sg-meta {
-  font-size: 0.75rem;
+  font-size: 12px;
   color: var(--sg-muted);
 }
 
@@ -352,7 +352,7 @@ pre {
 
 .sg-lines {
   display: inline-block;
-  font-size: 0.8rem;
+  font-size: 12.8px;
   background: var(--sg-bg);
 }
 
@@ -395,7 +395,7 @@ pre {
 }
 
 .sg-inspector-close {
-  font-size: 1.2rem;
+  font-size: 19.2px;
   border: 0;
   background: none;
   cursor: pointer;
@@ -415,7 +415,7 @@ pre {
   border-radius: 999px;
   background: var(--sg-panel);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;

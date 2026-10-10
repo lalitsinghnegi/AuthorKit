@@ -14,7 +14,7 @@ import {
   letterSpacingEm,
   lineHeightRatio,
   mergeTokens,
-  pxToRem,
+  px,
   shadowToCss,
   suggestColorName,
   textRole,
@@ -65,9 +65,9 @@ describe("normalise", () => {
   });
 
   it("converts sizes, line height, letter spacing and shadows", () => {
-    expect(pxToRem(40)).toBe("2.5rem");
-    expect(pxToRem(18)).toBe("1.125rem");
-    expect(pxToRem(0)).toBe("0");
+    expect(px(40)).toBe("40px");
+    expect(px(18.5)).toBe("18.5px");
+    expect(px(0)).toBe("0");
     expect(lineHeightRatio(48, 40)).toBe("1.2");
     expect(lineHeightRatio(24, 16)).toBe("1.5");
     expect(letterSpacingEm(-0.4, 40)).toBe("-0.01em");
@@ -137,9 +137,9 @@ describe("extractTokens on the fixture file", () => {
         confidence: "high",
       },
     });
-    expect(byName(tokens, "font-size-h1")?.value).toBe("2.5rem");
-    expect(byName(tokens, "font-size-h2")?.value).toBe("2rem");
-    expect(byName(tokens, "font-size-base")?.value).toBe("1rem");
+    expect(byName(tokens, "font-size-h1")?.value).toBe("40px");
+    expect(byName(tokens, "font-size-h2")?.value).toBe("32px");
+    expect(byName(tokens, "font-size-base")?.value).toBe("16px");
     expect(byName(tokens, "line-height-heading")?.value).toBe("1.2");
     expect(byName(tokens, "letter-spacing-heading")?.value).toBe("-0.01em");
     expect(byName(tokens, "font-family-heading")?.value).toMatch(/^"Inter", system-ui/);
@@ -149,12 +149,12 @@ describe("extractTokens on the fixture file", () => {
     const { tokens } = extract();
     // 10px (mobile button padding, used twice) beats 8px (once) at the 8px step; footer padding adds 48px.
     expect(tokens.filter((t) => t.type === "spacing").map((t) => [t.name, t.value])).toEqual([
-      ["space-2", "0.625rem"],
-      ["space-3", "0.75rem"],
-      ["space-4", "1rem"],
-      ["space-5", "1.5rem"],
-      ["space-6", "2rem"],
-      ["space-7", "3rem"],
+      ["space-2", "10px"],
+      ["space-3", "12px"],
+      ["space-4", "16px"],
+      ["space-5", "24px"],
+      ["space-6", "32px"],
+      ["space-7", "48px"],
     ]);
     expect(byName(tokens, "radius-pill")?.value).toBe("999px");
     expect(byName(tokens, "border-width")?.value).toBe("2px");
@@ -240,7 +240,7 @@ describe("extractTokens edge cases", () => {
     const tokens = extractAllTokens([{ fileKey: "K", roots: [root], styles: {} }]).tokens;
     // 20px is equally close to 16 and 24; ties go to the smaller step. 18px lands there too.
     expect(byName(tokens, "space-4")).toMatchObject({
-      value: "1.25rem",
+      value: "20px",
       meta: { usage: 2, confidence: "low" },
     });
     expect(byName(tokens, "space-4")?.meta.reasons).toEqual([
@@ -263,9 +263,9 @@ describe("extractTokens edge cases", () => {
     expect(result.notes).toContain(
       "No Figma text styles were found, so typography was estimated from text layers.",
     );
-    expect(byName(result.tokens, "font-size-base")?.value).toBe("1rem");
-    expect(byName(result.tokens, "font-size-h1")?.value).toBe("2.25rem");
-    expect(byName(result.tokens, "font-size-h2")?.value).toBe("1.5rem");
+    expect(byName(result.tokens, "font-size-base")?.value).toBe("16px");
+    expect(byName(result.tokens, "font-size-h1")?.value).toBe("36px");
+    expect(byName(result.tokens, "font-size-h2")?.value).toBe("24px");
     expect(byName(result.tokens, "font-size-h1")?.meta.confidence).toBe("low");
   });
 
@@ -475,7 +475,7 @@ describe("validateTokenValue", () => {
     ["color", "#0b4f8a"],
     ["color", "rgb(11 79 138 / 50%)"],
     ["color", "transparent"],
-    ["fontSize", "1.125rem"],
+    ["fontSize", "18px"],
     ["spacing", "0"],
     ["letterSpacing", "-0.01em"],
     ["lineHeight", "1.5"],

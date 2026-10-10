@@ -195,7 +195,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Body",
     },
     "type": "fontSize",
-    "value": "1rem",
+    "value": "16px",
   },
   {
     "meta": {
@@ -214,7 +214,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "H1",
     },
     "type": "fontSize",
-    "value": "2.5rem",
+    "value": "40px",
   },
   {
     "meta": {
@@ -233,7 +233,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "H2",
     },
     "type": "fontSize",
-    "value": "2rem",
+    "value": "32px",
   },
   {
     "meta": {
@@ -349,7 +349,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Button / Primary",
     },
     "type": "spacing",
-    "value": "0.625rem",
+    "value": "10px",
   },
   {
     "meta": {
@@ -368,7 +368,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Header / Mobile",
     },
     "type": "spacing",
-    "value": "0.75rem",
+    "value": "12px",
   },
   {
     "meta": {
@@ -389,7 +389,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Header / Desktop",
     },
     "type": "spacing",
-    "value": "1rem",
+    "value": "16px",
   },
   {
     "meta": {
@@ -408,7 +408,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Nav",
     },
     "type": "spacing",
-    "value": "1.5rem",
+    "value": "24px",
   },
   {
     "meta": {
@@ -427,7 +427,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Header / Desktop",
     },
     "type": "spacing",
-    "value": "2rem",
+    "value": "32px",
   },
   {
     "meta": {
@@ -446,7 +446,7 @@ exports[`extractTokens on the fixture file > matches the snapshot (styles only) 
       "nodeName": "Footer / Desktop",
     },
     "type": "spacing",
-    "value": "3rem",
+    "value": "48px",
   },
   {
     "meta": {

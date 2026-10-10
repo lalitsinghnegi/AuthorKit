@@ -157,12 +157,12 @@ describe("guide page", () => {
   it("shows token values and per-breakpoint overrides from the generated CSS", () => {
     const vars = collectVariables(pkg.files.filter((f) => f.path.endsWith(".css")));
     expect(vars.get("acme-font-size-h1")).toMatchObject({
-      base: "1.75rem",
-      overrides: [{ condition: "(min-width: 1024px)", value: "2.5rem" }],
+      base: "28px",
+      overrides: [{ condition: "(min-width: 1024px)", value: "40px" }],
     });
     const row = $$("#sg-tokens tr").find((tr) => tr.textContent!.includes("--acme-font-size-h1"))!;
-    expect(row.textContent).toContain("1.75rem");
-    expect(row.textContent).toContain("@media (min-width: 1024px) 2.5rem");
+    expect(row.textContent).toContain("28px");
+    expect(row.textContent).toContain("@media (min-width: 1024px) 40px");
     expect($$("#sg-tokens h3").map((h) => h.textContent)).not.toContain("Extra values from Figma");
     expect(html).toContain('<link rel="stylesheet" href="../css/tokens.css">');
   });

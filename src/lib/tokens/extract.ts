@@ -18,7 +18,6 @@ import {
   lineHeightRatio,
   num,
   px,
-  pxToRem,
   shadowToCss,
   slug,
 } from "./normalize";
@@ -390,13 +389,11 @@ function typography(
   for (const e of roles) {
     const size = e.style.fontSize!;
     if (e.role?.kind === "heading")
-      push(e, "fontSize", `font-size-h${e.role.level}`, "fontSize", pxToRem(size));
-    else if (e.role?.kind === "body")
-      push(e, "fontSize", "font-size-base", "fontSize", pxToRem(size));
-    else if (e.role?.kind === "small")
-      push(e, "fontSize", "font-size-sm", "fontSize", pxToRem(size));
+      push(e, "fontSize", `font-size-h${e.role.level}`, "fontSize", px(size));
+    else if (e.role?.kind === "body") push(e, "fontSize", "font-size-base", "fontSize", px(size));
+    else if (e.role?.kind === "small") push(e, "fontSize", "font-size-sm", "fontSize", px(size));
     else
-      push(e, "fontSize", `font-size-${slug(e.name) || "text"}`, "fontSize", pxToRem(size), [
+      push(e, "fontSize", `font-size-${slug(e.name) || "text"}`, "fontSize", px(size), [
         "Text style name not recognised as a heading, body or small style",
       ]);
   }
@@ -491,7 +488,7 @@ function scaleTokens(
       candidate(
         name,
         type,
-        pxToRem(chosen),
+        px(chosen),
         variable
           ? {
               sourceKey: `var:${variable.id}`,

@@ -27,23 +27,16 @@ export type ComputeInput = {
   styles?: Record<string, FigmaStyleMeta>;
 };
 
-const REM_BASE = 16;
 /** Estimated size of the other end of a fluid range, relative to the measured end. */
 export const FLUID_RATIO = 0.75;
 /** Viewport used for the small end when the smallest breakpoint has no min-width. */
 export const FLUID_MIN_VIEWPORT = 320;
 
-const isScalable = (m: Measured): m is { px: number; unit: "rem" } =>
-  !("keyword" in m) && m.unit === "rem" && m.px !== 0;
+const isScalable = (m: Measured): m is { px: number; scales: true } =>
+  !("keyword" in m) && m.scales && m.px !== 0;
 
 const toCss = (m: Measured): string =>
-  "keyword" in m
-    ? m.keyword
-    : m.px === 0
-      ? "0"
-      : m.unit === "rem"
-        ? `${num(m.px / REM_BASE, 4)}rem`
-        : `${num(m.px, 2)}px`;
+  "keyword" in m ? m.keyword : m.px === 0 ? "0" : `${num(m.px, 2)}px`;
 
 /** The viewport range fluid values scale across: smallest breakpoint start → largest breakpoint start. */
 export function fluidRange(breakpoints: readonly Breakpoint[]): { from: number; to: number } {
@@ -56,16 +49,10 @@ export function fluidRange(breakpoints: readonly Breakpoint[]): { from: number; 
 
 /**
  * clamp() that scales linearly from `minPx` at `from` to `maxPx` at `to` viewport width.
- * Example: 24→32px over 320→1024px → clamp(1.5rem, 1.2727rem + 1.1364vw, 2rem).
+ * Example: 24→32px over 320→1024px → clamp(24px, 20.36px + 1.1364vw, 32px).
  */
-export function clampCss(
-  minPx: number,
-  maxPx: number,
-  from: number,
-  to: number,
-  unit: "rem" | "px",
-): string {
-  const fmt = (px: number) => (unit === "rem" ? `${num(px / REM_BASE, 4)}rem` : `${num(px, 2)}px`);
+export function clampCss(minPx: number, maxPx: number, from: number, to: number): string {
+  const fmt = (px: number) => `${num(px, 2)}px`;
   if (to <= from || minPx === maxPx) return fmt(minPx);
   const slope = (maxPx - minPx) / (to - from);
   const intercept = minPx - slope * from;
@@ -86,7 +73,7 @@ export function fluidValue(
   if (!isScalable(m)) return toCss(m);
   const large = (frameBreakpoint?.minWidth ?? 0) >= TEMPLATE_DEFAULTS.largeScreen.minWidth;
   const [min, max] = large ? [m.px * FLUID_RATIO, m.px] : [m.px, m.px / FLUID_RATIO];
-  return clampCss(min, max, range.from, range.to, m.unit);
+  return clampCss(min, max, range.from, range.to);
 }
 
 function measure(frame: SourceFrame, styles: Record<string, FigmaStyleMeta>): Measurements {
@@ -152,7 +139,7 @@ export function computeEntry(
     for (const id of order) {
       values[id] = {};
       for (const v of variables) {
-        // Only rem sizes (type, spacing) scale; px values such as radius stay as designed.
+        // Only sizes (type, spacing) scale; radius stays as designed.
         const scales = isScalable(m[v]);
         values[id][v] = scales
           ? { value: fluidValue(m[v], frameBp, range), source: "fluid" }

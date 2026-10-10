@@ -26,7 +26,7 @@ export function validateTokenValue(type: TokenType, raw: string): string | null 
     case "size":
     case "radius":
     case "border":
-      return lengthOrZero(value) ? null : "Use a length such as 16px, 1rem or 0.5em";
+      return lengthOrZero(value) ? null : "Use a length such as 16px";
     case "letterSpacing":
       return lengthOrZero(value) || value === "normal"
         ? null

@@ -4,13 +4,13 @@ import { textRole } from "@/lib/tokens/naming";
 
 /**
  * A measured value. Lengths stay in px until the end, so fluid values can be
- * interpolated; `unit` says how they are written to CSS.
+ * interpolated; `scales` says whether a single frame may become a fluid clamp(). Written as px.
  */
-export type Measured = { px: number; unit: "rem" | "px" } | { keyword: string };
+export type Measured = { px: number; scales: boolean } | { keyword: string };
 export type Measurements = Record<string, Measured>;
 
-const rem = (px: number | undefined): Measured | undefined =>
-  typeof px === "number" && px >= 0 ? { px, unit: "rem" } : undefined;
+const size = (px: number | undefined): Measured | undefined =>
+  typeof px === "number" && px >= 0 ? { px, scales: true } : undefined;
 const kw = (keyword: string): Measured => ({ keyword });
 
 const visible = (n: FigmaNode) => n.visible !== false;
@@ -74,17 +74,17 @@ export const SPECS: Partial<Record<CssTemplateId, (frame: FigmaNode) => Measurem
     const layout = toggle ? DRAWER : nav ? INLINE : {};
     return {
       ...clean({
-        "header-padding-x": hasLayout(f) ? rem(f.paddingLeft) : undefined,
-        "header-gap": hasLayout(f) ? rem(f.itemSpacing) : undefined,
-        "header-min-height": rem(height(f)),
+        "header-padding-x": hasLayout(f) ? size(f.paddingLeft) : undefined,
+        "header-gap": hasLayout(f) ? size(f.itemSpacing) : undefined,
+        "header-min-height": size(height(f)),
       }),
       ...layout,
     };
   },
   footer(f) {
     return clean({
-      "footer-padding-y": hasLayout(f) ? rem(f.paddingTop) : undefined,
-      "footer-gap": hasLayout(f) ? rem(f.itemSpacing) : undefined,
+      "footer-padding-y": hasLayout(f) ? size(f.paddingTop) : undefined,
+      "footer-gap": hasLayout(f) ? size(f.itemSpacing) : undefined,
       "footer-direction":
         f.layoutMode === "HORIZONTAL"
           ? kw("row")
@@ -102,33 +102,33 @@ export const SPECS: Partial<Record<CssTemplateId, (frame: FigmaNode) => Measurem
     const label = firstText(button);
     const radius = button.cornerRadius;
     return clean({
-      "btn-padding-y": rem(button.paddingTop),
-      "btn-padding-x": rem(button.paddingLeft),
-      "btn-font-size": rem(label?.style?.fontSize),
+      "btn-padding-y": size(button.paddingTop),
+      "btn-padding-x": size(button.paddingLeft),
+      "btn-font-size": size(label?.style?.fontSize),
       "btn-radius":
         typeof radius === "number"
           ? radius >= 500
-            ? { px: 999, unit: "px" }
-            : { px: radius, unit: "px" }
+            ? { px: 999, scales: false }
+            : { px: radius, scales: false }
           : undefined,
     });
   },
   modals(f) {
     return clean({
-      "modal-width": rem(width(f)),
-      "modal-padding": hasLayout(f) ? rem(f.paddingTop) : undefined,
+      "modal-width": size(width(f)),
+      "modal-padding": hasLayout(f) ? size(f.paddingTop) : undefined,
     });
   },
   accordion(f) {
     const item =
       hasLayout(f) && f.paddingTop ? f : find(f, (n) => hasLayout(n) && Boolean(n.paddingTop), 2);
     return clean({
-      "accordion-padding-y": rem(item?.paddingTop),
-      "accordion-title-size": rem(firstText(f)?.style?.fontSize),
+      "accordion-padding-y": size(item?.paddingTop),
+      "accordion-title-size": size(firstText(f)?.style?.fontSize),
     });
   },
   isi(f) {
-    return clean({ "isi-padding-y": hasLayout(f) ? rem(f.paddingTop) : undefined });
+    return clean({ "isi-padding-y": hasLayout(f) ? size(f.paddingTop) : undefined });
   },
 };
 
@@ -149,7 +149,7 @@ export function readTypography(
           : role?.kind === "body"
             ? "font-size-base"
             : null;
-      if (name && !out[name]) out[name] = { px: n.style.fontSize, unit: "rem" };
+      if (name && !out[name]) out[name] = { px: n.style.fontSize, scales: true };
     }
     for (const child of n.children ?? []) visit(child);
   };

@@ -48,9 +48,9 @@ const data: ResponsiveFile = {
       mode: "fluid",
       frames: [{ linkId: "c", nodeId: "3:1", nodeName: "CTA", breakpointId: "m", tagged: false }],
       values: {
-        m: { "btn-font-size": { value: "clamp(1rem, 0.8rem + 1vw, 1.25rem)", source: "fluid" } },
-        t: { "btn-font-size": { value: "clamp(1rem, 0.8rem + 1vw, 1.25rem)", source: "fluid" } },
-        d: { "btn-font-size": { value: "clamp(1rem, 0.8rem + 1vw, 1.25rem)", source: "fluid" } },
+        m: { "btn-font-size": { value: "clamp(16px, 12.8px + 1vw, 20px)", source: "fluid" } },
+        t: { "btn-font-size": { value: "clamp(16px, 12.8px + 1vw, 20px)", source: "fluid" } },
+        d: { "btn-font-size": { value: "clamp(16px, 12.8px + 1vw, 20px)", source: "fluid" } },
       },
       notes: [],
     },

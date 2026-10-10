@@ -52,14 +52,14 @@ const css = (
 describe("specs", () => {
   it("reads the header and detects drawer vs inline navigation", () => {
     expect(SPECS.header!(node("2:1"))).toMatchObject({
-      "header-padding-x": { px: 32, unit: "rem" },
-      "header-gap": { px: 32, unit: "rem" },
-      "header-min-height": { px: 80, unit: "rem" },
+      "header-padding-x": { px: 32, scales: true },
+      "header-gap": { px: 32, scales: true },
+      "header-min-height": { px: 80, scales: true },
       "header-toggle-display": { keyword: "none" },
       "header-list-direction": { keyword: "row" },
     });
     expect(SPECS.header!(node("2:2"))).toMatchObject({
-      "header-padding-x": { px: 16, unit: "rem" },
+      "header-padding-x": { px: 16, scales: true },
       "header-toggle-display": { keyword: "inline-flex" },
       "header-nav-display": { keyword: "none" },
     });
@@ -67,21 +67,21 @@ describe("specs", () => {
 
   it("reads footer direction, CTA button and typography", () => {
     expect(SPECS.footer!(node("5:1"))).toEqual({
-      "footer-padding-y": { px: 48, unit: "rem" },
-      "footer-gap": { px: 32, unit: "rem" },
+      "footer-padding-y": { px: 48, scales: true },
+      "footer-gap": { px: 32, scales: true },
       "footer-direction": { keyword: "row" },
     });
     expect(SPECS.footer!(node("5:2"))["footer-direction"]).toEqual({ keyword: "column" });
     expect(SPECS.cta!(node("3:2"))).toEqual({
-      "btn-padding-y": { px: 10, unit: "rem" },
-      "btn-padding-x": { px: 20, unit: "rem" },
-      "btn-font-size": { px: 14, unit: "rem" },
-      "btn-radius": { px: 999, unit: "px" },
+      "btn-padding-y": { px: 10, scales: true },
+      "btn-padding-x": { px: 20, scales: true },
+      "btn-font-size": { px: 14, scales: true },
+      "btn-radius": { px: 999, scales: false },
     });
     expect(readTypography(node("1:3"))).toEqual({
-      "font-size-h1": { px: 28, unit: "rem" },
-      "font-size-h2": { px: 24, unit: "rem" },
-      "font-size-base": { px: 16, unit: "rem" },
+      "font-size-h1": { px: 28, scales: true },
+      "font-size-h2": { px: 24, scales: true },
+      "font-size-base": { px: 16, scales: true },
     });
   });
 
@@ -104,9 +104,9 @@ describe("fluid values", () => {
 
   it("computes the clamp() line exactly", () => {
     // 24px at 320px → 32px at 1024px: slope 8/704 = 1.1364vw, intercept 24 - 0.011364*320 = 20.3636px
-    expect(clampCss(24, 32, 320, 1024, "rem")).toBe("clamp(1.5rem, 1.2727rem + 1.1364vw, 2rem)");
-    expect(clampCss(16, 16, 320, 1024, "rem")).toBe("1rem");
-    expect(clampCss(10, 40, 320, 400, "px")).toBe("clamp(10px, -110px + 37.5vw, 40px)");
+    expect(clampCss(24, 32, 320, 1024)).toBe("clamp(24px, 20.36px + 1.1364vw, 32px)");
+    expect(clampCss(16, 16, 320, 1024)).toBe("16px");
+    expect(clampCss(10, 40, 320, 400)).toBe("clamp(10px, -110px + 37.5vw, 40px)");
   });
 
   it("makes a single desktop frame the top of the range and keeps px and keywords fixed", () => {
@@ -114,7 +114,7 @@ describe("fluid values", () => {
     const cta = data.components.cta!;
     expect(cta.mode).toBe("fluid");
     expect(cta.values.m["btn-padding-x"]).toEqual({
-      value: "clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem)",
+      value: "clamp(18px, 15.27px + 0.8523vw, 24px)",
       source: "fluid",
     });
     expect(cta.values.m["btn-radius"]).toEqual({ value: "999px", source: "inferred" });
@@ -128,7 +128,7 @@ describe("fluid values", () => {
 
   it("makes a single mobile frame the bottom of the range", () => {
     const value = compute([src("cta", "3:2", "m")]).components.cta!.values.d["btn-font-size"].value;
-    expect(value).toBe("clamp(0.875rem, 0.7424rem + 0.6629vw, 1.1667rem)");
+    expect(value).toBe("clamp(14px, 11.88px + 0.6629vw, 18.67px)");
   });
 });
 
@@ -145,8 +145,8 @@ describe("per-breakpoint values", () => {
   it("fills uncovered breakpoints from the nearest one and says so", () => {
     const header = data.components.header!;
     expect(header.mode).toBe("breakpoints");
-    expect(header.values.t["header-padding-x"]).toEqual({ value: "1rem", source: "inferred" });
-    expect(header.values.d["header-padding-x"]).toEqual({ value: "2rem", source: "frame" });
+    expect(header.values.t["header-padding-x"]).toEqual({ value: "16px", source: "inferred" });
+    expect(header.values.d["header-padding-x"]).toEqual({ value: "32px", source: "frame" });
     expect(header.notes).toEqual([
       "No header frame for tablet; values were copied from the nearest breakpoint.",
     ]);
@@ -159,24 +159,24 @@ describe("per-breakpoint values", () => {
         "/* mobile (≤ 767px): base */",
         ".acme-footer {",
         "  --acme-footer-direction: column;",
-        "  --acme-footer-gap: 1.5rem;",
-        "  --acme-footer-padding-y: 2rem;",
+        "  --acme-footer-gap: 24px;",
+        "  --acme-footer-padding-y: 32px;",
         "}",
         "",
         "/* desktop (≥ 1024px) */",
         "@media (min-width: 1024px) {",
         "  .acme-footer {",
         "    --acme-footer-direction: row;",
-        "    --acme-footer-gap: 2rem;",
-        "    --acme-footer-padding-y: 3rem;",
+        "    --acme-footer-gap: 32px;",
+        "    --acme-footer-padding-y: 48px;",
         "  }",
         "}",
       ].join("\n"),
     );
     const typography = css("typography", data);
-    expect(typography).toContain("  --acme-font-size-h1: 1.75rem;");
+    expect(typography).toContain("  --acme-font-size-h1: 28px;");
     expect(typography).toMatch(
-      /@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--acme-font-size-h1: 2\.5rem;\n {4}--acme-font-size-h2: 2rem;\n {2}\}/,
+      /@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--acme-font-size-h1: 40px;\n {4}--acme-font-size-h2: 32px;\n {2}\}/,
     );
     // Body text is the same at both sizes, so it never appears in a query.
     expect(typography.match(/font-size-base/g)).toHaveLength(1);

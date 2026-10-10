@@ -97,11 +97,11 @@ describe("GET /api/projects/[id]/package", () => {
           mode: "breakpoints",
           frames: [],
           values: {
-            [m.id]: { "footer-gap": { value: "1.5rem", source: "frame" } },
+            [m.id]: { "footer-gap": { value: "24px", source: "frame" } },
             [project.breakpoints.breakpoints[1].id]: {
-              "footer-gap": { value: "1.5rem", source: "inferred" },
+              "footer-gap": { value: "24px", source: "inferred" },
             },
-            [d.id]: { "footer-gap": { value: "2rem", source: "frame" } },
+            [d.id]: { "footer-gap": { value: "32px", source: "frame" } },
           },
           notes: [],
         },
@@ -113,7 +113,7 @@ describe("GET /api/projects/[id]/package", () => {
     expect(tokens).toContain("--acme-color-text: #1f2329;"); // still to review → default
     const footer = await zip.file("acme-health/css/components/footer.css")!.async("string");
     expect(footer).toMatch(
-      /@media \(min-width: 1024px\) \{\n {2}\.acme-footer \{[\s\S]*--acme-footer-gap: 2rem;/,
+      /@media \(min-width: 1024px\) \{\n {2}\.acme-footer \{[\s\S]*--acme-footer-gap: 32px;/,
     );
   });
 

@@ -45,23 +45,23 @@ const resolve = (tokens: DesignToken[] = [], responsive: ResponsiveFile | null =
 describe("resolveDesignValues priority", () => {
   it("uses defaults, including large-screen overrides, when nothing comes from Figma", () => {
     const { resolved, report } = resolve();
-    expect(resolved.tokensFor("m")["font-size-h1"]).toBe("2rem");
-    expect(resolved.tokensFor("d")["font-size-h1"]).toBe("2.75rem");
+    expect(resolved.tokensFor("m")["font-size-h1"]).toBe("32px");
+    expect(resolved.tokensFor("d")["font-size-h1"]).toBe("44px");
     expect(report.rows.every((r) => r.source === "default")).toBe(true);
     expect(report.attention).toEqual([]);
   });
 
   it("accepted and overridden tokens apply at every breakpoint and drop the large-screen default", () => {
     const { resolved, report } = resolve([
-      token("font-size-h1", "2.5rem"),
+      token("font-size-h1", "40px"),
       token("color-primary", "#123456", { status: "overridden", originalValue: "#8a0b4f" }),
     ]);
     expect(["m", "t", "d"].map((bp) => resolved.tokensFor(bp)["font-size-h1"])).toEqual([
-      "2.5rem",
-      "2.5rem",
-      "2.5rem",
+      "40px",
+      "40px",
+      "40px",
     ]);
-    expect(resolved.tokensFor("d")["font-size-h2"]).toBe("2.25rem"); // untouched tokens keep their default
+    expect(resolved.tokensFor("d")["font-size-h2"]).toBe("36px"); // untouched tokens keep their default
     expect(report.rows.find((r) => r.name === "font-size-h1")?.source).toBe("figma-token");
     expect(report.rows.find((r) => r.name === "color-primary")).toMatchObject({
       source: "override",
@@ -71,20 +71,20 @@ describe("resolveDesignValues priority", () => {
 
   it("responsive typography beats tokens, per breakpoint", () => {
     const { resolved, report } = resolve(
-      [token("font-size-h1", "2.5rem")],
+      [token("font-size-h1", "40px")],
       typography({
-        m: { "font-size-h1": "1.75rem" },
-        t: { "font-size-h1": "1.75rem" },
-        d: { "font-size-h1": "2.5rem" },
+        m: { "font-size-h1": "28px" },
+        t: { "font-size-h1": "28px" },
+        d: { "font-size-h1": "40px" },
       }),
     );
-    expect(resolved.tokensFor("m")["font-size-h1"]).toBe("1.75rem");
-    expect(resolved.tokensFor("d")["font-size-h1"]).toBe("2.5rem");
+    expect(resolved.tokensFor("m")["font-size-h1"]).toBe("28px");
+    expect(resolved.tokensFor("d")["font-size-h1"]).toBe("40px");
     expect(report.rows.find((r) => r.name === "font-size-h1")).toMatchObject({
       source: "responsive",
-      value: "1.75rem",
+      value: "28px",
     });
-    expect(report.attention).toEqual([]); // 2.5rem was measured at desktop: no conflict
+    expect(report.attention).toEqual([]); // 40px was measured at desktop: no conflict
   });
 
   it("ignores tokens to review and excluded tokens, and counts the waiting ones", () => {
@@ -125,20 +125,20 @@ describe("resolveDesignValues priority", () => {
           frames: [],
           values: {
             m: {
-              "footer-gap": { value: "1.5rem", source: "frame" },
+              "footer-gap": { value: "24px", source: "frame" },
               "footer-colour": { value: "red", source: "frame" },
             },
-            t: { "footer-gap": { value: "1.5rem", source: "inferred" } },
-            d: { "footer-gap": { value: "2rem", source: "frame" } },
+            t: { "footer-gap": { value: "24px", source: "inferred" } },
+            d: { "footer-gap": { value: "32px", source: "frame" } },
           },
           notes: ["No footer frame for tablet; values were copied from the nearest breakpoint."],
         },
       },
     };
     const { resolved, report } = resolve([], responsive);
-    expect(resolved.componentFor("footer", "m").footer["footer-gap"]).toBe("1.5rem");
+    expect(resolved.componentFor("footer", "m").footer["footer-gap"]).toBe("24px");
     expect(resolved.componentFor("footer", "d").footer).toMatchObject({
-      "footer-gap": "2rem",
+      "footer-gap": "32px",
       "footer-direction": "row",
     });
     expect(report.rows.find((r) => r.name === "footer-gap")).toMatchObject({
@@ -155,16 +155,16 @@ describe("resolveDesignValues priority", () => {
 describe("needs attention", () => {
   it("reports a token that conflicts with the measured values", () => {
     const { report } = resolve(
-      [token("font-size-h1", "3rem")],
+      [token("font-size-h1", "48px")],
       typography({
-        m: { "font-size-h1": "1.75rem" },
-        t: { "font-size-h1": "1.75rem" },
-        d: { "font-size-h1": "2.5rem" },
+        m: { "font-size-h1": "28px" },
+        t: { "font-size-h1": "28px" },
+        d: { "font-size-h1": "40px" },
       }),
     );
     expect(report.attention).toContainEqual({
       message:
-        "font-size-h1 is 3rem in Tokens but Responsive measured 1.75rem / 2.5rem; the responsive values are used.",
+        "font-size-h1 is 48px in Tokens but Responsive measured 28px / 40px; the responsive values are used.",
       screen: "responsive",
     });
   });
@@ -190,7 +190,7 @@ describe("needs attention", () => {
       }),
       token("font-size-h2", "big"),
     ]);
-    expect(resolved.tokensFor("m")["font-size-h2"]).toBe("1.625rem");
+    expect(resolved.tokensFor("m")["font-size-h2"]).toBe("26px");
     const messages = report.attention.map((a) => a.message);
     expect(messages).toContain(
       "color-primary: Figma has several values for this token; check that #ffd6e7 is the right one.",

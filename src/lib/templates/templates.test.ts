@@ -148,20 +148,20 @@ describe.each(["mobile-first", "desktop-first"] as const)("rendered templates (%
 describe("responsive hooks", () => {
   it("mobile-first: large-screen values go into a min-width query; tablet hook is a marker only", () => {
     const css = renderTemplate("tokens", ctxFor("mobile-first"));
-    expect(css).toContain("--ak-font-size-h1: 2rem;");
+    expect(css).toContain("--ak-font-size-h1: 32px;");
     expect(css).toContain(
       "/* @authorkit-responsive tokens · tablet (768px – 1023px): no overrides */",
     );
     expect(css).toMatch(
-      /\/\* @authorkit-responsive tokens · desktop \(≥ 1024px\) \*\/\n@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 2\.75rem;/,
+      /\/\* @authorkit-responsive tokens · desktop \(≥ 1024px\) \*\/\n@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 44px;/,
     );
   });
 
   it("desktop-first: base holds large values; smaller screens override with max-width", () => {
     const css = renderTemplate("tokens", ctxFor("desktop-first"));
-    expect(css).toContain("--ak-font-size-h1: 2.75rem;");
+    expect(css).toContain("--ak-font-size-h1: 44px;");
     expect(css).toMatch(
-      /@media \(max-width: 1023px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 2rem;/,
+      /@media \(max-width: 1023px\) \{\n {2}:root \{\n {4}--ak-font-size-h1: 32px;/,
     );
     // Mobile inherits the tablet override through the cascade, so it adds nothing.
     expect(css).toContain("/* @authorkit-responsive tokens · mobile (≤ 767px): no overrides */");

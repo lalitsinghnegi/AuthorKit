@@ -84,7 +84,7 @@ Rules:
 
 - **`extractTokens(inputs)`** (`src/lib/tokens/extract.ts`) is pure: Figma nodes, styles and variables go in, `ExtractedToken[]` comes out.
   - **Source priority:** variables beat styles, which beat values scanned from layers.
-  - **Units:** colours as hex, or `rgb(… / a%)` when transparent. Font sizes and spacing in rem (16px base). Line height unitless. Letter spacing in em. Radius, borders and shadows in px.
+  - **Units:** colours as hex, or `rgb(… / a%)` when transparent. All sizes in px (font sizes, spacing, radius, borders, shadows); never rem, in extraction, defaults or templates. Line height unitless. Letter spacing in em.
 - **Names:** tokens are named after template tokens where possible (`naming.ts`), so they fill the CSS. Anything else gets a slug name and is `mapped: false`.
   - **Spacing** snaps to the 8-step scale (4–64px), radius to sm/md/lg/pill, and shadows to sm/md/lg by blur.
   - **Conflicting values** for one name: the most trusted, then most used, wins. The others become `-alt` tokens.
@@ -123,7 +123,7 @@ Rules:
   - Only one frame per breakpoint is used; extras are reported as conflicts.
   - Untagged links are treated as the base breakpoint.
   - **Two or more breakpoints measured:** uncovered breakpoints copy the nearest measured one (a tie goes to the smaller), marked `inferred`.
-  - **One breakpoint measured:** rem sizes become `clamp()` between `fluidRange` (smallest breakpoint start → largest breakpoint start, 320px if there's no min). A large-screen frame is the top of the range and the other end is `FLUID_RATIO` (0.75). px values and keywords stay fixed. Marked `fluid`.
+  - **One breakpoint measured:** sizes marked `scales` (type, spacing) become px `clamp()` between `fluidRange` (smallest breakpoint start → largest breakpoint start, 320px if there's no min). A large-screen frame is the top of the range and the other end is `FLUID_RATIO` (0.75). Radius and keywords stay fixed. Marked `fluid`.
 - **Storage:** results are saved to `data/projects/<id>/responsive.json` (`ResponsiveFile`). `renderResponsiveCss` previews them with `cascade()`: base for the first breakpoint, then only the changes per media query.
 - **Template variables that change by breakpoint** are declared through `{{vars "<component>" "<suffix>"}}` with defaults in `tokens.json` → `components`. A variant that must not be undone by breakpoint overrides sets the property directly (`padding-inline: 0` on tertiary buttons, `max-width` on interstitial modals) rather than overriding the shared variable.
 

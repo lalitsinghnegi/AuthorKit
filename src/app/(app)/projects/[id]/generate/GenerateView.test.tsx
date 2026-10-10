@@ -158,7 +158,7 @@ describe("GenerateView", () => {
             name: "footer-gap",
             file: "footer.css",
             source: "responsive",
-            value: "1.5rem",
+            value: "24px",
           },
           {
             kind: "token",

@@ -85,7 +85,7 @@ describe("extractResponsiveAction", () => {
       source: "frame",
     });
     expect(result.data.typography!.values[m]["font-size-h1"]).toEqual({
-      value: "1.75rem",
+      value: "28px",
       source: "frame",
     });
     expect(await getResponsive(id)).toEqual(result.data);

@@ -1254,16 +1254,16 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
   --acme-color-isi-heading: #111418;
   --acme-font-family-base: system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
   --acme-font-family-heading: system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
-  --acme-font-size-xs: 0.75rem;
-  --acme-font-size-sm: 0.875rem;
-  --acme-font-size-base: 1rem;
-  --acme-font-size-lg: 1.125rem;
-  --acme-font-size-h1: 2.75rem;
-  --acme-font-size-h2: 2.25rem;
-  --acme-font-size-h3: 1.75rem;
-  --acme-font-size-h4: 1.375rem;
-  --acme-font-size-h5: 1.125rem;
-  --acme-font-size-h6: 1rem;
+  --acme-font-size-xs: 12px;
+  --acme-font-size-sm: 14px;
+  --acme-font-size-base: 16px;
+  --acme-font-size-lg: 18px;
+  --acme-font-size-h1: 44px;
+  --acme-font-size-h2: 36px;
+  --acme-font-size-h3: 28px;
+  --acme-font-size-h4: 22px;
+  --acme-font-size-h5: 18px;
+  --acme-font-size-h6: 16px;
   --acme-font-size-sup: 0.75em;
   --acme-font-weight-regular: 400;
   --acme-font-weight-bold: 700;
@@ -1271,14 +1271,14 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
   --acme-line-height-heading: 1.2;
   --acme-line-height-tight: 1.1;
   --acme-letter-spacing-heading: -0.01em;
-  --acme-space-1: 0.25rem;
-  --acme-space-2: 0.5rem;
-  --acme-space-3: 0.75rem;
-  --acme-space-4: 1rem;
-  --acme-space-5: 1.5rem;
-  --acme-space-6: 2rem;
-  --acme-space-7: 3rem;
-  --acme-space-8: 4rem;
+  --acme-space-1: 4px;
+  --acme-space-2: 8px;
+  --acme-space-3: 12px;
+  --acme-space-4: 16px;
+  --acme-space-5: 24px;
+  --acme-space-6: 32px;
+  --acme-space-7: 48px;
+  --acme-space-8: 64px;
   --acme-radius-sm: 4px;
   --acme-radius-md: 8px;
   --acme-radius-lg: 16px;
@@ -1292,17 +1292,17 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
   --acme-z-modal: 1000;
   --acme-duration-fast: 150ms;
   --acme-duration-base: 250ms;
-  --acme-size-container-max: 75rem;
-  --acme-size-gutter: 2rem;
-  --acme-size-header-height: 5rem;
-  --acme-size-logo-height: 2.5rem;
-  --acme-size-icon: 1.25rem;
-  --acme-size-touch-target: 2.75rem;
+  --acme-size-container-max: 1200px;
+  --acme-size-gutter: 32px;
+  --acme-size-header-height: 80px;
+  --acme-size-logo-height: 40px;
+  --acme-size-icon: 20px;
+  --acme-size-touch-target: 44px;
   --acme-size-focus-ring: 3px;
   --acme-size-focus-offset: 2px;
-  --acme-size-modal-max: 40rem;
-  --acme-size-modal-narrow: 30rem;
-  --acme-size-isi-bar-collapsed: 7.5rem;
+  --acme-size-modal-max: 640px;
+  --acme-size-modal-narrow: 480px;
+  --acme-size-isi-bar-collapsed: 120px;
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
@@ -1311,13 +1311,13 @@ exports[`generatePackage > matches the snapshot (desktop-first) > desktop-first:
 /* @authorkit-responsive tokens · tablet (768px – 1023px) */
 @media (max-width: 1023px) {
   :root {
-    --acme-font-size-h1: 2rem;
-    --acme-font-size-h2: 1.625rem;
-    --acme-font-size-h3: 1.375rem;
-    --acme-font-size-h4: 1.25rem;
-    --acme-size-gutter: 1rem;
-    --acme-size-header-height: 4rem;
-    --acme-size-logo-height: 2rem;
+    --acme-font-size-h1: 32px;
+    --acme-font-size-h2: 26px;
+    --acme-font-size-h3: 22px;
+    --acme-font-size-h4: 20px;
+    --acme-size-gutter: 16px;
+    --acme-size-header-height: 64px;
+    --acme-size-logo-height: 32px;
   }
 }
 
@@ -2579,16 +2579,16 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
   --acme-color-isi-heading: #111418;
   --acme-font-family-base: system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
   --acme-font-family-heading: system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
-  --acme-font-size-xs: 0.75rem;
-  --acme-font-size-sm: 0.875rem;
-  --acme-font-size-base: 1rem;
-  --acme-font-size-lg: 1.125rem;
-  --acme-font-size-h1: 2rem;
-  --acme-font-size-h2: 1.625rem;
-  --acme-font-size-h3: 1.375rem;
-  --acme-font-size-h4: 1.25rem;
-  --acme-font-size-h5: 1.125rem;
-  --acme-font-size-h6: 1rem;
+  --acme-font-size-xs: 12px;
+  --acme-font-size-sm: 14px;
+  --acme-font-size-base: 16px;
+  --acme-font-size-lg: 18px;
+  --acme-font-size-h1: 32px;
+  --acme-font-size-h2: 26px;
+  --acme-font-size-h3: 22px;
+  --acme-font-size-h4: 20px;
+  --acme-font-size-h5: 18px;
+  --acme-font-size-h6: 16px;
   --acme-font-size-sup: 0.75em;
   --acme-font-weight-regular: 400;
   --acme-font-weight-bold: 700;
@@ -2596,14 +2596,14 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
   --acme-line-height-heading: 1.2;
   --acme-line-height-tight: 1.1;
   --acme-letter-spacing-heading: -0.01em;
-  --acme-space-1: 0.25rem;
-  --acme-space-2: 0.5rem;
-  --acme-space-3: 0.75rem;
-  --acme-space-4: 1rem;
-  --acme-space-5: 1.5rem;
-  --acme-space-6: 2rem;
-  --acme-space-7: 3rem;
-  --acme-space-8: 4rem;
+  --acme-space-1: 4px;
+  --acme-space-2: 8px;
+  --acme-space-3: 12px;
+  --acme-space-4: 16px;
+  --acme-space-5: 24px;
+  --acme-space-6: 32px;
+  --acme-space-7: 48px;
+  --acme-space-8: 64px;
   --acme-radius-sm: 4px;
   --acme-radius-md: 8px;
   --acme-radius-lg: 16px;
@@ -2617,17 +2617,17 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
   --acme-z-modal: 1000;
   --acme-duration-fast: 150ms;
   --acme-duration-base: 250ms;
-  --acme-size-container-max: 75rem;
-  --acme-size-gutter: 1rem;
-  --acme-size-header-height: 4rem;
-  --acme-size-logo-height: 2rem;
-  --acme-size-icon: 1.25rem;
-  --acme-size-touch-target: 2.75rem;
+  --acme-size-container-max: 1200px;
+  --acme-size-gutter: 16px;
+  --acme-size-header-height: 64px;
+  --acme-size-logo-height: 32px;
+  --acme-size-icon: 20px;
+  --acme-size-touch-target: 44px;
   --acme-size-focus-ring: 3px;
   --acme-size-focus-offset: 2px;
-  --acme-size-modal-max: 40rem;
-  --acme-size-modal-narrow: 30rem;
-  --acme-size-isi-bar-collapsed: 7.5rem;
+  --acme-size-modal-max: 640px;
+  --acme-size-modal-narrow: 480px;
+  --acme-size-isi-bar-collapsed: 120px;
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
@@ -2638,13 +2638,13 @@ exports[`generatePackage > matches the snapshot (mobile-first) > mobile-first: c
 /* @authorkit-responsive tokens · desktop (≥ 1024px) */
 @media (min-width: 1024px) {
   :root {
-    --acme-font-size-h1: 2.75rem;
-    --acme-font-size-h2: 2.25rem;
-    --acme-font-size-h3: 1.75rem;
-    --acme-font-size-h4: 1.375rem;
-    --acme-size-gutter: 2rem;
-    --acme-size-header-height: 5rem;
-    --acme-size-logo-height: 2.5rem;
+    --acme-font-size-h1: 44px;
+    --acme-font-size-h2: 36px;
+    --acme-font-size-h3: 28px;
+    --acme-font-size-h4: 22px;
+    --acme-size-gutter: 32px;
+    --acme-size-header-height: 80px;
+    --acme-size-logo-height: 40px;
   }
 }
 "

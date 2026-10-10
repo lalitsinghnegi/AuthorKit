@@ -61,7 +61,7 @@ describe.skipIf(!CHROME)("generated package in a real browser", () => {
       .locator("h1")
       .first()
       .evaluate((el) => getComputedStyle(el).fontSize);
-    expect(h1).toBe("40px"); // 2.5rem at desktop width
+    expect(h1).toBe("40px"); // 40px at desktop width
     expect(errors).toEqual([]);
     await page.close();
   });

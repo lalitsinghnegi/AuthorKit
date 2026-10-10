@@ -30,25 +30,25 @@ describe("package generated from Figma", () => {
 
   it("uses measured typography per breakpoint instead of the built-in large-screen sizes", () => {
     const tokens = content(generate("mobile-first"), "css/tokens.css");
-    expect(tokens).toContain("  --acme-font-size-h1: 1.75rem;");
+    expect(tokens).toContain("  --acme-font-size-h1: 28px;");
     expect(tokens).toMatch(
-      /@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--acme-font-size-h1: 2\.5rem;\n {4}--acme-font-size-h2: 2rem;/,
+      /@media \(min-width: 1024px\) \{\n {2}:root \{\n {4}--acme-font-size-h1: 40px;\n {4}--acme-font-size-h2: 32px;/,
     );
-    expect(tokens).not.toContain("--acme-font-size-h1: 2.75rem");
+    expect(tokens).not.toContain("--acme-font-size-h1: 44px");
   });
 
   it("puts measured component values in base styles and media queries", () => {
     const pkg = generate("mobile-first");
     const header = content(pkg, "css/components/header.css");
-    expect(header).toContain("  --acme-header-padding-x: 1rem;");
+    expect(header).toContain("  --acme-header-padding-x: 16px;");
     const desktopQuery = header.slice(header.indexOf("@media (min-width: 1024px)"));
-    expect(desktopQuery).toContain("--acme-header-padding-x: 2rem;");
+    expect(desktopQuery).toContain("--acme-header-padding-x: 32px;");
     expect(desktopQuery).toContain("--acme-header-toggle-display: none;");
     expect(content(pkg, "css/components/footer.css")).toMatch(
       /@media \(min-width: 1024px\) \{\n {2}\.acme-footer \{\n {4}--acme-footer-direction: row;/,
     );
     expect(content(pkg, "css/components/cta.css")).toContain(
-      "  --acme-btn-padding-x: clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem);",
+      "  --acme-btn-padding-x: clamp(18px, 15.27px + 0.8523vw, 24px);",
     );
 
     const desktop = content(generate("desktop-first"), "css/components/footer.css");

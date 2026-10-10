@@ -1,8 +1,5 @@
 import type { FigmaColor, FigmaEffect } from "@/lib/figma/types";
 
-/** Base font size used to convert px to rem. */
-export const REM_BASE = 16;
-
 /** Round to at most `digits` decimals and drop trailing zeros: 1.2000 → "1.2". */
 export function num(value: number, digits = 3): string {
   const rounded = Number(value.toFixed(digits));
@@ -24,7 +21,6 @@ export function colorToCss(color: FigmaColor, opacity = 1): string {
   return `rgb(${r} ${g} ${b} / ${num(alpha * 100, 1)}%)`;
 }
 
-export const pxToRem = (px: number) => (px === 0 ? "0" : `${num(px / REM_BASE, 4)}rem`);
 export const px = (value: number) => (value === 0 ? "0" : `${num(value, 2)}px`);
 
 /** Line height as a unitless ratio of the font size (e.g. 48px on 40px → "1.2"). */

@@ -283,9 +283,9 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
  */
 
 .acme-btn {
-  --acme-btn-padding-y: clamp(0.5625rem, 0.4773rem + 0.4261vw, 0.75rem);
-  --acme-btn-padding-x: clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem);
-  --acme-btn-font-size: clamp(0.75rem, 0.6364rem + 0.5682vw, 1rem);
+  --acme-btn-padding-y: clamp(9px, 7.64px + 0.4261vw, 12px);
+  --acme-btn-padding-x: clamp(18px, 15.27px + 0.8523vw, 24px);
+  --acme-btn-font-size: clamp(12px, 10.18px + 0.5682vw, 16px);
   --acme-btn-radius: 999px;
   --acme-btn-bg: transparent;
   --acme-btn-color: var(--acme-color-primary);
@@ -426,8 +426,8 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
 .acme-footer {
   --acme-footer-direction: row;
   --acme-footer-align: center;
-  --acme-footer-padding-y: 3rem;
-  --acme-footer-gap: 2rem;
+  --acme-footer-padding-y: 48px;
+  --acme-footer-gap: 32px;
   --acme-footer-bg: var(--acme-color-footer-background);
   --acme-footer-color: var(--acme-color-footer-text);
   --acme-footer-link-color: var(--acme-color-footer-link);
@@ -498,8 +498,8 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   .acme-footer {
     --acme-footer-direction: column;
     --acme-footer-align: flex-start;
-    --acme-footer-padding-y: 2rem;
-    --acme-footer-gap: 1.5rem;
+    --acme-footer-padding-y: 32px;
+    --acme-footer-gap: 24px;
   }
 }
 
@@ -555,9 +555,9 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-header-nav-padding: 0;
   --acme-header-nav-shadow: none;
   --acme-header-list-direction: row;
-  --acme-header-padding-x: 2rem;
-  --acme-header-gap: 2rem;
-  --acme-header-min-height: 5rem;
+  --acme-header-padding-x: 32px;
+  --acme-header-gap: 32px;
+  --acme-header-min-height: 80px;
   --acme-header-bg: var(--acme-color-header-background);
   --acme-header-color: var(--acme-color-text);
   --acme-header-shadow: var(--acme-shadow-sm);
@@ -673,9 +673,9 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
     --acme-header-nav-padding: var(--acme-space-4) var(--acme-size-gutter);
     --acme-header-nav-shadow: var(--acme-shadow-md);
     --acme-header-list-direction: column;
-    --acme-header-padding-x: 1rem;
-    --acme-header-gap: 1rem;
-    --acme-header-min-height: 4rem;
+    --acme-header-padding-x: 16px;
+    --acme-header-gap: 16px;
+    --acme-header-min-height: 64px;
   }
 }
 
@@ -1268,16 +1268,16 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-color-isi-heading: #111418;
   --acme-font-family-base: "Inter", system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
   --acme-font-family-heading: "Inter", system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
-  --acme-font-size-xs: 0.75rem;
-  --acme-font-size-sm: 0.875rem;
-  --acme-font-size-base: 1rem;
-  --acme-font-size-lg: 1.125rem;
-  --acme-font-size-h1: 2.5rem;
-  --acme-font-size-h2: 2rem;
-  --acme-font-size-h3: 1.75rem;
-  --acme-font-size-h4: 1.375rem;
-  --acme-font-size-h5: 1.125rem;
-  --acme-font-size-h6: 1rem;
+  --acme-font-size-xs: 12px;
+  --acme-font-size-sm: 14px;
+  --acme-font-size-base: 16px;
+  --acme-font-size-lg: 18px;
+  --acme-font-size-h1: 40px;
+  --acme-font-size-h2: 32px;
+  --acme-font-size-h3: 28px;
+  --acme-font-size-h4: 22px;
+  --acme-font-size-h5: 18px;
+  --acme-font-size-h6: 16px;
   --acme-font-size-sup: 0.75em;
   --acme-font-weight-regular: 400;
   --acme-font-weight-bold: 700;
@@ -1285,14 +1285,14 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-line-height-heading: 1.2;
   --acme-line-height-tight: 1.1;
   --acme-letter-spacing-heading: -0.01em;
-  --acme-space-1: 0.25rem;
-  --acme-space-2: 0.5rem;
-  --acme-space-3: 0.75rem;
-  --acme-space-4: 1rem;
-  --acme-space-5: 1.5rem;
-  --acme-space-6: 2rem;
-  --acme-space-7: 3rem;
-  --acme-space-8: 4rem;
+  --acme-space-1: 4px;
+  --acme-space-2: 8px;
+  --acme-space-3: 12px;
+  --acme-space-4: 16px;
+  --acme-space-5: 24px;
+  --acme-space-6: 32px;
+  --acme-space-7: 48px;
+  --acme-space-8: 64px;
   --acme-radius-sm: 4px;
   --acme-radius-md: 8px;
   --acme-radius-lg: 16px;
@@ -1306,17 +1306,17 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-z-modal: 1000;
   --acme-duration-fast: 150ms;
   --acme-duration-base: 250ms;
-  --acme-size-container-max: 75rem;
-  --acme-size-gutter: 2rem;
-  --acme-size-header-height: 5rem;
-  --acme-size-logo-height: 2.5rem;
-  --acme-size-icon: 1.25rem;
-  --acme-size-touch-target: 2.75rem;
+  --acme-size-container-max: 1200px;
+  --acme-size-gutter: 32px;
+  --acme-size-header-height: 80px;
+  --acme-size-logo-height: 40px;
+  --acme-size-icon: 20px;
+  --acme-size-touch-target: 44px;
   --acme-size-focus-ring: 3px;
   --acme-size-focus-offset: 2px;
-  --acme-size-modal-max: 40rem;
-  --acme-size-modal-narrow: 30rem;
-  --acme-size-isi-bar-collapsed: 7.5rem;
+  --acme-size-modal-max: 640px;
+  --acme-size-modal-narrow: 480px;
+  --acme-size-isi-bar-collapsed: 120px;
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
@@ -1325,13 +1325,13 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
 /* @authorkit-responsive tokens · tablet (768px – 1023px) */
 @media (max-width: 1023px) {
   :root {
-    --acme-font-size-h1: 1.75rem;
-    --acme-font-size-h2: 1.5rem;
-    --acme-font-size-h3: 1.375rem;
-    --acme-font-size-h4: 1.25rem;
-    --acme-size-gutter: 1rem;
-    --acme-size-header-height: 4rem;
-    --acme-size-logo-height: 2rem;
+    --acme-font-size-h1: 28px;
+    --acme-font-size-h2: 24px;
+    --acme-font-size-h3: 22px;
+    --acme-font-size-h4: 20px;
+    --acme-size-gutter: 16px;
+    --acme-size-header-height: 64px;
+    --acme-size-logo-height: 32px;
   }
 }
 
@@ -1540,70 +1540,70 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "token",
       "name": "font-size-xs",
       "source": "default",
-      "value": "0.75rem",
+      "value": "12px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-sm",
       "source": "default",
-      "value": "0.875rem",
+      "value": "14px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-base",
       "source": "responsive",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-lg",
       "source": "default",
-      "value": "1.125rem",
+      "value": "18px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h1",
       "source": "responsive",
-      "value": "2.5rem",
+      "value": "40px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h2",
       "source": "responsive",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h3",
       "source": "default",
-      "value": "1.75rem",
+      "value": "28px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h4",
       "source": "default",
-      "value": "1.375rem",
+      "value": "22px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h5",
       "source": "default",
-      "value": "1.125rem",
+      "value": "18px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h6",
       "source": "default",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
@@ -1659,56 +1659,56 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "token",
       "name": "space-1",
       "source": "default",
-      "value": "0.25rem",
+      "value": "4px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-2",
       "source": "figma-token",
-      "value": "0.5rem",
+      "value": "8px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-3",
       "source": "figma-token",
-      "value": "0.75rem",
+      "value": "12px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-4",
       "source": "default",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-5",
       "source": "figma-token",
-      "value": "1.5rem",
+      "value": "24px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-6",
       "source": "default",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-7",
       "source": "default",
-      "value": "3rem",
+      "value": "48px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-8",
       "source": "default",
-      "value": "4rem",
+      "value": "64px",
     },
     {
       "file": "tokens.css",
@@ -1806,42 +1806,42 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "token",
       "name": "size-container-max",
       "source": "default",
-      "value": "75rem",
+      "value": "1200px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-gutter",
       "source": "default",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-header-height",
       "source": "default",
-      "value": "5rem",
+      "value": "80px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-logo-height",
       "source": "default",
-      "value": "2.5rem",
+      "value": "40px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-icon",
       "source": "default",
-      "value": "1.25rem",
+      "value": "20px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-touch-target",
       "source": "default",
-      "value": "2.75rem",
+      "value": "44px",
     },
     {
       "file": "tokens.css",
@@ -1862,21 +1862,21 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "token",
       "name": "size-modal-max",
       "source": "default",
-      "value": "40rem",
+      "value": "640px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-modal-narrow",
       "source": "default",
-      "value": "30rem",
+      "value": "480px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-isi-bar-collapsed",
       "source": "default",
-      "value": "7.5rem",
+      "value": "120px",
     },
     {
       "file": "tokens.css",
@@ -1946,21 +1946,21 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "component",
       "name": "header-padding-x",
       "source": "responsive",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "header.css",
       "kind": "component",
       "name": "header-gap",
       "source": "responsive",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "header.css",
       "kind": "component",
       "name": "header-min-height",
       "source": "responsive",
-      "value": "5rem",
+      "value": "80px",
     },
     {
       "file": "footer.css",
@@ -1981,14 +1981,14 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "component",
       "name": "footer-padding-y",
       "source": "responsive",
-      "value": "3rem",
+      "value": "48px",
     },
     {
       "file": "footer.css",
       "kind": "component",
       "name": "footer-gap",
       "source": "responsive",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "isi.css",
@@ -2016,21 +2016,21 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "kind": "component",
       "name": "btn-padding-y",
       "source": "responsive-fluid",
-      "value": "clamp(0.5625rem, 0.4773rem + 0.4261vw, 0.75rem)",
+      "value": "clamp(9px, 7.64px + 0.4261vw, 12px)",
     },
     {
       "file": "cta.css",
       "kind": "component",
       "name": "btn-padding-x",
       "source": "responsive-fluid",
-      "value": "clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem)",
+      "value": "clamp(18px, 15.27px + 0.8523vw, 24px)",
     },
     {
       "file": "cta.css",
       "kind": "component",
       "name": "btn-font-size",
       "source": "responsive-fluid",
-      "value": "clamp(0.75rem, 0.6364rem + 0.5682vw, 1rem)",
+      "value": "clamp(12px, 10.18px + 0.5682vw, 16px)",
     },
     {
       "file": "cta.css",
@@ -2340,9 +2340,9 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
  */
 
 .acme-btn {
-  --acme-btn-padding-y: clamp(0.5625rem, 0.4773rem + 0.4261vw, 0.75rem);
-  --acme-btn-padding-x: clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem);
-  --acme-btn-font-size: clamp(0.75rem, 0.6364rem + 0.5682vw, 1rem);
+  --acme-btn-padding-y: clamp(9px, 7.64px + 0.4261vw, 12px);
+  --acme-btn-padding-x: clamp(18px, 15.27px + 0.8523vw, 24px);
+  --acme-btn-font-size: clamp(12px, 10.18px + 0.5682vw, 16px);
   --acme-btn-radius: 999px;
   --acme-btn-bg: transparent;
   --acme-btn-color: var(--acme-color-primary);
@@ -2483,8 +2483,8 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
 .acme-footer {
   --acme-footer-direction: column;
   --acme-footer-align: flex-start;
-  --acme-footer-padding-y: 2rem;
-  --acme-footer-gap: 1.5rem;
+  --acme-footer-padding-y: 32px;
+  --acme-footer-gap: 24px;
   --acme-footer-bg: var(--acme-color-footer-background);
   --acme-footer-color: var(--acme-color-footer-text);
   --acme-footer-link-color: var(--acme-color-footer-link);
@@ -2557,8 +2557,8 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   .acme-footer {
     --acme-footer-direction: row;
     --acme-footer-align: center;
-    --acme-footer-padding-y: 3rem;
-    --acme-footer-gap: 2rem;
+    --acme-footer-padding-y: 48px;
+    --acme-footer-gap: 32px;
   }
 }
 "
@@ -2612,9 +2612,9 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-header-nav-padding: var(--acme-space-4) var(--acme-size-gutter);
   --acme-header-nav-shadow: var(--acme-shadow-md);
   --acme-header-list-direction: column;
-  --acme-header-padding-x: 1rem;
-  --acme-header-gap: 1rem;
-  --acme-header-min-height: 4rem;
+  --acme-header-padding-x: 16px;
+  --acme-header-gap: 16px;
+  --acme-header-min-height: 64px;
   --acme-header-bg: var(--acme-color-header-background);
   --acme-header-color: var(--acme-color-text);
   --acme-header-shadow: var(--acme-shadow-sm);
@@ -2732,9 +2732,9 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
     --acme-header-nav-padding: 0;
     --acme-header-nav-shadow: none;
     --acme-header-list-direction: row;
-    --acme-header-padding-x: 2rem;
-    --acme-header-gap: 2rem;
-    --acme-header-min-height: 5rem;
+    --acme-header-padding-x: 32px;
+    --acme-header-gap: 32px;
+    --acme-header-min-height: 80px;
   }
 }
 "
@@ -3325,16 +3325,16 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-color-isi-heading: #111418;
   --acme-font-family-base: "Inter", system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
   --acme-font-family-heading: "Inter", system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", arial, sans-serif;
-  --acme-font-size-xs: 0.75rem;
-  --acme-font-size-sm: 0.875rem;
-  --acme-font-size-base: 1rem;
-  --acme-font-size-lg: 1.125rem;
-  --acme-font-size-h1: 1.75rem;
-  --acme-font-size-h2: 1.5rem;
-  --acme-font-size-h3: 1.375rem;
-  --acme-font-size-h4: 1.25rem;
-  --acme-font-size-h5: 1.125rem;
-  --acme-font-size-h6: 1rem;
+  --acme-font-size-xs: 12px;
+  --acme-font-size-sm: 14px;
+  --acme-font-size-base: 16px;
+  --acme-font-size-lg: 18px;
+  --acme-font-size-h1: 28px;
+  --acme-font-size-h2: 24px;
+  --acme-font-size-h3: 22px;
+  --acme-font-size-h4: 20px;
+  --acme-font-size-h5: 18px;
+  --acme-font-size-h6: 16px;
   --acme-font-size-sup: 0.75em;
   --acme-font-weight-regular: 400;
   --acme-font-weight-bold: 700;
@@ -3342,14 +3342,14 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-line-height-heading: 1.2;
   --acme-line-height-tight: 1.1;
   --acme-letter-spacing-heading: -0.01em;
-  --acme-space-1: 0.25rem;
-  --acme-space-2: 0.5rem;
-  --acme-space-3: 0.75rem;
-  --acme-space-4: 1rem;
-  --acme-space-5: 1.5rem;
-  --acme-space-6: 2rem;
-  --acme-space-7: 3rem;
-  --acme-space-8: 4rem;
+  --acme-space-1: 4px;
+  --acme-space-2: 8px;
+  --acme-space-3: 12px;
+  --acme-space-4: 16px;
+  --acme-space-5: 24px;
+  --acme-space-6: 32px;
+  --acme-space-7: 48px;
+  --acme-space-8: 64px;
   --acme-radius-sm: 4px;
   --acme-radius-md: 8px;
   --acme-radius-lg: 16px;
@@ -3363,17 +3363,17 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-z-modal: 1000;
   --acme-duration-fast: 150ms;
   --acme-duration-base: 250ms;
-  --acme-size-container-max: 75rem;
-  --acme-size-gutter: 1rem;
-  --acme-size-header-height: 4rem;
-  --acme-size-logo-height: 2rem;
-  --acme-size-icon: 1.25rem;
-  --acme-size-touch-target: 2.75rem;
+  --acme-size-container-max: 1200px;
+  --acme-size-gutter: 16px;
+  --acme-size-header-height: 64px;
+  --acme-size-logo-height: 32px;
+  --acme-size-icon: 20px;
+  --acme-size-touch-target: 44px;
   --acme-size-focus-ring: 3px;
   --acme-size-focus-offset: 2px;
-  --acme-size-modal-max: 40rem;
-  --acme-size-modal-narrow: 30rem;
-  --acme-size-isi-bar-collapsed: 7.5rem;
+  --acme-size-modal-max: 640px;
+  --acme-size-modal-narrow: 480px;
+  --acme-size-isi-bar-collapsed: 120px;
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
@@ -3384,13 +3384,13 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
 /* @authorkit-responsive tokens · desktop (≥ 1024px) */
 @media (min-width: 1024px) {
   :root {
-    --acme-font-size-h1: 2.5rem;
-    --acme-font-size-h2: 2rem;
-    --acme-font-size-h3: 1.75rem;
-    --acme-font-size-h4: 1.375rem;
-    --acme-size-gutter: 2rem;
-    --acme-size-header-height: 5rem;
-    --acme-size-logo-height: 2.5rem;
+    --acme-font-size-h1: 40px;
+    --acme-font-size-h2: 32px;
+    --acme-font-size-h3: 28px;
+    --acme-font-size-h4: 22px;
+    --acme-size-gutter: 32px;
+    --acme-size-header-height: 80px;
+    --acme-size-logo-height: 40px;
   }
 }
 "
@@ -3597,70 +3597,70 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "token",
       "name": "font-size-xs",
       "source": "default",
-      "value": "0.75rem",
+      "value": "12px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-sm",
       "source": "default",
-      "value": "0.875rem",
+      "value": "14px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-base",
       "source": "responsive",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-lg",
       "source": "default",
-      "value": "1.125rem",
+      "value": "18px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h1",
       "source": "responsive",
-      "value": "1.75rem",
+      "value": "28px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h2",
       "source": "responsive",
-      "value": "1.5rem",
+      "value": "24px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h3",
       "source": "default",
-      "value": "1.375rem",
+      "value": "22px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h4",
       "source": "default",
-      "value": "1.25rem",
+      "value": "20px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h5",
       "source": "default",
-      "value": "1.125rem",
+      "value": "18px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "font-size-h6",
       "source": "default",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
@@ -3716,56 +3716,56 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "token",
       "name": "space-1",
       "source": "default",
-      "value": "0.25rem",
+      "value": "4px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-2",
       "source": "figma-token",
-      "value": "0.5rem",
+      "value": "8px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-3",
       "source": "figma-token",
-      "value": "0.75rem",
+      "value": "12px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-4",
       "source": "default",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-5",
       "source": "figma-token",
-      "value": "1.5rem",
+      "value": "24px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-6",
       "source": "default",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-7",
       "source": "default",
-      "value": "3rem",
+      "value": "48px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "space-8",
       "source": "default",
-      "value": "4rem",
+      "value": "64px",
     },
     {
       "file": "tokens.css",
@@ -3863,42 +3863,42 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "token",
       "name": "size-container-max",
       "source": "default",
-      "value": "75rem",
+      "value": "1200px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-gutter",
       "source": "default",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-header-height",
       "source": "default",
-      "value": "4rem",
+      "value": "64px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-logo-height",
       "source": "default",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-icon",
       "source": "default",
-      "value": "1.25rem",
+      "value": "20px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-touch-target",
       "source": "default",
-      "value": "2.75rem",
+      "value": "44px",
     },
     {
       "file": "tokens.css",
@@ -3919,21 +3919,21 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "token",
       "name": "size-modal-max",
       "source": "default",
-      "value": "40rem",
+      "value": "640px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-modal-narrow",
       "source": "default",
-      "value": "30rem",
+      "value": "480px",
     },
     {
       "file": "tokens.css",
       "kind": "token",
       "name": "size-isi-bar-collapsed",
       "source": "default",
-      "value": "7.5rem",
+      "value": "120px",
     },
     {
       "file": "tokens.css",
@@ -4003,21 +4003,21 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "component",
       "name": "header-padding-x",
       "source": "responsive",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "header.css",
       "kind": "component",
       "name": "header-gap",
       "source": "responsive",
-      "value": "1rem",
+      "value": "16px",
     },
     {
       "file": "header.css",
       "kind": "component",
       "name": "header-min-height",
       "source": "responsive",
-      "value": "4rem",
+      "value": "64px",
     },
     {
       "file": "footer.css",
@@ -4038,14 +4038,14 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "component",
       "name": "footer-padding-y",
       "source": "responsive",
-      "value": "2rem",
+      "value": "32px",
     },
     {
       "file": "footer.css",
       "kind": "component",
       "name": "footer-gap",
       "source": "responsive",
-      "value": "1.5rem",
+      "value": "24px",
     },
     {
       "file": "isi.css",
@@ -4073,21 +4073,21 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "kind": "component",
       "name": "btn-padding-y",
       "source": "responsive-fluid",
-      "value": "clamp(0.5625rem, 0.4773rem + 0.4261vw, 0.75rem)",
+      "value": "clamp(9px, 7.64px + 0.4261vw, 12px)",
     },
     {
       "file": "cta.css",
       "kind": "component",
       "name": "btn-padding-x",
       "source": "responsive-fluid",
-      "value": "clamp(1.125rem, 0.9545rem + 0.8523vw, 1.5rem)",
+      "value": "clamp(18px, 15.27px + 0.8523vw, 24px)",
     },
     {
       "file": "cta.css",
       "kind": "component",
       "name": "btn-font-size",
       "source": "responsive-fluid",
-      "value": "clamp(0.75rem, 0.6364rem + 0.5682vw, 1rem)",
+      "value": "clamp(12px, 10.18px + 0.5682vw, 16px)",
     },
     {
       "file": "cta.css",
