@@ -1,3 +1,4 @@
+import { shortName } from "@/lib/figma/names";
 import type { FigmaNode } from "@/lib/figma/types";
 import type { FrameMapping } from "@/lib/model";
 import { classify, type MappableComponent } from "./patterns";
@@ -20,15 +21,16 @@ export function candidateFrames(root: FigmaNode): CandidateFrame[] {
   const out: CandidateFrame[] = [];
   const visit = (node: FigmaNode, trail: string[], depth: number) => {
     if (node.visible === false) return;
-    const path = [...trail, node.name];
+    const name = shortName(node.name);
+    const path = [...trail, name];
     if (FRAME_TYPES.has(node.type)) {
       out.push({
         nodeId: node.id,
-        nodeName: node.name,
+        nodeName: name,
         path: path.join(" › "),
         width: node.absoluteBoundingBox?.width,
         height: node.absoluteBoundingBox?.height,
-        childNames: (node.children ?? []).slice(0, 12).map((c) => c.name),
+        childNames: (node.children ?? []).slice(0, 12).map((c) => shortName(c.name)),
       });
     }
     if (depth < MAX_DEPTH) for (const child of node.children ?? []) visit(child, path, depth + 1);

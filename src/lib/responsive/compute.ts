@@ -1,4 +1,5 @@
 import { mediaQueries, sortBreakpoints } from "@/lib/breakpoints";
+import { shortName } from "@/lib/figma/names";
 import type { FigmaNode, FigmaStyleMeta } from "@/lib/figma/types";
 import type {
   Breakpoint,
@@ -113,13 +114,13 @@ export function computeEntry(
     if (!tagged) {
       const name = sorted.find((b) => b.id === base)?.name;
       notes.push(
-        `“${source.node.name}” is on a link without a screen size, so it was used for ${name} (the base breakpoint).`,
+        `“${shortName(source.node.name)}” is on a link without a screen size, so it was used for ${name} (the base breakpoint).`,
       );
     }
     if (byBreakpoint.has(bp)) {
       const name = sorted.find((b) => b.id === bp)?.name;
       notes.push(
-        `More than one ${label} frame for ${name}: “${byBreakpoint.get(bp)!.node.name}” was used, “${source.node.name}” was not.`,
+        `More than one ${label} frame for ${name}: “${shortName(byBreakpoint.get(bp)!.node.name)}” was used, “${shortName(source.node.name)}” was not.`,
       );
       continue;
     }
@@ -127,7 +128,7 @@ export function computeEntry(
     frames.push({
       linkId: source.linkId,
       nodeId: source.node.id,
-      nodeName: source.node.name,
+      nodeName: shortName(source.node.name),
       breakpointId: bp,
       tagged,
     });
@@ -137,7 +138,7 @@ export function computeEntry(
   for (const [bp, source] of byBreakpoint) {
     const values = measure(source, input.styles ?? {});
     if (Object.keys(values).length) measured.set(bp, values);
-    else notes.push(`Nothing measurable was found in “${source.node.name}”.`);
+    else notes.push(`Nothing measurable was found in “${shortName(source.node.name)}”.`);
   }
   if (measured.size === 0) return { mode: "none", frames, values: {}, notes };
 

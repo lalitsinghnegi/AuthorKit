@@ -267,6 +267,34 @@ describe("extractTokens edge cases", () => {
     expect(byName(result.tokens, "font-size-h1")?.meta.confidence).toBe("low");
   });
 
+  it("shortens long layer names, e.g. text layers named after a paragraph of copy", () => {
+    const copy = "Important Safety Information. ".repeat(40);
+    const root = frame([
+      {
+        id: "1:1",
+        name: copy,
+        type: "TEXT",
+        style: { fontFamily: "Lato", fontWeight: 400, fontSize: 16, lineHeightPx: 24 },
+        fills: [{ type: "SOLID", color: { r: 0.1, g: 0.2, b: 0.3, a: 1 } }],
+      },
+    ]);
+    const { tokens } = extractTokens([{ fileKey: "K", roots: [root], styles: {} }]);
+    expect(tokens.length).toBeGreaterThan(0);
+    for (const t of tokens) {
+      expect(t.meta.figmaName.length).toBeLessThanOrEqual(120);
+      expect(t.source?.nodeName?.length ?? 0).toBeLessThanOrEqual(120);
+    }
+    const saved = mergeTokens(
+      [],
+      tokens,
+      (() => {
+        let n = 0;
+        return () => `id-${++n}`;
+      })(),
+    );
+    expect(TokenFile.safeParse({ schemaVersion: 1, tokens: saved.tokens }).success).toBe(true);
+  });
+
   it("flags poor contrast on the foreground token", () => {
     const styles = {
       "S:p": { key: "kp", name: "Primary", styleType: "FILL" },

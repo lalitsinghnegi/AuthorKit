@@ -6,6 +6,7 @@ import type {
   FigmaTypeStyle,
   FigmaVariablesResponse,
 } from "@/lib/figma/types";
+import { shortName } from "@/lib/figma/names";
 import { TOKEN_TYPES, type DesignToken, type TokenMeta, type TokenType } from "@/lib/model";
 import { contrastRatio } from "@/lib/templates/contrast";
 import { TEMPLATE_DEFAULTS } from "@/lib/templates/defaults";
@@ -159,9 +160,12 @@ function candidate(
     name,
     type,
     value,
-    source,
+    source: source && {
+      ...source,
+      ...(source.nodeName !== undefined && { nodeName: shortName(source.nodeName) }),
+    },
     priority,
-    meta: { ...meta, confidence: "high", mapped: false },
+    meta: { ...meta, figmaName: shortName(meta.figmaName), confidence: "high", mapped: false },
   };
 }
 
