@@ -175,14 +175,13 @@ describe("GenerateView", () => {
             value: "var(--{{prefix}}-radius-pill)",
           },
         ],
-        extras: ["color-teal"],
         attention: [
           { message: "2 tokens are waiting for review and not used yet.", screen: "tokens" },
         ],
       },
     });
     const section = screen.getByRole("region", { name: "Design sources" });
-    expect(section).toHaveTextContent("2 values from Figma · 2 defaults · 1 extra variable");
+    expect(section).toHaveTextContent("2 values from Figma · 2 defaults");
     expect(within(section).getByText(/waiting for review/)).toBeInTheDocument();
     expect(within(section).getByRole("link", { name: "Open Tokens" })).toHaveAttribute(
       "href",

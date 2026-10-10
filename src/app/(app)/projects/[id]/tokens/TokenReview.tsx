@@ -366,7 +366,7 @@ function TokenRow({
           {(meta?.mapped ?? TEMPLATE_TOKENS.has(t.name)) ? (
             <span className={styles.mapped}>fills the CSS</span>
           ) : (
-            <span className={styles.custom}>extra variable</span>
+            <span className={styles.custom}>not used</span>
           )}
         </div>
       </td>

@@ -85,7 +85,7 @@ export async function runQualityChecks(
   const issues = [
     ...(await lint(files, project.prefix, selectors.siteClasses ?? [])),
     ...checkVariables(files),
-    ...checkUnused(files, project.prefix, pkg.report?.extras),
+    ...checkUnused(files, project.prefix),
     ...checkMediaOrder(files, project.approach, project.breakpoints.breakpoints),
     ...checkClasses(files, project.prefix, selectors.manifests),
     ...checkLiterals(files),

@@ -22,7 +22,6 @@ const asset = (name: string) => readFileSync(path.join(ASSETS, name), "utf8");
 export function generateStyleGuide(
   project: Pick<Project, "brandName" | "prefix" | "approach" | "breakpoints">,
   files: GeneratedFile[],
-  extras: readonly string[] = [],
   manifests: Record<CssTemplateId, ComponentManifest> = getManifests(),
 ): GeneratedFile[] {
   const css = files.filter((f) => f.path.endsWith(".css"));
@@ -32,7 +31,6 @@ export function generateStyleGuide(
     files,
     entryName: entryFileName(project),
     variables: collectVariables(css),
-    extras,
   });
   const file = (name: string, content: string): GeneratedFile => ({
     path: `${STYLE_GUIDE_DIR}/${name}`,

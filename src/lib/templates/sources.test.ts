@@ -99,13 +99,13 @@ describe("resolveDesignValues priority", () => {
     ]);
   });
 
-  it("adds accepted non-template tokens as extras", () => {
-    const { resolved, report } = resolve([
-      token("color-teal-accent", "#009980"),
-      token("color-brand-alt", "#111111"),
-    ]);
-    expect(resolved.extraNames).toEqual(["color-brand-alt", "color-teal-accent"]);
-    expect(report.extras).toEqual(["color-brand-alt", "color-teal-accent"]);
+  it("leaves out accepted non-template tokens and reports them", () => {
+    const { resolved, report } = resolve([token("color-teal-accent", "#009980")]);
+    expect(resolved.tokensFor("m")).not.toHaveProperty("color-teal-accent");
+    expect(report.attention).toContainEqual({
+      message: "color-teal-accent is not a template token, so it is not used.",
+      screen: "tokens",
+    });
     const ctx = buildTemplateContext({
       brandName: "B",
       prefix: "acme",
@@ -113,11 +113,7 @@ describe("resolveDesignValues priority", () => {
       breakpoints: bps,
       tokens: [token("color-teal-accent", "#009980")],
     });
-    const css = renderTemplate("tokens", ctx);
-    expect(css).toContain(
-      "  /* Extra values from Figma: not read by the templates, available for your own CSS */\n  --acme-color-teal-accent: #009980;",
-    );
-    expect(css).toContain(" *   --acme-color-teal-accent");
+    expect(renderTemplate("tokens", ctx)).not.toContain("color-teal-accent");
   });
 
   it("responsive component values beat defaults; unknown variables are reported", () => {

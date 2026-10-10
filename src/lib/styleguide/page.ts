@@ -34,7 +34,6 @@ export type GuideInput = {
   files: GeneratedFile[];
   entryName: string;
   variables: Map<string, VariableValue>;
-  extras: readonly string[];
 };
 
 /** A representative viewport width for showing each breakpoint. */
@@ -281,10 +280,9 @@ function tokenPreview(
 }
 
 function tokensSection(input: GuideInput): string {
-  const { project, variables, extras } = input;
+  const { project, variables } = input;
   const p = project.prefix;
   const background = variables.get(`${p}-color-background`)?.base ?? "#fff";
-  const typeOf = new Map(TEMPLATE_DEFAULTS.tokens.map((t) => [t.name, t.type]));
   const row = (name: string, type: TokenType) => {
     const full = `${p}-${name}`;
     const v = variables.get(full);
@@ -301,21 +299,11 @@ function tokensSection(input: GuideInput): string {
       .join("");
     return rows ? `<h3>${g.title}</h3>${table(rows)}` : "";
   }).join("");
-  const extraRows = extras
-    .map((name) =>
-      row(
-        name,
-        typeOf.get(name) ??
-          (/^#|^rgb/.test(variables.get(`${p}-${name}`)?.base ?? "") ? "color" : "size"),
-      ),
-    )
-    .join("");
 
   return `<section class="sg-section" id="sg-tokens" aria-labelledby="sg-tokens-title" data-sg-search="design tokens colors typography spacing radius shadows">
 <h2 id="sg-tokens-title">Design tokens</h2>
 <p class="sg-lead">Every design value is a CSS custom property on <code>:root</code>. Use the variables, not the raw values, so your components follow the brand when tokens change.</p>
 ${groups}
-${extraRows ? `<h3>Extra values from Figma</h3><p>Not read by the templates; available for your own CSS.</p>${table(extraRows)}` : ""}
 </section>`;
 }
 

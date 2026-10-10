@@ -72,22 +72,17 @@ export function checkVariables(files: GeneratedFile[]): QualityIssue[] {
 
 /**
  * Variables nobody reads. Tokens are the package's public API, so unused
- * tokens are summarised in one note; extra Figma values are expected to be
- * unused; unused component variables are reported one by one.
+ * tokens are summarised in one note; unused component variables are
+ * reported one by one.
  */
-export function checkUnused(
-  files: GeneratedFile[],
-  prefix: string,
-  extras: readonly string[] = [],
-): QualityIssue[] {
+export function checkUnused(files: GeneratedFile[], prefix: string): QualityIssue[] {
   const { uses, declared } = variableFacts(files);
   const used = new Set(uses.map((u) => u.name));
   const tokenNames = new Set(TEMPLATE_DEFAULTS.tokens.map((t) => `${prefix}-${t.name}`));
-  const extraNames = new Set(extras.map((e) => `${prefix}-${e}`));
   const unusedTokens: string[] = [];
   const issues: QualityIssue[] = [];
   for (const [name, where] of declared) {
-    if (used.has(name) || extraNames.has(name)) continue;
+    if (used.has(name)) continue;
     if (tokenNames.has(name)) unusedTokens.push(name);
     else
       issues.push({

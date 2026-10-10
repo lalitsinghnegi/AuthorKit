@@ -20,7 +20,7 @@ function designSources(
   const rows = report.rows.filter((r) => files.has(r.file));
   const fromFigma = rows.filter((r) => r.source !== "default").length;
   const defaults = rows.filter((r) => r.source === "default");
-  if (fromFigma === 0 && report.extras.length === 0) {
+  if (fromFigma === 0) {
     return [
       "## Design sources",
       "",
@@ -34,11 +34,6 @@ function designSources(
     `- **From Figma:** ${fromFigma} value${fromFigma === 1 ? "" : "s"} (design tokens and per-breakpoint component values)`,
     `- **AuthorKit defaults:** ${defaults.length} value${defaults.length === 1 ? "" : "s"} not yet defined in the design`,
   ];
-  if (report.extras.length) {
-    lines.push(
-      `- **Extra values from Figma:** ${report.extras.map((n) => `\`--${prefix}-${n}\``).join(", ")} (in \`tokens.css\`, for your own CSS)`,
-    );
-  }
   if (defaults.length) {
     lines.push("", "Values still using defaults:", "");
     const byFile = new Map<string, string[]>();

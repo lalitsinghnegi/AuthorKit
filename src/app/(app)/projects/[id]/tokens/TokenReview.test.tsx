@@ -106,7 +106,7 @@ describe("TokenReview", () => {
       within(row("color-primary")).getByRole("link", { name: "Brand/Primary" }),
     ).toHaveAttribute("href", "https://www.figma.com/design/AbCdEf1234567890XyZ012?node-id=1-10");
     expect(within(row("color-primary")).getByText("fills the CSS")).toBeInTheDocument();
-    expect(within(row("color-teal")).getByText("extra variable")).toBeInTheDocument();
+    expect(within(row("color-teal")).getByText("not used")).toBeInTheDocument();
     expect(within(row("color-teal")).getByText("Used only once")).toBeInTheDocument();
     expect(
       within(row("color-primary")).getByTitle("Contrast against the page background"),

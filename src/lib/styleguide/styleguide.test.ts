@@ -14,7 +14,7 @@ import { buildStatesCss, forceStateSelector } from "./states";
 import { collectVariables } from "./variables";
 
 const pkg = generate("mobile-first");
-const guide = generateStyleGuide(project("mobile-first"), pkg.files, pkg.report!.extras);
+const guide = generateStyleGuide(project("mobile-first"), pkg.files);
 const file = (p: string) => guide.find((f) => f.path === p)!.content;
 const html = file("style-guide/index.html");
 const dom = new JSDOM(html);
@@ -163,7 +163,7 @@ describe("guide page", () => {
     const row = $$("#sg-tokens tr").find((tr) => tr.textContent!.includes("--acme-font-size-h1"))!;
     expect(row.textContent).toContain("1.75rem");
     expect(row.textContent).toContain("@media (min-width: 1024px) 2.5rem");
-    expect($$("#sg-tokens h3").map((h) => h.textContent)).toContain("Extra values from Figma");
+    expect($$("#sg-tokens h3").map((h) => h.textContent)).not.toContain("Extra values from Figma");
     expect(html).toContain('<link rel="stylesheet" href="../css/tokens.css">');
   });
 
@@ -183,9 +183,7 @@ describe("guide page", () => {
   });
 
   it("is deterministic", () => {
-    expect(generateStyleGuide(project("mobile-first"), pkg.files, pkg.report!.extras)).toEqual(
-      guide,
-    );
+    expect(generateStyleGuide(project("mobile-first"), pkg.files)).toEqual(guide);
   });
 
   it("works with a user CSS file in the package", () => {

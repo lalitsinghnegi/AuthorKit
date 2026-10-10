@@ -105,7 +105,6 @@ All design values are CSS custom properties. Override a token after loading the 
 
 - **From Figma:** 34 values (design tokens and per-breakpoint component values)
 - **AuthorKit defaults:** 65 values not yet defined in the design
-- **Extra values from Figma:** \`--acme-color-accent\` (in \`tokens.css\`, for your own CSS)
 
 Values still using defaults:
 
@@ -1241,7 +1240,6 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
  *   --acme-size-isi-bar-expanded
  *   --acme-size-sup-offset
  *   --acme-size-sub-offset
- *   --acme-color-accent
  */
 
 :root {
@@ -1322,9 +1320,6 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
-
-  /* Extra values from Figma: not read by the templates, available for your own CSS */
-  --acme-color-accent: #009980;
 }
 
 /* @authorkit-responsive tokens · tablet (768px – 1023px) */
@@ -1363,9 +1358,6 @@ exports[`package generated from Figma > matches the snapshot (desktop-first) > d
       "message": "Header: No header frame for tablet; values were copied from the nearest breakpoint.",
       "screen": "responsive",
     },
-  ],
-  "extras": [
-    "color-accent",
   ],
   "rows": [
     {
@@ -2170,7 +2162,6 @@ All design values are CSS custom properties. Override a token after loading the 
 
 - **From Figma:** 34 values (design tokens and per-breakpoint component values)
 - **AuthorKit defaults:** 65 values not yet defined in the design
-- **Extra values from Figma:** \`--acme-color-accent\` (in \`tokens.css\`, for your own CSS)
 
 Values still using defaults:
 
@@ -3306,7 +3297,6 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
  *   --acme-size-isi-bar-expanded
  *   --acme-size-sup-offset
  *   --acme-size-sub-offset
- *   --acme-color-accent
  */
 
 :root {
@@ -3387,9 +3377,6 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
   --acme-size-isi-bar-expanded: 70vh;
   --acme-size-sup-offset: -0.5em;
   --acme-size-sub-offset: 0.25em;
-
-  /* Extra values from Figma: not read by the templates, available for your own CSS */
-  --acme-color-accent: #009980;
 }
 
 /* @authorkit-responsive tokens · tablet (768px – 1023px): no overrides */
@@ -3428,9 +3415,6 @@ exports[`package generated from Figma > matches the snapshot (mobile-first) > mo
       "message": "Header: No header frame for tablet; values were copied from the nearest breakpoint.",
       "screen": "responsive",
     },
-  ],
-  "extras": [
-    "color-accent",
   ],
   "rows": [
     {

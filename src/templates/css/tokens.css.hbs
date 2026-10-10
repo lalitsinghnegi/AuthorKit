@@ -4,12 +4,5 @@
 {{#each tokens}}
   --{{@root.prefix}}-{{name}}: {{value}};
 {{/each}}
-{{#if extraTokens.length}}
-
-  /* Extra values from Figma: not read by the templates, available for your own CSS */
-{{#each extraTokens}}
-  --{{@root.prefix}}-{{name}}: {{value}};
-{{/each}}
-{{/if}}
 }
 {{> responsive}}

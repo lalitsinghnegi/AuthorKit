@@ -88,7 +88,7 @@ Rules:
 - **Names:** tokens are named after template tokens where possible (`naming.ts`), so they fill the CSS. Anything else gets a slug name and is `mapped: false`.
   - **Spacing** snaps to the 8-step scale (4–64px), radius to sm/md/lg/pill, and shadows to sm/md/lg by blur.
   - **Conflicting values** for one name: the most trusted, then most used, wins. The others become `-alt` tokens.
-- **Only high-confidence tokens are kept.** `extractTokens` drops every low-confidence token (the template default is used instead) and adds a note with the count; `extractAllTokens` returns everything, rated, for tests. Extra (non-template) values therefore only come from renames or hand-made tokens.
+- **Only high-confidence tokens are kept.** `extractTokens` drops every low-confidence token (the template default is used instead) and adds a note with the count; `extractAllTokens` returns everything, rated, for tests.
 - **Low confidence** = any reason in `meta.reasons`:
   - a value used once and not saved as a style
   - far (more than 25%) from its scale step
@@ -134,10 +134,9 @@ Rules:
   - **tokens:** responsive typography > accepted or overridden token (every breakpoint; drops the built-in large-screen override) > default (+ large-screen default)
   - **component variables:** responsive value > default (+ large-screen default)
   - **not used:** tokens with status `auto` or `excluded`
-- **Extra tokens:** accepted tokens with non-template names are written to `tokens.css` after the template tokens as "Extra values from Figma".
+- **Only template tokens are written.** An accepted token whose name is not a template token is left out of the package and reported in `attention`; the Tokens screen marks it "not used".
 - **Report contents:**
   - `rows` give the source of every template token and component variable; the defaults-used list comes from these
-  - `extras` lists the extra tokens
   - `attention` holds warnings with the screen to fix them on: token vs responsive conflicts, multi-valued or missing tokens, invalid values, tokens waiting for review, contrast on the final colours, and responsive notes
 - **Loading inputs:** `generatePackage(project, { tokens, responsive })`. The zip route and the Generate page load them with `loadGenerationInputs(projectId)`.
 - **Colours from Figma use short hex** when possible (`#fff`), as the output lint rules require.
@@ -157,7 +156,7 @@ Rules:
   - classes in a templated file not matching its manifest, in either direction
 - **Warnings:**
   - a `var()` with a fallback but no definition
-  - unused component variables (unused tokens are grouped into one note; extra values are skipped)
+  - unused component variables (unused tokens are grouped into one note)
   - query widths that aren't project breakpoints
   - literal design values
   - files over 50 KB, or a package over 250 KB
@@ -167,7 +166,7 @@ Rules:
 
 ## Developer style guide
 
-- **`generateStyleGuide(project, files, extras)`** (`src/lib/styleguide/generate.ts`, server-only) returns static files under `style-guide/`:
+- **`generateStyleGuide(project, files)`** (`src/lib/styleguide/generate.ts`, server-only) returns static files under `style-guide/`:
   - `index.html`, from `renderGuidePage` in `page.ts`
   - `styleguide.css` and `styleguide.js`, copied from `src/templates/styleguide/`; plain browser code, no build step, works from `file://`
   - `states.css`

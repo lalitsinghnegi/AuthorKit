@@ -30,8 +30,6 @@ export type Attention = { message: string; screen?: "tokens" | "mapping" | "resp
 
 export type GenerationReport = {
   rows: SourceRow[];
-  /** Accepted tokens whose names are not template tokens, added to tokens.css as extra variables. */
-  extras: string[];
   attention: Attention[];
 };
 
@@ -39,8 +37,6 @@ export type GenerationReport = {
 export type ResolvedValues = {
   /** Template token names in template order. */
   tokenNames: string[];
-  /** Extra token names (sorted), declared after the template tokens. */
-  extraNames: string[];
   tokensFor: (breakpointId: string) => Values;
   /** component → block/element suffix → variable → value, for one breakpoint. */
   componentFor: (id: CssTemplateId, breakpointId: string) => Record<string, Values>;
@@ -112,7 +108,6 @@ export function resolveDesignValues(input: SourceInput): {
   const defaultValue: Values = Object.fromEntries(defaults.tokens.map((t) => [t.name, t.value]));
 
   const fromFigma = new Map<string, DesignToken>();
-  const extras = new Map<string, string>();
   for (const token of input.tokens ?? []) {
     if (!ACTIVE.has(token.status)) continue;
     const error = validateTokenValue(token.type, token.value);
@@ -123,8 +118,15 @@ export function resolveDesignValues(input: SourceInput): {
       });
       continue;
     }
-    if (templateSet.has(token.name)) fromFigma.set(token.name, token);
-    else extras.set(token.name, token.value);
+    // Only template tokens reach the CSS; anything else is reported and left out.
+    if (!templateSet.has(token.name)) {
+      attention.push({
+        message: `${token.name} is not a template token, so it is not used.`,
+        screen: "tokens",
+      });
+      continue;
+    }
+    fromFigma.set(token.name, token);
     if (token.meta?.missing) {
       attention.push({
         message: `${token.name} is no longer found in Figma but is still used.`,
@@ -181,7 +183,6 @@ export function resolveDesignValues(input: SourceInput): {
             ? defaults.largeScreen.tokens[name]
             : defaultValue[name];
     }
-    for (const [name, value] of extras) out[name] = value;
     return out;
   };
 
@@ -287,10 +288,9 @@ export function resolveDesignValues(input: SourceInput): {
   return {
     resolved: {
       tokenNames: templateNames,
-      extraNames: [...extras.keys()].sort(),
       tokensFor,
       componentFor,
     },
-    report: { rows, extras: [...extras.keys()].sort(), attention },
+    report: { rows, attention },
   };
 }

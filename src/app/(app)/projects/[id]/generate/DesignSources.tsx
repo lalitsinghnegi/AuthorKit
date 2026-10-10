@@ -35,13 +35,6 @@ export function DesignSources({
       <p style={{ marginTop: 0 }}>
         <strong>{fromFigma.length}</strong> value{fromFigma.length === 1 ? "" : "s"} from Figma ·{" "}
         <strong>{defaults.length}</strong> default{defaults.length === 1 ? "" : "s"}
-        {report.extras.length > 0 && (
-          <>
-            {" "}
-            · <strong>{report.extras.length}</strong> extra variable
-            {report.extras.length === 1 ? "" : "s"}
-          </>
-        )}
       </p>
 
       {report.attention.length > 0 && (

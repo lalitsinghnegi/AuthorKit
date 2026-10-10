@@ -21,8 +21,6 @@ export type TemplateContext = {
   approach: Approach;
   /** Template token base values, in declaration order. */
   tokens: { name: string; value: string }[];
-  /** Accepted Figma tokens that no template reads, declared after the template tokens. */
-  extraTokens: { name: string; value: string }[];
   tokenHooks: Hook[];
   /** component → block/element suffix → variable → base value */
   componentBase: Record<CssTemplateId, Record<string, Values>>;
@@ -70,10 +68,6 @@ export function buildTemplateContextWithReport(input: ContextInput): {
     name,
     value: resolve(tokenCascade.base[name]),
   }));
-  const extraTokens = resolved.extraNames.map((name) => ({
-    name,
-    value: resolve(tokenCascade.base[name]),
-  }));
   const tokenHooks = toHooks(tokenCascade.steps, () => ":root", prefix, resolve);
 
   // Components: flatten "suffix\0variable" so one cascade covers all selectors.
@@ -112,7 +106,6 @@ export function buildTemplateContextWithReport(input: ContextInput): {
       prefix,
       approach,
       tokens,
-      extraTokens,
       tokenHooks,
       componentBase,
       componentHooks,

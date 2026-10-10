@@ -17,16 +17,15 @@ describe("package generated from Figma", () => {
     expect(pkg.report).toMatchSnapshot(`${approach}: report`);
   });
 
-  it("fills tokens from Figma: accepted, overridden, excluded and extra", () => {
+  it("fills tokens from Figma: accepted, overridden and excluded", () => {
     const tokens = content(generate("mobile-first"), "css/tokens.css");
     expect(tokens).toContain("  --acme-color-primary: #8a0b4f;");
     expect(tokens).toContain("  --acme-color-primary-hover: #5a0632;");
     expect(tokens).toContain("  --acme-color-surface: #f4f6f8;"); // excluded → default
     expect(tokens).toContain('  --acme-font-family-heading: "Inter", system-ui');
-    // Uncertain values (the one-off accent, the CTA label) are left out at extraction;
-    // a token added by hand with a non-template name is still written as an extra.
+    // Only template tokens are written; nothing extra.
     expect(tokens).not.toContain("--acme-color-one-off-accent");
-    expect(tokens).toMatch(/Extra values from Figma[^\n]*\n {2}--acme-color-accent: #009980;/);
+    expect(tokens).not.toContain("Extra values");
   });
 
   it("uses measured typography per breakpoint instead of the built-in large-screen sizes", () => {
@@ -70,13 +69,12 @@ describe("package generated from Figma", () => {
       source: "responsive-fluid",
     });
     expect(report.rows.find((r) => r.name === "color-surface")?.source).toBe("default");
-    expect(report.extras).toEqual(["color-accent"]);
     expect(report.attention.map((a) => a.message)).toContain(
       "Header: No header frame for tablet; values were copied from the nearest breakpoint.",
     );
     const readme = content(pkg, "README.md");
     expect(readme).toMatch(/- \*\*From Figma:\*\* \d+ values/);
-    expect(readme).toContain("- **Extra values from Figma:** `--acme-color-accent`");
+    expect(readme).not.toContain("Extra values");
     expect(readme).toMatch(/- `tokens\.css`: [^\n]*`--acme-color-surface`/);
   });
 

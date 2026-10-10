@@ -43,24 +43,14 @@ export function inputs(approach: Project["approach"]): GenerationInputs {
   const extracted = extractTokens([
     { fileKey: "K", roots: [node("1:1"), node("1:2"), node("3:1")], styles: fixture.styles },
   ]).tokens;
-  // Review: accept everything, override one, exclude one, add one extra by hand.
-  const tokens: DesignToken[] = [
-    ...mergeTokens([], extracted, () => `tok-${++id}`).tokens.map((t): DesignToken =>
-      t.name === "color-primary-hover"
-        ? { ...t, value: "#5a0632", status: "overridden" }
-        : t.name === "color-surface"
-          ? { ...t, status: "excluded" }
-          : { ...t, status: "accepted" },
-    ),
-    {
-      id: "tok-extra",
-      name: "color-accent",
-      type: "color",
-      value: "#009980",
-      originalValue: "",
-      status: "accepted",
-    },
-  ];
+  // Review: accept everything, override one, exclude one.
+  const tokens: DesignToken[] = mergeTokens([], extracted, () => `tok-${++id}`).tokens.map((t) =>
+    t.name === "color-primary-hover"
+      ? { ...t, value: "#5a0632", status: "overridden" }
+      : t.name === "color-surface"
+        ? { ...t, status: "excluded" }
+        : { ...t, status: "accepted" },
+  );
   const p = project(approach);
   const responsive = computeResponsive({
     breakpoints: p.breakpoints.breakpoints,

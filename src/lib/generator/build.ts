@@ -74,7 +74,7 @@ export function addDeveloperExtras(
     ...(project.npm?.enabled
       ? [extra(PACKAGE_JSON, renderPackageJson(project, project.npm, entryName, files))]
       : []),
-    ...generateStyleGuide(project, files, report?.extras, manifests),
+    ...generateStyleGuide(project, files, manifests),
     ...rest,
   ];
 }
